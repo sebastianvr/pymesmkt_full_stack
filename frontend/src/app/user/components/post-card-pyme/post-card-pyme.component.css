@@ -1,0 +1,23 @@
+.dateHeader {
+    display: inline;
+}
+
+.stateHeader {
+    display: inline;
+}
+
+.tableResume tbody tr td {
+    border-bottom: 1px solid #c8c9ca;
+}
+
+.cardMain {
+    min-width: 500px;
+    /* margin: auto auto; */
+    /* width: auto; */
+}
+
+.btnMoreInformation {
+    position: relative;
+    left: 70%;
+
+}

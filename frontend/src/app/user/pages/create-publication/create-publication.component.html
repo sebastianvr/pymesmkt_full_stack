@@ -1,0 +1,314 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-center">
+
+        <div class="container">
+            <div class="col-md-12 g-5 pt-4">
+                <form [formGroup]="formularioPublicacion" (ngSubmit)="enviarPublicacion()">
+
+                    <!-- Producto o servicio botones -->
+                    <div class="container">
+                        <div class="col-md-12 text-center mb-3">
+                            <h3 class="queDeseas fs-3 text-center d-inline pb-2">¿Qué deseas publicar? </h3>
+                            <a class="descripcionLabel text-muted">(Selecciona una opción)</a>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 text-end">
+                                <label class="btn btn-primary fs-4">
+                                    <input class="inputRadio" type="radio" value="Producto"
+                                        (click)="limpiarFormulario('Producto')" formControlName="productoOServicio">
+                                    Producto
+                                </label>
+                            </div>
+                            <div class="col-6 text-start">
+                                <label class="btn btn-primary fs-4">
+                                    <input class="inputRadio" type="radio" value="Servicio"
+                                        (click)="limpiarFormulario('Servicio')" formControlName="productoOServicio">
+                                    Servicio
+                                </label>
+                            </div>
+
+                            <hr class="my-3">
+                        </div>
+                    </div>
+
+                    <!-- Formulario para un PRODUCTO -->
+                    <div class="row g-3"
+                        *ngIf="this.formularioPublicacion.get('productoOServicio')?.value == 'Producto'">
+
+                        <div class="col-md-12">
+                            <img class="iconPublicacion float-end dmx-auto" src="../../../assets/icons/box-seam.svg"
+                                alt="pen.svg" width="80">
+                            <h3 class="fs-4 d-inline">Publica el producto que necesitas</h3>
+                        </div>
+
+                        <!-- Titulo -->
+                        <div class="col-sm-12">
+                            <label for="titlePublication" class="form-label">Título <a
+                                    class="descripcionLabel text-muted">(Escribe el nombre del producto que deseas
+                                    buscar)</a></label>
+                            <input pInputText type="text" formControlName="titulo" class="form-control"
+                                id="titlePublication">
+                            <span *ngIf="campoInvalido('titulo')" class="form-text text-danger">
+                                El titulo es obligatorio
+                            </span>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="col-sm-12">
+                            <label for="descriptionPublication" class="form-label">Descripción</label>
+                            <textarea pInputTextarea class="form-control" formControlName="descripcion"
+                                id="descriptionPublication"></textarea>
+                            <span *ngIf="campoInvalido('descripcion')" class="form-text text-danger">
+                                La descripción es obligatoria.
+                            </span>
+                        </div>
+
+                        <!-- Color -->
+                        <div class="col-md-6">
+                            <label for="colorInput" class="form-label">Color <a
+                                    class="descripcionLabel text-muted">(Opcional)</a></label>
+                            <input pInputText type="text" formControlName="color" class="form-control" id="colorInput">
+                        </div>
+
+                        <!-- Modelo -->
+                        <div class="col-md-6">
+                            <label for="modeloInput" class="form-label">Modelo <a
+                                    class="descripcionLabel text-muted">(Opcional)</a></label>
+                            <input pInputText type="text" formControlName="modelo" class="form-control"
+                                id="modeloInput">
+                        </div>
+
+                        <!-- Garantía -->
+                        <div class="col-md-6">
+                            <label for="">Garantía</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" [value]="true" formControlName="garantia"
+                                    id="flexRadioDefault1">
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    Si
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" [value]="false" formControlName="garantia"
+                                    id="flexRadioDefault2">
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Años de garantia -->
+                        <div class="col-md-6 p-grid p-fluid p-0">
+                            <label for="aniosGarantia" class="form-label">Años de garantía
+                                <a class="descripcionLabel text-muted">
+                                    (Opcional)
+                                </a>
+                            </label>
+                            <input pInputNumber type="number"
+                                formControlName="aniosGarantia" class="form-control" id="aniosGarantia" min="0">
+                        </div>
+
+                        <!-- Cantidad de productos -->
+                        <div class="col-md-6 col-xs-12">
+                            <label for="horizontal" class="form-label d-block">Cantidad de productos</label>
+                            <p-inputNumber (onBlur)="calcularTotal()" formControlName="cantidad" [showButtons]="true"
+                                buttonLayout="horizontal" [min]="1" name="horizontal" inputId="horizontal"
+                                locale="es-CH" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                                target="undefined">
+                            </p-inputNumber>
+                        </div>
+
+                        <!-- Precio por unidad -->
+                        <div class="col-md-6 col-xs-12">
+                            <label for="precioUnidad" class="form-label d-block">Precio por unidad</label>
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">$</span>
+                                <p-inputNumber (onBlur)="calcularTotal()" inputId="precioUnidad"
+                                    formControlName="precioPorUnidad" mode="decimal" locale="es-CH"
+                                    name="precioPorUnidad"></p-inputNumber>
+                            </div>
+                        </div>
+
+                        <!-- Precio total a pagar -->
+                        <div class="col-md-12">
+                            <label for="maximumPrice" class="form-label d-block">Precio total a pagar</label>
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">$</span>
+                                <p-inputNumber inputId="maximumPrice" name="maximumPrice" formControlName="totalPrecio"
+                                    mode="decimal" locale="es-CH" currency="CLP" name="maximumPrice"></p-inputNumber>
+                            </div>
+                            <span *ngIf="campoInvalido('totalPrecio')" class="form-text text-danger">
+                                El precio total es obligatorio.
+                            </span>
+                        </div>
+
+                        <!-- Subir archivos -->
+                        <div class="mb-3 col-md-12">
+                            <label for="files[]" class="mb-2">Subir archivos</label>
+                            <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
+                                [showUploadButton]="false" url="./upload.php" (onUpload)="onUpload($event)"
+                                [multiple]="true" accept="" [maxFileSize]="1000000">
+                                <ng-template pTemplate="content">
+                                    <ul *ngIf="uploadedFiles.length">
+                                        <li *ngFor="let file of uploadedFiles">{{file.name}} - {{file.size}} bytes</li>
+                                    </ul>
+                                </ng-template>
+                            </p-fileUpload>
+                        </div>
+
+                        <!-- Boton para enviar -->
+                        <div class="container">
+                            <button 
+                                class="float-end btn btn-primary btn-lg mb-3">Publicar</button>
+                        </div>
+                    </div>
+
+                    <!-- Formulario para un SERVICIO -->
+                    <div class="row g-3"
+                        *ngIf="this.formularioPublicacion.get('productoOServicio')?.value == 'Servicio'">
+                        <div class="col-md-12">
+                            <img class="iconPublicacion float-end dmx-auto" src="../../../assets/icons/puzzle.svg"
+                                alt="pen.svg" width="80">
+                            <h3 class="fs-4 d-inline">Publica el servicio que necesitas</h3>
+                        </div>
+
+                        <!-- Titulo -->
+                        <div class="col-sm-12">
+                            <label for="titlePublication" class="form-label">Título
+                                <a class="descripcionLabel text-muted">(Escribe el servicio que deseas buscar)</a>
+                            </label>
+                            <input pInputText type="text" formControlName="titulo" class="form-control"
+                                id="titlePublication">
+                            <span *ngIf="campoInvalido('titulo')" class="form-text text-danger">
+                                El titulo es obligatorio.
+                            </span>
+
+                        </div>
+
+                        <!-- Descripcion -->
+                        <div class="col-sm-12">
+                            <label for="descriptionPublication" class="form-label">Descripción</label>
+                            <textarea pInputTextarea class="form-control" formControlName="descripcion"
+                                id="descriptionPublication"></textarea>
+                            <span *ngIf="campoInvalido('descripcion')" class="form-text text-danger">
+                                La descripción es obligatoria.
+                            </span>
+                        </div>
+
+                        <!-- Garantia -->
+                        <div class="col-md-6">
+                            <label for="">Garantía</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" [value]="true" formControlName="garantia"
+                                    id="flexRadioDefault1">
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    Si
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" [value]="false" formControlName="garantia"
+                                    id="flexRadioDefault2">
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Años de garantia -->
+                        <div class="col-md-6">
+                            <label for="aniosGarantia" class="form-label">Años de garantía
+                                <a class="descripcionLabel text-muted">
+                                    (Opcional)
+                                </a>
+                            </label>
+                            <input pInputNumber type="number" formControlName="aniosGarantia" class="form-control"
+                                id="aniosGarantia">
+                            <span *ngIf="campoInvalido('aniosGarantia')" class="form-text text-danger">
+                                Ingresar años de garantía del producto.
+                            </span>
+                        </div>
+
+                        <!-- Precio total -->
+                        <div class="col-md-12">
+                            <label for="maximumPrice" class="form-label d-block">Precio total a pagar</label>
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">$</span>
+                                <p-inputNumber inputId="maximumPrice" name="maximumPrice" formControlName="totalPrecio"
+                                    mode="decimal" locale="es-CH" currency="CLP" name="maximumPrice"></p-inputNumber>
+                            </div>
+                            <span *ngIf="campoInvalido('totalPrecio')" class="form-text text-danger">
+                                El precio total es obligatorio.
+                            </span>
+
+                        </div>
+
+                        <!-- Fecha inicio -->
+                        <div class="col-md-4 col-sm-12">
+                            <label for="dateTermination" class="form-label d-block">Fecha de inicio del servicio</label>
+                            <div class="p-inputgroup">
+                                <p-calendar class="" [showIcon]="true" icon="pi pi-calendar-plus"
+                                    formControlName="fechaInicio" inputId="dateTermination" name="dateTermination"
+                                    dateFormat="d 'de' MM yy">
+                                </p-calendar>
+                            </div>
+                            <span *ngIf="campoInvalido('fechaInicio')" class="form-text text-danger">
+                                La fecha de inicio es obligatoria.
+                            </span>
+                        </div>
+
+                        <!-- Fecha finalizacion -->
+                        <div class="col-md-4 col-sm-12">
+                            <label for="dateTermination" class="form-label d-block">Fecha de finalización del
+                                servicio</label>
+                            <div class="p-inputgroup">
+                                <p-calendar class="" [showIcon]="true" icon="pi pi-calendar-times"
+                                    formControlName="fechaTermino" inputId="dateTermination" name="dateTermination"
+                                    dateFormat="d 'de' MM yy">
+                                </p-calendar>
+                            </div>
+                            <span *ngIf="campoInvalido('fechaTermino')" class="form-text text-danger">
+                                La fecha de finalización es obligatoria.
+                            </span>
+                        </div>
+
+                        <!-- Horas a trabajar -->
+                        <div class="col-md-4 col-sm-12">
+                            <label for="horasATrabajar" class="form-label">Cantidad de horas a trabajar
+                                <a class="descripcionLabel text-muted">(Opcional)</a>
+                            </label>
+                            <input type="time" [value]="" formControlName="horasATrabajar" class="form-control"
+                                id="horasATrabajar">
+                        </div>
+
+                        <!-- Subir archivos -->
+                        <div class="mb-3 col-md-12">
+                            <label for="files[]" class="mb-2">Subir archivos</label>
+                            <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
+                                [showUploadButton]="false" url="./upload.php" (onUpload)="onUpload($event)"
+                                [multiple]="true" accept="" [maxFileSize]="1000000">
+                                <ng-template pTemplate="content">
+                                    <ul *ngIf="uploadedFiles.length">
+                                        <li *ngFor="let file of uploadedFiles">{{file.name}} - {{file.size}} bytes</li>
+                                    </ul>
+                                </ng-template>
+                            </p-fileUpload>
+                        </div>
+
+                        <!-- Boton para enviar -->
+                        <div class="container">
+                            <button (click)="this.formularioPublicacion.markAllAsTouched()"
+                                class="float-end btn btn-primary btn-lg mb-3">Publicar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Ver json del formulario -->
+            <div class="container">
+                <pre>{{formularioPublicacion.value | json}}</pre>
+            </div>
+
+        </div>
+    </div>
+</div>

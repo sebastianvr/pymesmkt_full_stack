@@ -1,0 +1,50 @@
+<div class="container-fluid">
+
+    <div class="container card mt-5" style="max-width:500px;">
+
+        <form [formGroup]="formularioLogin" (ngSubmit)="login()" class="px-4 py-3">
+            <div class="container text-center">
+                <img class="mt-4" src="../../../assets/icons/user.svg" alt="user" width="106" height="85">
+
+            </div>
+            <h1 class="h3 mb-3 pt-2 fw-normal text-center">Iniciar sesión</h1>
+
+            <div class="mb-3">
+                <label for="exampleDropdownFormEmail1" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" formControlName="emailUsuario" id="exampleDropdownFormEmail1"
+                    placeholder="correo@correo.com">
+                <span *ngIf="campoInvalido('emailUsuario')" class="form-text text-danger">
+                    El correo es inválido.
+                </span>
+            </div>
+            <div class="mb-3">
+                <label for="exampleDropdownFormPassword1" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" name="password" autocomplete="on"
+                    formControlName="contrasenia" id="exampleDropdownFormPassword1" placeholder="******">
+                <span *ngIf="campoInvalido('contrasenia')" class="form-text text-danger">
+                    La contraseña es obligatoria.
+                </span>
+            </div>
+            <!-- <div class="mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="dropdownCheck">
+              <label class="form-check-label" for="dropdownCheck">
+                Recordar cuenta
+              </label>
+            </div>
+          </div> -->
+            <button role="link" class="btn btn-primary">Acceder</button>
+            
+        </form>
+
+    </div>
+    <p-toast></p-toast>
+    <div class="container card my-3 text-center" style="max-width:500px;">
+
+        <p class="pt-3"> ¿No tienes cuenta?
+            <a class="link-primary" routerLink="/visitor/registro">Regístrate</a>
+        </p>
+
+    </div>
+
+</div>

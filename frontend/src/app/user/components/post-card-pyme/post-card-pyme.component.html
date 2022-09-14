@@ -1,0 +1,169 @@
+<div class="container">
+    <div class="row">
+  
+      <div class="col-12">
+        <div *ngFor="let item of data; let i = index">
+  
+          <div class="p-0">
+            <div class="card cardMain  shadow-sm rounded mb-2" style="width: 18rem;">
+  
+              <div class="card-header pt-2">
+                <h6 class="dateHeader text-muted"> <strong class="">Id publicación:</strong> {{item.id}}</h6>
+                <h6
+                  [ngClass]="{'alert-primary' : item.ofertasRecibidas ==='Sé el primero en ofertar', 'alert-warning' : item.ofertasRecibidas.includes('ofertas recibidas')}"
+                  class="stateHeader float-end alert m-0 p-1" role="alert">{{item.ofertasRecibidas}}</h6>
+              </div>
+  
+              <div class="card-body">
+                <h5 class="card-title"><a href="#" class="card-link">{{item.titulo}}</a></h5>
+                <p class="card-text">{{item.descripcion | uppercase}}</p>
+  
+                <hr style="height: 3px;">
+  
+                <table class="tableResume table table-hover table-borderless">
+                  <tbody>
+                    <tr *ngIf="item.precioMax">
+                      <td colspan="2" class="start-*"><strong>Monto Disponible</strong></td>
+                      <td class="text-end">${{item.precioMax}}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="start-*"><strong>Empresa</strong></td>
+                      <td class="text-end">{{item.nombreEmpresa}}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="start-*"><strong>Calificación</strong></td>
+                      <td class="text-end">{{item.calificacion}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+  
+  
+              </div>
+  
+              <div class="card-footer containerMoreInformation">
+  
+                <button class="btn btn-primary text-center" type="button" data-bs-toggle="collapse"
+                  [attr.data-bs-target]="'#collapseExample' + i" aria-expanded="false" aria-controls="collapseExample">
+                  Más información
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-chevron-down" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                  </svg>
+                </button>
+  
+                <div class="cardAccordion collapse mt-2" [attr.id]="'collapseExample' + i">
+                  <div class="card card-body col-12">
+                    <h4 class="text-center my-2">Detalles de la publicación</h4>
+                    <table class="tableResume table table-hover table-borderless">
+                      <tbody>
+                        <tr>
+                          <td colspan="2" class="start-*"><strong>Fecha creación</strong></td>
+                          <td class="text-end">{{item.fechaCreacion | date}}</td>
+                        </tr>
+                        <tr>
+                          <td colspan="2" class="start-*"><strong>Garantía</strong></td>
+                          <td class="text-end">Si</td>
+                        </tr>
+                        <tr *ngIf="item.cantidad">
+                          <td colspan="2" class="start-*"><strong>Cantidad</strong></td>
+                          <td class="text-end">{{item.cantidad}}</td>
+                        </tr>
+                        <tr>
+                          <td colspan="2" class="start-*"><strong>Fecha de término</strong></td>
+                          <td class="text-end">{{item.fechaExpiracion | date}}</td>
+                        </tr>
+                        <tr *ngIf="item.modelo">
+                          <td colspan="2" class="start-*"><strong>Modelo</strong></td>
+                          <td class="text-end">{{item.modelo}}</td>
+                        </tr>
+                        <tr *ngIf="item.color">
+                          <td colspan="2" class="start-*"><strong>Color</strong></td>
+                          <td class="text-end">{{item.color}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+  
+                    <div *ngIf="item.archivo" class="container p-0 text-center">
+                      <div class="col-md-4 col-sm-12">
+                        <h3 class="fs-6">Archivos adjuntos</h3>
+                        <img class="d-block mx-auto" width="50" src="../../../../assets/icons/file-earmark-arrow-down.svg"
+                          alt="ile-earmark-arrow-down.svg">
+                        <button class="btn btn-secondary btn-sm my-2" type="button">Descargar</button>
+  
+                      </div>
+                    </div>
+  
+  
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <button class="btn btn-lg btn-success" type="button" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">Ofertar</button>
+                    </div>
+  
+  
+                    <!-- Modal para ofertar-->
+                    <div class="modal fade" id="exampleModal" data-bs-backdrop="static" tabindex="-1"
+                      aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Escribe una oferta</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="container my-3">
+                              <form>
+                                <!-- monto , mensaje -->
+                                
+                                <div class="col-md-12">
+    
+                                  <label for="descriptionPublication" class="form-label">Mensaje</label>
+                                  <textarea pInputTextarea class="form-control" id="descriptionPublication">
+                                            </textarea>
+    
+    
+                                </div>
+                                <br>
+                                <div class="col-md-12" style="width: 300px;">
+                                  <label for="maximumPrice" class="form-label d-block">Precio de oferta</label>
+                                  <div class="p-inputgroup">
+                                    <span class="p-inputgroup-addon">$</span>
+                                    <p-inputNumber inputId="maximumPrice" name="maximumPrice" mode="decimal" locale="es-CH"
+                                      currency="CLP" name="maximumPrice"></p-inputNumber>
+                                  </div>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Enviar oferta</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-end">
+          <li class="page-item disabled">
+            <a class="page-link">Anterior</a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Siguiente</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>

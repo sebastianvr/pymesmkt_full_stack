@@ -1,0 +1,100 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-center">
+
+        <div class="container">
+            <div class="col-lg-12 pt-4 text-center">
+                <img class="d-block mx-auto mb-3" src="../../../assets/icons/stickies.svg" alt="pen.svg" width="72">
+                <h2 class="fs-2 mb-1">Ver mis publicaciones</h2>
+            </div>
+
+            <div class="container">
+                <pre>{{this.formularioBusqueda.value | json}}</pre>
+            </div>
+            <hr>
+
+            <div class="col-md-12 g-5 ">
+                <div class="container">
+                    <div class="container">
+                        <h3 class="fs-3 mb-3">Filtrar una publicación</h3>
+
+                        <div class="row">
+                            <form [formGroup]="formularioBusqueda" (ngSubmit)="buscar()">
+                                <div class="col-md-12">
+                                    <label for="firstName" class="form-label">Título de la publicación</label>
+                                    <input type="text" class="form-control" id="firstName" formControlName="titulo">
+                                </div>
+
+                                <div class="col-md-12 mt-3">
+                                    <label for="dateTermination" class="form-label">Buscar según fecha de
+                                        publicación</label>
+                                    <div class="p-field">
+                                        <p-calendar class="calendarClass" [showIcon]="true" inputId="dateTermination"
+                                            name="dateTermination" dateFormat="d 'de' MM yy"
+                                            formControlName="fecha"></p-calendar>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12">
+                                    <button class="float-end btn btn-primary">Buscar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <div *ngFor="let item of this.cards; let i = index">
+
+
+                        <div class="card cardMain  shadow-sm rounded mb-2" style="width: 18rem;">
+
+                            <div class="card-header pt-2">
+                                <h6 [ngClass]="{
+                                            'alert-primary' : item.estadoPublicacion.includes('ACTIVA'), 
+                                            'alert-success' : item.estadoPublicacion.includes('FINLIZADA'),
+                                            'alert-danger' : item.estadoPublicacion.includes('ELIMINADA')
+                                        }" class="stateHeader alert m-0 p-1" role="alert">Publicación {{ item.estadoPublicacion | lowercase}}
+                                </h6>
+                            </div>
+
+                            <div class="card-body">
+                                <h5 class="card-title"><a href="#" class="card-link">{{item.titulo | uppercase}}</a>
+                                </h5>
+                                <p class="card-text">{{item.descripcion | uppercase}}</p>
+
+                                <hr style="height: 3px;">
+
+                                <table class="tableResume table-hover table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="2" class="start-*"><strong>Fecha Publicación</strong>
+                                            </td>
+                                            <td class="text-end">{{item.createdAt | date}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" class="start-*"><strong>Precio</strong>
+                                            </td>
+                                            <td class="text-end">$ {{item.precioTotal}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="card-footer containerMoreInformation">
+
+                                <button class="btn btn-primary float-end" routerLink="/user/publication-detail" type="button">
+                                    Más información
+                                </button>
+                            </div>
+                        </div>
+                        <br>
+                    </div> 
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

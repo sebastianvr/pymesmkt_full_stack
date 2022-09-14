@@ -1,0 +1,29 @@
+.inputRadio{
+    display: none;
+}
+
+.descripcionLabel{
+    text-decoration: none;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type=time]::-webkit-calendar-picker-indicator {
+  background: none;
+}
+
+/* .iconPublicacion{
+
+  border: 1px solid black;
+  border-radius: 50%;
+} */
+
+/* .calendarf{
+  display: none;
+} */
+
+input[type=number] { -moz-appearance:textfield; }
