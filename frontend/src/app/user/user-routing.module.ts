@@ -24,7 +24,7 @@ const routes: Routes = [
       { path: 'my-profile', component: MyProfileComponent },
       { path: 'create-publication', component: CreatePublicationComponent },
       { path: 'see-publications', component: SeePublicationsComponent },
-      { path: 'publication-detail', component: PublicationDetailComponent },
+      { path: 'publication-detail/:id', component: PublicationDetailComponent },
       { path: 'offers-received', component: OffersReceivedComponent },
       { path: 'offers-made', component: OffersMadeComponent },
       { path: 'purchases', component: PurchasesComponent },
