@@ -3,155 +3,200 @@
 
         <div class="container">
             <div class="col-lg-12 pt-4 text-center">
-                <img class="d-block mx-auto mb-3" src="../../../assets/icons/blockquote-left.svg" alt="pen.svg"
-                    width="144" height="114">
+                <img class="float-end mx-auto mb-3" src="../../../assets/icons/blockquote-left.svg" alt="pen.svg"
+                    width="55">
                 <h2 class="fs-1 mb-5">Detalle de la publicación</h2>
             </div>
 
-            <hr>
+            <hr class="m-0">
 
-            <div class="col-md-12 g-5 mt-5">
-                <div class="container d-grid gap-2 text-center">
-                    <button class="alert alert-success alert-lg text-center" type="button">COMPRA FINALIZADA</button>
-                </div>
-
-                <div class="container mt-3">
-                    <h3 class="text-center">{{compras[0].titulo}}</h3>
-                    <p>{{compras[0].descripcion}}</p>
-
-                    <table class="table table-hover">
-                        <tbody>
-                            <tr>
-                                <td>Empresa</td>
-                                <td>{{compras[0].nombreEmpresa}}</td>
-                            </tr>
-                            <tr>
-                                <td>Dueño de la empresa</td>
-                                <td>{{compras[0].proveedor}}</td>
-                            </tr>
-                            <tr>
-                                <td>Precio</td>
-                                <td>{{compras[0].precio}}</td>
-                            </tr>
-                            <tr>
-                                <td>Cantidad</td>
-                                <td>{{compras[0].cantidad}}</td>
-                            </tr>
-                            <tr>
-                                <td>Fecha de expiración</td>
-                                <td>{{compras[0].fechaExpiracion | date}}</td>
-                            </tr>
-                            <tr>
-                                <td>Precio</td>
-                                <td>{{compras[0].precio}}</td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-
-                </div>
-
-                <div class="container ">
-                    <button class="btn btn-danger float-start" data-bs-toggle="modal" data-bs-target="#modalReport"
-                        type="button">Reportar un problema</button>
-
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="modalReport" data-bs-backdrop="static" data-bs-keyboard="false"
-                        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">Reporta el problema que ocurrio
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="container px-1">
-                                        <form>
-                                            <div class="col-12">
-                                                <label for="addresDescriptionCompany" class="form-label">Escribe los todos
-                                                    los detalles pertinentes </label>
-                                                <textarea class="form-control" cols="150" rows="9"
-                                                    id="addresDescriptionCompany">
-                                              </textarea>
-                                            </div>
-                                            <div class="col-12 mt-4">
-                                                <label>Añadir archivo adjunto</label>
-                                                <p-fileUpload mode="basic" name="demo[]" url="./upload.php"
-                                                    accept="image/*" [maxFileSize]="1000000"></p-fileUpload>
-
-                                            </div>
-
-                                        </form>
-
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary">Enviar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-secondary float-end" data-bs-toggle="modal"
-                        data-bs-target="#modalCalification" type="button">Calificar al proveedor</button>
-
-                    <div class="modal fade" id="modalCalification" data-bs-backdrop="static" data-bs-keyboard="false"
-                        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">Califica a tu proveedor
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="container px-1">
-                                        <form>
-
-                                            <div class="col-sm-12">
-                                                <label for="nameCompany" class="form-label">Titulo</label>
-                                                <input type="text" class="form-control" id="nameCompany" placeholder=""
-                                                    value="" required="">
-                                                <!-- <div class="invalid-feedback">
-                                                    Se requiere un nombre válido.
-                                                  </div> -->
-                                            </div>
-                                            <div class="col-sm-12 mt-2">
-                                                <label for="addresDescriptionCompany"
-                                                    class="form-label">Comentario</label>
-                                                <textarea class="form-control" cols="150" rows="9"
-                                                    id="addresDescriptionCompany">
-                                              </textarea>
-
-                                            </div>
-
-                                            <div class="col-sm-12 mt-2">
-                                                <label>Puntuación   </label>
-                                               <br>
-                                               <img class="mx-1" src="../../../assets/icons/star.svg" height="30px" alt="">
-                                               <img class="mx-1" src="../../../assets/icons/star.svg" height="30px" alt="">
-                                               <img class="mx-1" src="../../../assets/icons/star.svg" height="30px" alt="">
-                                               <img class="mx-1" src="../../../assets/icons/star.svg" height="30px" alt="">
-                                               <img class="mx-1" src="../../../assets/icons/star.svg" height="30px" alt="">
-
-                                            </div>
-
-                                        </form>
-
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary">Enviar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-12 text-center my-5" *ngIf="!publicacion; else divPublicacion">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
+
+            <ng-template #divPublicacion>
+                <div class="col-md-12 g-5 mt-4">
+                    <div class="container d-grid gap-2 text-center">
+                        <button [ngClass]="{
+                            'alert-primary' : publicacion.procesoDeCompra.includes('INICIADA'), 
+                            'alert-warning' : publicacion.procesoDeCompra.includes('EN PROCESO'),
+                            'alert-success' : publicacion.procesoDeCompra.includes('FINALIZADA')
+                        }" class="alert alert-success alert-lg text-center" type="button">Compra
+                            {{publicacion.procesoDeCompra | lowercase}}
+                        </button>
+                        <!-- <div class="col-md-12">
+                            <img class="iconPublicacion float-end dmx-auto" src="../../../assets/icons/box-seam.svg"
+                                alt="pen.svg" width="80">
+                            <h3 class="fs-4 d-inline">Publica el producto que necesitas</h3>
+                        </div> -->
+                    </div>
+
+                    <div class="container mt-3">
+                        <h3 class="text-center">{{publicacion.titulo}}</h3>
+                        <p>{{publicacion.descripcion}}</p>
+
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <td>Precio total</td>
+                                    <td>{{publicacion.precioTotal | currency : 'CLP'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Cantidad</td>
+                                    <td>{{this.publicacion.cantidadElementos}}</td>
+                                </tr>
+                                <tr *ngIf="publicacion.precioUnidad">
+                                    <td>Precio por unidad</td>
+                                    <td>{{publicacion.precioUnidad | currency : 'CLP'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Garantía</td>
+                                    <td>{{publicacion.garantia.toString() | i18nSelect:garantiaMapa}}</td>
+                                </tr>
+                                <tr *ngIf="publicacion.aniosGarantia">
+                                    <td>Años de garantía</td>
+                                    <td>{{publicacion.aniosGarantia}}</td>
+                                </tr>
+                                <tr *ngIf="publicacion.fechaInicioServicio">
+                                    <td>Fecha inicio del servicio</td>
+                                    <td>{{publicacion.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
+                                </tr>
+                                <tr *ngIf="publicacion.fechaFinServicio">
+                                    <td>Fecha finalización del servicio </td>
+                                    <td>{{publicacion.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
+                                </tr>
+                                <tr *ngIf="publicacion.horasATrabajar">
+                                    <td>Cantidad de horas a trabajar </td>
+                                    <td>{{publicacion.horasATrabajar}}</td>
+                                </tr>
+                                <tr *ngIf="publicacion.modelo">
+                                    <td>Modelo</td>
+                                    <td>{{publicacion.modelo}}</td>
+                                </tr>
+                                <tr *ngIf="publicacion.color">
+                                    <td>Color</td>
+                                    <td>{{publicacion.color | titlecase}}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <!-- <div class="container ">
+                        <button class="btn btn-danger float-start" data-bs-toggle="modal" data-bs-target="#modalReport"
+                            type="button">Reportar un problema</button>
+
+
+                        
+                        <div class="modal fade" id="modalReport" data-bs-backdrop="static" data-bs-keyboard="false"
+                            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">Reporta el problema que ocurrio
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="container px-1">
+                                            <form>
+                                                <div class="col-12">
+                                                    <label for="addresDescriptionCompany" class="form-label">Escribe los
+                                                        todos
+                                                        los detalles pertinentes </label>
+                                                    <textarea class="form-control" cols="150" rows="9"
+                                                        id="addresDescriptionCompany">
+                                                  </textarea>
+                                                </div>
+                                                <div class="col-12 mt-4">
+                                                    <label>Añadir archivo adjunto</label>
+                                                    <p-fileUpload mode="basic" name="demo[]" url="./upload.php"
+                                                        accept="image/*" [maxFileSize]="1000000"></p-fileUpload>
+
+                                                </div>
+
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary">Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary float-end" data-bs-toggle="modal"
+                            data-bs-target="#modalCalification" type="button">Calificar al proveedor</button>
+
+                        <div class="modal fade" id="modalCalification" data-bs-backdrop="static"
+                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">Califica a tu proveedor
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="container px-1">
+                                            <form>
+
+                                                <div class="col-sm-12">
+                                                    <label for="nameCompany" class="form-label">Titulo</label>
+                                                    <input type="text" class="form-control" id="nameCompany"
+                                                        placeholder="" value="" required="">
+                                                </div>
+                                                <div class="col-sm-12 mt-2">
+                                                    <label for="addresDescriptionCompany"
+                                                        class="form-label">Comentario</label>
+                                                    <textarea class="form-control" cols="150" rows="9"
+                                                        id="addresDescriptionCompany">
+                                                  </textarea>
+
+                                                </div>
+
+                                                <div class="col-sm-12 mt-2">
+                                                    <label>Puntuación </label>
+                                                    <br>
+                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
+                                                        alt="">
+                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
+                                                        alt="">
+                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
+                                                        alt="">
+                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
+                                                        alt="">
+                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
+                                                        alt="">
+
+                                                </div>
+
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary">Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="col-12">
+                        <button class="btn btn-primary float-end">Editar publicación</button>
+                    </div>
+
+                </div>
+            </ng-template>
+
         </div>
     </div>
 </div>
