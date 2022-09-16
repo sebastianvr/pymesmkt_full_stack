@@ -26,7 +26,7 @@ export class AuthService {
       .pipe(
         tap(resp => {
           if (resp.ok) {
-            localStorage.setItem('token', resp.token)
+            sessionStorage.setItem('token', resp.token)
             this._usuario = {
               nombreUsuario: resp.nombreUsuario!,
               id: resp.id!,
@@ -44,7 +44,7 @@ export class AuthService {
       .pipe(
         tap(resp => {
           if (resp.ok) {
-            localStorage.setItem('token', resp.token)
+            sessionStorage.setItem('token', resp.token)
             this._usuario = {
               nombreUsuario: resp.nombreUsuario!,
               id: resp.id!,
@@ -59,11 +59,11 @@ export class AuthService {
   // Obtiene el jwt guardado en LocalStorage 
   validarToken() {
     const headers = new HttpHeaders()
-      .set('token', localStorage.getItem('token') || '')
+      .set('token', sessionStorage.getItem('token') || '')
     return this.http.get<any>(`${this.url}/api/auth/renew`, { headers })
       .pipe(
         map(resp => {
-          localStorage.setItem('token', resp.token)
+          sessionStorage.setItem('token', resp.token)
           this._usuario = {
             nombreUsuario: resp.nombreUsuario!,
             id: resp.id!,
@@ -75,6 +75,6 @@ export class AuthService {
   }
 
   logOut() {
-    localStorage.clear()
+    sessionStorage.clear()
   }
 } 
