@@ -20,11 +20,15 @@ export class PublicacionService {
     return this.http.post(`${this.url}/api/publicacion`, nuevaPublicacion)
   }
 
-  getAllPublicaciones(){
-
+  getPublicacionById(id : string) : Observable<any>{
+    return this.http.get<any>(`${this.url}/api/publicacion/${id}`)
   }
 
-  getAllPublicacionById(id : string){
+  getAllPublicaciones(page : number = 0 , size : number = 10){
+    return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
+  }
+
+  getAllPublicacionById(id : string) : Observable<any>{
     return this.http.get<any>(`${this.url}/api/publicacion/usuario/${id}`)
   }
 
