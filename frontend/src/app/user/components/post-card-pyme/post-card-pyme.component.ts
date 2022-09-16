@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 
 @Component({
   selector: 'app-post-card-pyme',
@@ -7,13 +8,21 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PostCardPymeComponent implements OnInit {
 
+  publicaciones! : any[]
   data: any[] = [];
+
+  garantiaMapa = {
+    'true': 'Si',
+    'false': 'No'
+  }
 
   // para realizar oferta
   maxPrice!: number;
   mensaje!: string;
 
-  constructor() {
+  constructor(
+    private publicacionService : PublicacionService 
+  ) {
     this.data = [
       {
         id: 'fsm2vsgo1pr',
@@ -58,10 +67,17 @@ export class PostCardPymeComponent implements OnInit {
         archivo: null,
       }
     ]
-   }
-
-  ngOnInit(): void {
   }
+  
+  ngOnInit(): void {
+    this.publicacionService.getAllPublicaciones()
+      .subscribe(({content, totalPages}) => {
+        this.publicaciones = content
+        console.log(this.publicaciones)
+      })
+  }
+
+  
 
   
 
