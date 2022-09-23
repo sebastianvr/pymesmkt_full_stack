@@ -24,8 +24,9 @@ export class PublicacionService {
     return this.http.get<any>(`${this.url}/api/publicacion/${id}`)
   }
 
-  getAllPublicaciones(page : number = 0 , size : number = 10){
+  getAllPublicaciones(page : number = 4 , size : number = 100){
     return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
+    
   }
 
   getAllPublicacionById(id : string) : Observable<any>{
@@ -36,7 +37,7 @@ export class PublicacionService {
 
   }
 
-  deletePublicacion(){
-
+  deletePublicacion(id : any){
+    return this.http.delete<any>(`${this.url}/api/publicacion/${id}`);
   }
 }
