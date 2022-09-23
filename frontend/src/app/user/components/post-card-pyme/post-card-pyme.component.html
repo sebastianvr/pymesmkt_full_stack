@@ -27,11 +27,11 @@
                   </tr>
                   <tr>
                     <td colspan="2" class="start-*"><strong>Empresa</strong></td>
-                    <td class="text-end">{{item.nombreEmpresa}} -----</td>
+                    <td class="text-end">{{item.Usuario.Pyme.nombrePyme}}</td>
                   </tr>
                   <tr>
                     <td colspan="2" class="start-*"><strong>Calificación</strong></td>
-                    <td class="text-end">{{item.calificacion}} -----</td>
+                    <!-- <td class="text-end">{{item.Usuario.Calificacions[i].promedio}}</td> -->
                   </tr>
                 </tbody>
               </table>
@@ -60,17 +60,25 @@
                         <td colspan="2" class="start-*"><strong>Fecha creación</strong></td>
                         <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy'}}</td>
                       </tr>
+                      <tr *ngIf="item.fechaInicioServicio">
+                        <td colspan="2" class="start-*"><strong>Fecha de inicio servicio</strong></td>
+                        <td class="text-end">{{item.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
+                      </tr>
+                      <tr *ngIf="item.fechaFinServicio">
+                        <td colspan="2" class="start-*"><strong>Fecha de término servicio</strong></td>
+                        <td class="text-end">{{item.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
+                      </tr>
                       <tr>
                         <td colspan="2" class="start-*"><strong>Garantía</strong></td>
                         <td class="text-end">{{item.garantia.toString() | i18nSelect:garantiaMapa}}</td>
                       </tr>
-                      <tr *ngIf="item.cantidad">
-                        <td colspan="2" class="start-*"><strong>Cantidad</strong></td>
-                        <td class="text-end">{{item.cantidad}}</td>
+                      <tr *ngIf="item.aniosGarantia">
+                        <td colspan="2" class="start-*"><strong>Años de garantía</strong></td>
+                        <td class="text-end">{{item.aniosGarantia | number }}</td>
                       </tr>
-                      <tr>
-                        <td colspan="2" class="start-*"><strong>Fecha de término</strong></td>
-                        <td class="text-end">{{item.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
+                      <tr *ngIf="item.cantidadElementos">
+                        <td colspan="2" class="start-*"><strong>Cantidad</strong></td>
+                        <td class="text-end">{{item.cantidadElementos}}</td>
                       </tr>
                       <tr *ngIf="item.modelo">
                         <td colspan="2" class="start-*"><strong>Modelo</strong></td>
@@ -92,50 +100,66 @@
                     </div>
                   </div>
 
+                  <div *ngIf="isIdsIguales(item.UsuarioId)" class="container">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <button class="btn btn-lg btn-success" type="button" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">Ofertar
+                      </button>
+                    </div>
 
-                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button class="btn btn-lg btn-success" type="button" data-bs-toggle="modal"
-                      data-bs-target="#exampleModal">Ofertar</button>
-                  </div>
+                    <!-- Modal para ofertar-->
 
+                    <form [formGroup]="formularioOferta" (ngSubmit)="enviarOferta(item.id)">
+                      <div class="modal fade" id="exampleModal" data-bs-backdrop="static" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <!-- <h5 class="modal-title" id="exampleModalLabel">Escribe una oferta</h5> -->
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                            </div>
 
-                  <!-- Modal para ofertar-->
-                  <div class="modal fade" id="exampleModal" data-bs-backdrop="static" tabindex="-1"
-                    aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="exampleModalLabel">Escribe una oferta</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <div class="container my-3">
-                            <form>
-                              <!-- monto , mensaje -->
+                            <div class="modal-body">
+                              <div class="container">
 
-                              <div class="col-md-12">
-
-                                <label for="descriptionPublication" class="form-label">Mensaje</label>
-                                <textarea pInputTextarea class="form-control" id="descriptionPublication"></textarea>
-                              </div>
-                              <br>
-                              <div class="col-md-12" style="width: 300px;">
-                                <label for="maximumPrice" class="form-label d-block">Precio de oferta</label>
-                                <div class="p-inputgroup">
-                                  <span class="p-inputgroup-addon">$</span>
-                                  <p-inputNumber inputId="maximumPrice" name="maximumPrice" mode="decimal"
-                                    locale="es-CH" currency="CLP" name="maximumPrice"></p-inputNumber>
+                                <!-- FORMULARIO PARA ENVIAR EL MANSAJE DE OFERTA -->
+                                <div class="col-md-12">
+                                  <h3 class="fs-5 mb-2">Escribe tu propuesta y empieza a colaborar con esta empresa.
+                                  </h3>
+                                  <label for="descriptionPublication" class="form-label mb-0">Mensaje</label>
+                                  <textarea pInputTextarea class="form-control" formControlName="mensaje"
+                                    id="descriptionPublication"></textarea>
+                                  <span *ngIf="campoInvalido('mensaje')" class="form-text text-danger">
+                                    El mensaje es obligatorio.
+                                  </span>
+                                </div>
+                                <br>
+                                <div class="col-md-12" style="width: 300px;">
+                                  <label for="maximumPrice" class="form-label mb-0 d-block">Precio de oferta</label>
+                                  <div class="p-inputgroup">
+                                    <span class="p-inputgroup-addon">$</span>
+                                    <p-inputNumber inputId="maximumPrice" mode="decimal" locale="es-CH" currency="CLP"
+                                      formControlName="precioOferta"></p-inputNumber>
+                                  </div>
+                                  <span *ngIf="campoInvalido('precioOferta')" class="form-text d-block text-danger">
+                                    El precio es obligatorio.
+                                  </span>
                                 </div>
                               </div>
-                            </form>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Enviar
+                                oferta</button>
+                            </div>
                           </div>
                         </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Enviar oferta</button>
-                        </div>
                       </div>
-                    </div>
+                    </form>
+
                   </div>
+
+
                 </div>
               </div>
             </div>
@@ -165,6 +189,5 @@
     <p-paginator [rows]="10" [totalRecords]="120" [rowsPerPageOptions]="[10,20,30]"></p-paginator>
     <h5>Basic</h5>
     <p-paginator [rows]="10" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10,20,30]"></p-paginator>
-
   </div> -->
 </div>

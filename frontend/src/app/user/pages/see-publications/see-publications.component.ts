@@ -16,7 +16,7 @@ export class SeePublicationsComponent implements OnInit {
   cards: any[] = [];
 
 
-  data! : any[]
+  data!: any[]
   constructor(
     private fb: FormBuilder,
     private publicacionService: PublicacionService,
@@ -24,10 +24,8 @@ export class SeePublicationsComponent implements OnInit {
 
   ) {
     this.usuario = this.authService.usuario
-    
+
   }
-
-
 
   // crear formulario
   formularioBusqueda: FormGroup = this.fb.group({
@@ -38,30 +36,9 @@ export class SeePublicationsComponent implements OnInit {
   ngOnInit(): void {
     this.publicacionService.getAllPublicacionById(this.usuario.id).subscribe(data => {
       this.cards = data.content
-      console.log(this.cards)
+      // console.log(data)
+      // console.log(this.cards)
     })
-
-    // this.data = [
-    //   {
-    //     id: 'fsm2vsgo1pr',
-    //     titulo: 'Adquisición de 40 sacos de harina de trigo',
-    //     fecha: new Date(),
-    //     estado: 'Publicación finalizada',
-    //     descripcion: 'La panadería el molino busca proveedoor de sacos de harina marca "XXXXXXX" sin polvos de hornear, para elaboración pan y pasteles',
-    //     montoDisponible: 159990
-
-    //   },
-    //   {
-    //     id: 'gkm5zsgo1po',
-    //     titulo: 'Adquisición 40 kilos de dulce de leche',
-    //     fecha: new Date(),
-    //     estado: 'Publicación activa',
-    //     descripcion: 'La panadería el molino busca proveedoor de dulce de leche, para pasteles y tartas , de preferencia marca "XXXXXXX"',
-    //     montoDisponible: 425000
-
-    //   },
-    // ]
-
   }
 
   buscar() {

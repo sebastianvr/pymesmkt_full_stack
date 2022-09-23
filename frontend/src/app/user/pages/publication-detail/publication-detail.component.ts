@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { switchMap } from 'rxjs';
 import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
+import Swal from 'sweetalert2'
 
 @Component({
   selector: 'app-publication-detail',
@@ -9,7 +11,6 @@ import { PublicacionService } from '../../../core/services/publicacion/publicaci
   styleUrls: ['./publication-detail.component.css']
 })
 export class PublicationDetailComponent implements OnInit {
-  compras: any
   publicacion!: any
 
   garantiaMapa = {
@@ -19,56 +20,9 @@ export class PublicationDetailComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private router : Router,
     private publicacionService: PublicacionService
-  ) {
-
-
-    this.compras = [
-      //   {
-      //     id: 'fsm2vsgo1pr',
-      //     titulo: 'Adquisición de 40 sacos de harina de trigo',
-      //     productoOServicio: 'producto',
-      //     descripcion: 'La panadería el molino busca proveedoor de sacos de harina marca "XXXXXXX" sin polvos de hornear, para elaboración pan y pasteles',
-      //     usado: null,
-      //     precio: 1500000,
-      //     cantidad: 40,
-      //     color: undefined,
-      //     modelo: undefined,
-      //     horasATrabajar: null,
-      //     estado: 'Sé el primero en ofertar',
-      //     fechaExpiracion: new Date(),
-      //     fechaCreacion: new Date(),
-      //     estadoDeCompra: 'Compra finalizada',
-      //     fechaActualizacion: new Date(),
-      //     nombreEmpresa: 'Heredia Ltda.',
-      //     garantia: true,
-      //     archivo: 'alskdaASDAJDqqwQJJSskaJANjsAASJskJSNNNBBBnnansnNABWBABbanwwwS',
-      //     proveedor: 'Juan Santana Jorquera',
-      //   },
-      //   {
-      //     id: 'aqn5vhgo5ir',
-      //     titulo: 'Adquisición 40 kilos de dulce de leche ',
-      //     productoOServicio: 'producto',
-      //     descripcion: 'La panadería el molino busca proveedoor de dulce de leche, para pasteles y tartas , de preferencia marca "XXXXXXX"',
-      //     usado: null,
-      //     precio: 4500000,
-      //     cantidad: null,
-      //     color: undefined,
-      //     modelo: undefined,
-      //     horasATrabajar: null,
-      //     estado: 'Sé el primero en ofertar',
-      //     fechaExpiracion: new Date(),
-      //     fechaCreacion: new Date(),
-      //     estadoDeCompra: 'Compra en proceso',
-      //     fechaActualizacion: new Date(),
-      //     nombreEmpresa: 'Heredia Ltda.',
-      //     garantia: true,
-      //     archivo: 'alskdaASDAJDqqwQJJSskaJANjsAASJskJSNNNBBBnnansnNABWBABbanwwwS',
-      //     proveedor: 'Juan Santana Jorquera',
-      //   }
-
-    ]
-  }
+  ) { }
 
   ngOnInit(): void {
     this.activatedRoute.params
@@ -81,7 +35,49 @@ export class PublicationDetailComponent implements OnInit {
         this.publicacion = publicacion
         console.log(this.publicacion)
       })
-
   }
 
+  eliminarPublicacion() {
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger'
+      },
+      buttonsStyling: false
+    })
+    
+    swalWithBootstrapButtons.fire({
+      title: '¿Estás seguro de eliminar la publicación?',
+      text: "No podrás revertir esto!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Si, eliminar!',
+      cancelButtonText: 'No, cancelar!',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        swalWithBootstrapButtons.fire(
+          'Eliminado!',
+          'Tu publicación ha sido eliminada.',
+          'success'
+        )
+        this.publicacionService.deletePublicacion(this.publicacion.id).subscribe()
+        this.router.navigate(['/user/see-publications'])
+
+      
+      } else if (
+        /* Read more about handling dismissals below */
+        result.dismiss === Swal.DismissReason.cancel
+      ) {
+        swalWithBootstrapButtons.fire(
+          'Cancelado',
+          '',
+          'error'
+        )
+      }
+    })
+  }
+
+
+  
 }
