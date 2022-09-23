@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
-import { threadId } from 'worker_threads';
 
 @Component({
   selector: 'app-sidebar-user',
@@ -28,10 +27,11 @@ export class SidebarUserComponent implements OnInit {
             label: 'Inicio',
             icon: 'pi pi-home',
             routerLink: '/user',
-            // command : (event : any ) =>{
-            //     console.log(event)
+            command : (event : any ) =>{
+                console.log(event.originalEvent)
+                // quitar el sidebar
 
-            // }
+            }
 
         },
         {

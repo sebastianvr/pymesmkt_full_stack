@@ -1,5 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { PymeServiceService } from '../../../core/services/pyme/pyme-service.service';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
+import { OfertaService } from '../../../core/services/oferta/oferta.service';
+
 
 @Component({
   selector: 'app-post-card-pyme',
@@ -8,8 +15,12 @@ import { PublicacionService } from '../../../core/services/publicacion/publicaci
 })
 export class PostCardPymeComponent implements OnInit {
 
-  publicaciones! : any[]
-  data: any[] = [];
+  publicaciones!: any[]
+  empresa!: any
+  idUsuario!: string
+ 
+  // @ViewChild('closebutton') closebutton! : ElementRef;
+ 
 
   garantiaMapa = {
     'true': 'Si',
@@ -20,65 +31,92 @@ export class PostCardPymeComponent implements OnInit {
   maxPrice!: number;
   mensaje!: string;
 
+  id = this.authService.usuario.id
+
+
+
   constructor(
-    private publicacionService : PublicacionService 
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService,
+    private publicacionService: PublicacionService,
+    private ofertaService: OfertaService
   ) {
-    this.data = [
-      {
-        id: 'fsm2vsgo1pr',
-        titulo: 'ADQ. BASTÓN RETRÁCTIL',
-        productoOServicio: 'producto',
-        descripcion: 'NECESIDAD DE MATERIALIZAR LA ADQUISICIÓN DE BASTÓN RETRÁCTIL PARA EMPRESA DE SEGURIDAD, CON LA FINALIDAD QUE EL PERSONAL DE LA INSTITUCIÓN CUENTE CON LOS ELEMENTOS NECESARIOS PARA DESARROLLAR DE BUENA MANERA SUS FUNCIONES.',
-        usado: null,
-        precioMax: 1500000,
-        cantidad: 5,
-        color: undefined,
-        modelo: undefined,
-        horasATrabajar: null,
-        ofertasRecibidas: 'Sé el primero en ofertar',
-        fechaExpiracion: new Date(),
-        fechaCreacion: new Date(),
-        fechaActualizacion: new Date(),
-        nombreEmpresa: 'MaxSecuity Ltda',
-        calificacion: 5,
-        garantia: true,
-        aniosGarantia : 3,
-        archivo: 'alskdaASDAJDqqwQJJSskaJANjsAASJskJSNNNBBBnnansnNABWBABbanwwwS',
-      },
-      {
-        id: 'fsm2vsgo1pr',
-        titulo: 'ADQ. BASTÓN RETRÁCTIL',
-        productoOServicio: 'producto',
-        descripcion: 'NECESIDAD DE MATERIALIZAR LA ADQUISICIÓN DE BASTÓN RETRÁCTIL PARA EMPRESA DE SEGURIDAD, CON LA FINALIDAD QUE EL PERSONAL DE LA INSTITUCIÓN CUENTE CON LOS ELEMENTOS NECESARIOS PARA DESARROLLAR DE BUENA MANERA SUS FUNCIONES.',
-        usado: null,
-        precioMax: 450000,
-        cantidad: 5,
-        color: undefined,
-        modelo: undefined,
-        horasATrabajar: null, 
-        ofertasRecibidas: '2 ofertas recibidas',
-        fechaExpiracion: new Date(),
-        fechaCreacion: new Date(),
-        fechaActualizacion: new Date(),
-        nombreEmpresa: 'MaxSecuity Ltda',
-        calificacion: 5,
-        garantia: true,
-        aniosGarantia : 3,
-        archivo: null,
-      }
-    ]
   }
-  
+
+  formularioOferta: FormGroup = this.fb.group({
+    mensaje: [, Validators.required],
+    precioOferta: [, Validators.required],
+  })
+
   ngOnInit(): void {
-    this.publicacionService.getAllPublicaciones()
-      .subscribe(({content, totalPages}) => {
+
+    this.publicacionService.getAllPublicaciones(0, 10)
+      .subscribe(({ content, totalPages }) => {
         this.publicaciones = content
         console.log(this.publicaciones)
       })
   }
 
-  
+  isIdsIguales(itemId: string): boolean {
+    if (this.id === itemId) {
+      return false
+    }
+    return true
+  }
 
-  
+
+  enviarOferta(publicacionId: string) {
+    if (this.formularioOferta.invalid) {
+      this.formularioOferta.markAllAsTouched()
+      return
+    }
+
+    const nuevaOferta = {
+      mensaje: this.formularioOferta.get('mensaje')?.value,
+      precioOferta: this.formularioOferta.get('precioOferta')?.value,
+      UsuarioId: this.id,
+      PublicacionId: publicacionId
+    }
+
+    console.log(nuevaOferta)
+    //conectar el servicio
+
+    // if(this.closebutton.nativeElement.click()){
+    //   console.log('dentro del close')
+    // }
+    
+    Swal.fire({
+      position: 'top-end',
+      icon: 'success',
+      title: 'Tu oferta ha sido enviada!',
+      showConfirmButton: false,
+      timer: 2000
+    }).then((result) => {
+      if (result) {
+        
+        
+        // console.log(this.closebutton.nativeElement)
+        this.ofertaService.postOferta(nuevaOferta).subscribe();
+        // this.closebutton.nativeElement.hide();
+        this.formularioOferta.reset();
+        this.router.navigate(['/user/offers-made']);
+      }
+    }
+    )
+
+
+    
+    // console.log(this.formularioOferta.value)
+  }
+
+
+  campoInvalido(campo: string) {
+    return this.formularioOferta.get(campo)?.errors
+      && this.formularioOferta.get(campo)?.touched
+  }
+
+
+
 
 }
