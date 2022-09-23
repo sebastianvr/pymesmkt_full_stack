@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { MessageService, PrimeNGConfig } from 'primeng/api';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -48,12 +49,29 @@ export class LoginComponent implements OnInit {
     this.AuthService.login(this.formularioLogin.value).subscribe(ok => {
       console.log(ok)
       if (ok === true) {
-        this.showMessageToast('success', 'Accediendo');
+        
+        Swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: 'Accediendo',
+          showConfirmButton: false,
+          timer: 800,
+        })
+        
         this.router.navigate(['/user'])
+      
       } else {
+       
         // mostrar mensaje de error
-        this.showMessageToast('error', 'Error', ok);
-        this.formularioLogin.reset()
+        Swal.fire({
+          position: 'top-end',
+          icon: 'error',
+          title: 'Error',
+          text: ok,
+          showConfirmButton: false,
+          timer: 1500,
+        })
+        // this.formularioLogin.reset()
       }
     })
 
@@ -64,7 +82,7 @@ export class LoginComponent implements OnInit {
       && this.formularioLogin.controls[campo].touched
   }
 
-  showMessageToast(severity : string, summary : string, detail : string = ''){
+  showMessageToast(severity: string, summary: string, detail: string = '') {
     this.messageService.add({ severity: severity, summary: summary, detail: detail })
   }
 }

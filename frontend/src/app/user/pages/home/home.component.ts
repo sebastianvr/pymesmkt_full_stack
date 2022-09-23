@@ -26,11 +26,13 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.regiones = this.regionesComunas.getRegiones()
-    this.publicacionesService.getAllPublicaciones()
-      .subscribe( ({content}) => {
-        this.allPublicaciones = content
-        // console.log(content)
-      })
+    
+    // this.publicacionesService.getAllPublicaciones()
+    //   .subscribe( ({content}) => {
+    //     this.allPublicaciones = content
+    //     console.log(this.allPublicaciones)
+    //     // console.log(content)
+    //   })
   }
 
 }

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { PymeServiceService } from '../../../core/services/pyme/pyme-service.service';
 
 @Component({
   selector: 'app-post-card-visitor',
@@ -7,51 +10,32 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PostCardVisitorComponent implements OnInit {
 
-  data: any[] = []
-  
-  constructor() { }
+  // data: any[] = []
+  publicaciones!: any[]
+  empresa!: any
+  idUsuario!: string
+
+  garantiaMapa = {
+    'true': 'Si',
+    'false': 'No'
+  }
+
+  // para realizar oferta
+  maxPrice!: number;
+  mensaje!: string;
+
+  constructor(
+    private publicacionService: PublicacionService,
+    private authService: AuthService,
+    private pymeService: PymeServiceService
+  ) { }
 
   ngOnInit(): void {
-    this.data = [
-      {
-        id: 'fsm2vsgo1pr',
-        titulo: 'ADQ. BASTÓN RETRÁCTIL',
-        productoOServicio: 'producto',
-        descripcion: 'NECESIDAD DE MATERIALIZAR LA ADQUISICIÓN DE BASTÓN RETRÁCTIL PARA EMPRESA DE SEGURIDAD, CON LA FINALIDAD QUE EL PERSONAL DE LA INSTITUCIÓN CUENTE CON LOS ELEMENTOS NECESARIOS PARA DESARROLLAR DE BUENA MANERA SUS FUNCIONES.',
-        usado: null,
-        precioMax: 150000,
-        cantidad: 5,
-        color: undefined,
-        modelo: undefined,
-        horasATrabajar: null,
-        estado: 'Sé el primero en ofertar',
-        fechaExpiracion: new Date(),
-        fechaCreacion: new Date(),
-        fechaActualizacion: new Date(),
-        nombreEmpresa: 'MaxSecuity Ltda',
-        garantia: true,
-        archivo: 'alskdaASDAJDqqwQJJSskaJANjsAASJskJSNNNBBBnnansnNABWBABbanwwwS',
-      },
-      {
-        id: 'fsm2vsgo1pr',
-        titulo: 'ADQ. BASTÓN RETRÁCTIL',
-        productoOServicio: 'producto',
-        descripcion: 'NECESIDAD DE MATERIALIZAR LA ADQUISICIÓN DE BASTÓN RETRÁCTIL PARA EMPRESA DE SEGURIDAD, CON LA FINALIDAD QUE EL PERSONAL DE LA INSTITUCIÓN CUENTE CON LOS ELEMENTOS NECESARIOS PARA DESARROLLAR DE BUENA MANERA SUS FUNCIONES.',
-        usado: null,
-        precioMax: 150000,
-        cantidad: 5,
-        color: undefined,
-        modelo: undefined,
-        horasATrabajar: null,
-        estado: '2 ofertas realizadas',
-        fechaExpiracion: new Date(),
-        fechaCreacion: new Date(),
-        fechaActualizacion: new Date(),
-        nombreEmpresa: 'MaxSecuity Ltda',
-        garantia: true,
-        archivo: 'alskdaASDAJDqqwQJJSskaJANjsAASJskJSNNNBBBnnansnNABWBABbanwwwS',
-      }
-    ]
+    this.publicacionService.getAllPublicaciones(0, 10)
+      .subscribe(({ content, totalPages }) => {
+        this.publicaciones = content
+        console.log(this.publicaciones)
+      })
   }
 
 }
