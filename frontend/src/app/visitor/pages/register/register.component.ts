@@ -45,41 +45,41 @@ export class RegisterComponent implements OnInit {
     this.regionesPropietario = this.regionesComunas.getRegiones()
 
     // Reseteo el formulario para evitar llevar desde el cliente
-    this.formulario.reset({
+    // this.formulario.reset({
 
-      infoPropietario: {
-        nombre: 'Sebastian',
-        apellidos: 'Vidal',
-        run: '12.321.233-1',
-        correoPropietario: 'sebastian.vi@gmail.com',
-        contrasenia: '123.123',
-        contrasenia2: '123.123'
-      },
-      infoLocalidadPropietario: {
-        opRegion: 'Antofagasta',
-        opCommune: 'Mejillones',
-        direccionPropietario: 'Av. Lorem ipsum #123',
-        direccionPropietario2: '',
-        descripcion: 'Cerca de la plaza, Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi, nostrum.',
-      },
+    //   infoPropietario: {
+    //     nombre: 'Sebastian',
+    //     apellidos: 'Vidal',
+    //     run: '12.321.233-1',
+    //     correoPropietario: 'sebastian.vi@gmail.com',
+    //     contrasenia: '123.123',
+    //     contrasenia2: '123.123'
+    //   },
+    //   infoLocalidadPropietario: {
+    //     opRegion: 'Antofagasta',
+    //     opCommune: 'Mejillones',
+    //     direccionPropietario: 'Av. Lorem ipsum #123',
+    //     direccionPropietario2: '',
+    //     descripcion: 'Cerca de la plaza, Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi, nostrum.',
+    //   },
 
-      infoEmpresa: {
-        nombreEmpresa: 'El Molino ',
-        rut: '123.321.324-1',
-        tipoEmpresa: 'Empresa comercial',
-        rubro: 'Panadería, Pastelería',
-      },
+    //   infoEmpresa: {
+    //     nombreEmpresa: 'El Molino ',
+    //     rut: '123.321.324-1',
+    //     tipoEmpresa: 'Empresa comercial',
+    //     rubro: 'Panadería, Pastelería',
+    //   },
 
-      infoLocalidadEmpresa: {
-        usarDireccionPersonal: true,
-        regionEmpresa: '',
-        communeEmpresa: '',
-        direccionEmpresa: '',
-        descripcionEmpresa: '',
-      },
+    //   infoLocalidadEmpresa: {
+    //     usarDireccionPersonal: true,
+    //     regionEmpresa: '',
+    //     communeEmpresa: '',
+    //     direccionEmpresa: '',
+    //     descripcionEmpresa: '',
+    //   },
 
-      terminosYCondiciones: true
-    });
+    //   terminosYCondiciones: true
+    // });
   }
 
   getPercent() {
@@ -170,6 +170,7 @@ export class RegisterComponent implements OnInit {
     // problemas al copiar campos revisar!!
     // console.log(this.formulario.get('infoLocalidadPropietario')?.get('opCommune')?.value)
     if (!copiar) {
+      // this.formulario.get('infoLocalidadEmpresa')?.get('usarDireccionPersonal')?.patchValue({usarDireccionPersonal : false});
       this.formulario.get('infoLocalidadEmpresa')?.patchValue({
         regionEmpresa: this.formulario.get('infoLocalidadPropietario')?.get('opRegion')?.value
       });
@@ -187,12 +188,14 @@ export class RegisterComponent implements OnInit {
       })
       return
     } else {
+      // this.formulario.get('infoLocalidadEmpresa')?.get('usarDireccionPersonal')?.patchValue({usarDireccionPersonal : true});
       this.formulario.get('infoLocalidadEmpresa')?.reset()
       // this.formulario.get('infoLocalidadEmpresa')?.patchValue({
       //   regionEmpresa: '',
       //   communeEmpresa: '',
       //   direccionEmpresa: '',
-      //   descripcionEmpresa: ''
+      //   descripcionEmpresa: '',
+      //   usarDireccionPersonal : false
       // })
     }
   }

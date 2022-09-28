@@ -1,136 +1,10 @@
-<!-- <div class="container">
-    <div class="row">
-  
-      <div class="col-12">
-        <div *ngFor="let item of data; let i = index">
-          <div class="container-fluid p-0">
-  
-            <div class="card cardMain  shadow-sm rounded mb-2" style="width: 18rem;">
-  
-              <div class="card-header pt-2">
-  
-                <h6 class="dateHeader text-muted"> <strong class="">Id publicación:</strong> {{item.id}}</h6>
-  
-                <h6
-                  [ngClass]="{'alert-primary' : item.estado ==='Sé el primero en ofertar', 'alert-warning' : item.estado.includes('ofertas realizadas')}"
-                  class="stateHeader float-end alert m-0 p-1" role="alert">{{item.estado}}</h6>
-              </div>
-  
-              <div class="card-body">
-                <h5 class="card-title"><a href="#" class="card-link">{{item.titulo}}</a></h5>
-                <p class="card-text">{{item.descripcion | uppercase}}</p>
-  
-                <hr style="height: 3px;">
-  
-                <table class="tableResume table table-hover table-borderless">
-                  <tbody>
-                    <tr>
-                      <td colspan="2" class="start-*"><strong>Monto Disponible</strong></td>
-                      <td class="text-end">${{item.precioMax}}</td>
-                    </tr>
-                    <tr>
-                      <td colspan="2" class="start-*"><strong>Empresa</strong></td>
-                      <td class="text-end">{{item.nombreEmpresa}}</td>
-                    </tr>
-                  </tbody>
-                </table>
-  
-  
-              </div>
-  
-              <div class="card-footer containerMoreInformation">
-  
-                <button class="btn btn-primary btnMoreInformation" type="button" data-bs-toggle="collapse"
-                  [attr.data-bs-target]="'#collapseExample' + i" aria-expanded="false" aria-controls="collapseExample">
-                  Más información
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-chevron-down" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd"
-                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-                  </svg>
-                </button>
-  
-                <div class="cardAccordion collapse" [attr.id]="'collapseExample' + i">
-                  <div class="card card-body col-12 mt-2">
-                    <h4 class="text-center my-2">Detalles de la publicación</h4>
-                    <table class="tableResume table table-hover table-borderless">
-                      <tbody>
-                        <tr>
-                          <td colspan="2" class="start-*"><strong>Fecha creación</strong></td>
-                          <td class="text-end">{{item.fechaCreacion | date}}</td>
-                        </tr>
-                        <tr>
-                          <td colspan="2" class="start-*"><strong>Garantía</strong></td>
-                          <td class="text-end">Si</td>
-                        </tr>
-                        <tr *ngIf="item.cantidad">
-                          <td colspan="2" class="start-*"><strong>Cantidad</strong></td>
-                          <td class="text-end">{{item.cantidad}}</td>
-                        </tr>
-                        <tr *ngIf="item.fechaExpiracion">
-                          <td colspan="2" class="start-*"><strong>Fecha de término</strong></td>
-                          <td class="text-end">{{item.fechaExpiracion | date}}</td>
-                        </tr>
-                        <tr ng *ngIf="item.modelo">
-                          <td colspan="2" class="start-*"><strong>Modelo</strong></td>
-                          <td class="text-end">{{item.modelo}}</td>
-                        </tr>
-                        <tr ng *ngIf="item.modelo">
-                          <td colspan="2" class="start-*"><strong>Modelo</strong></td>
-                          <td class="text-end">{{item.modelo}}</td>
-                        </tr>
-                        <tr ng *ngIf="item.modelo">
-                          <td colspan="2" class="start-*"><strong>Modelo</strong></td>
-                          <td class="text-end">{{item.modelo}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-  
-                    <div *ngIf="item.archivo" class="container p-0 text-center">
-                      <div class="col-md-4 col-sm-12">
-                        <h3 class="fs-6">Archivos adjuntos</h3>
-                        <img class="d-block mx-auto" width="50" src="../../../../assets/icons/file-earmark-arrow-down.svg"
-                          alt="ile-earmark-arrow-down.svg">
-                        <button class="btn btn-secondary btn-sm my-2" disabled type="button">Descargar</button>
-  
-                      </div>
-                    </div>
-  
-  
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                      <button class="btn btn-lg btn-secondary" disabled type="button">Ofertar</button>
-                    </div>
-  
-                  </div>
-                </div>
-              </div>
-            </div>
-            <br>
-          </div>
-  
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-end">
-          <li class="page-item disabled">
-            <a class="page-link">Anterior</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item">
-            <a class="page-link" href="#">Siguiente</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div> -->
-
 <div class="container">
   <div class="row">
-
+    <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="size"
+      [collectionSize]="numElement" (pageChange)="done()">
+    </ngb-pagination>
+  </div>
+  <div class="row">
     <div class="col-12">
       <div *ngFor="let item of publicaciones; let i = index">
 
@@ -221,15 +95,18 @@
                       </tr>
                     </tbody>
                   </table>
+
                   <div class="container">
-                    <!-- <button type="button" class="btn btn-secondary float-end" data-bs-container="body" data-bs-toggle="popover"
-                      data-bs-placement="left" data-bs-content="Right popover">
-                      Popover on right
-                    </button> -->
-                    <button type="button" class="btn btn-secondary" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="left" data-bs-content="Left popover">
-                      Popover on left
-                    </button>
+                    <div class="row">
+                      <div class="container">
+                        <button type="button" class="btn btn-success float-end" placement="bottom"
+                          ngbTooltip="Registrate para hacer una oferta!.">
+                          Ofertar
+                        </button>
+                      </div>
+                    </div>
                   </div>
+
                 </div>
               </div>
             </div>
@@ -240,23 +117,8 @@
     </div>
   </div>
   <div class="row">
-    <nav aria-label="Page navigation example">
-      <ul class="pagination justify-content-end">
-        <li class="page-item disabled">
-          <a class="page-link">Anterior</a>
-        </li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item">
-          <a class="page-link" href="#">Siguiente</a>
-        </li>
-      </ul>
-    </nav>
+    <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="size"
+      [collectionSize]="numElement" (pageChange)="done()">
+    </ngb-pagination>
   </div>
-  <!-- <div class="row">
-      <p-paginator [rows]="10" [totalRecords]="120" [rowsPerPageOptions]="[10,20,30]"></p-paginator>
-      <h5>Basic</h5>
-      <p-paginator [rows]="10" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10,20,30]"></p-paginator>
-    </div> -->
 </div>
