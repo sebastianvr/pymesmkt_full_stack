@@ -16,10 +16,17 @@ export class OfertaService {
   ) { }
 
 
-  postOferta(oferta : any): Observable<any>{
+  postOferta(oferta: any): Observable<any> {
     return this.http.post<any>(`${this.url}/api/oferta/`, oferta)
   }
- 
+
+  getOfertas(idUsuario: string): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/oferta/${idUsuario}`)
+  }
+
+  deleteOferta(idOferta: string): Observable<any> {
+    return this.http.delete<any>(`${this.url}/api/oferta/${idOferta}`)
+  }
   // getPymeById(id: string): Observable<any> {
   //   return this.http.get<any>(`${this.url}/api/pyme/${id}`)
   // }

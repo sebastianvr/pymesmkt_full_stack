@@ -24,7 +24,7 @@ export class PublicacionService {
     return this.http.get<any>(`${this.url}/api/publicacion/${id}`)
   }
 
-  getAllPublicaciones(page : number = 4 , size : number = 100){
+  getAllPublicaciones(page : number = 0 , size : number = 0){
     return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
     
   }
