@@ -11,13 +11,25 @@
 }
 
 .cardMain {
-    min-width: 600px;
+    min-width: 490px;
     margin: auto auto;
-    width: auto;
+    /* width: auto; */
 }
 
-.btnMoreInformation {
+/* .btnMoreInformation {
     position: relative;
     left: 70%;
 
+} */
+
+
+/* .card { overflow: hidden } */
+
+.my-custom-class {
+    background: aliceblue;
+    font-size: 125%;
+}
+
+.my-custom-class .arrow::after {
+    border-top-color: aliceblue;
 }

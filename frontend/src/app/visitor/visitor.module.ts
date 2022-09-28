@@ -13,6 +13,8 @@ import { SearchPublicationComponent } from './components/search-publication/sear
 import { MessageService } from 'primeng/api';
 import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
 
 const components: any[] = [
   HomeComponent,
@@ -33,7 +35,8 @@ const components: any[] = [
     CommonModule,
     VisitorRoutingModule,
     ReactiveFormsModule,
-    PrimeNgModule
-  ]
+    PrimeNgModule,
+    NgbModule,
+  ],
 })
 export class VisitorModule { }

@@ -1,0 +1,16 @@
+.card-body{
+    /* background-color:  #0d6efd; */
+    border-radius: 3px;
+    /* color: white; */
+}
+
+
+.containerPublicacion {
+    max-width: 1000px;
+    margin: auto;
+}
+
+/* .containerPrecio{
+    border: 1px solid black;
+    
+} */
