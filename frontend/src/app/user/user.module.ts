@@ -17,10 +17,12 @@ import { NavbarPymeComponent } from './components/navbar-pyme/navbar-pyme.compon
 import { FooterComponent } from './components/footer/footer.component';
 import { SidebarUserComponent } from './components/sidebar-user/sidebar-user.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+
 import { SearchPublicationComponent } from './components/search-publication/search-publication.component';
 import { PostCardPymeComponent } from './components/post-card-pyme/post-card-pyme.component';
 import { MainComponent } from './pages/main/main.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { MessageService } from 'primeng/api';
 
 
 const components = [
@@ -36,20 +38,21 @@ const components = [
   NavbarPymeComponent,
   FooterComponent,
   SidebarUserComponent,
-  SearchPublicationComponent
+  SearchPublicationComponent,
+  PostCardPymeComponent,
+  MainComponent,
 ]
 
 @NgModule({
   declarations: [
     ...components,
-    PostCardPymeComponent,
-    MainComponent,
   ],
   imports: [
     CommonModule,
     UserRoutingModule,
     ReactiveFormsModule,
-    PrimeNgModule
+    PrimeNgModule,
+    NgbModule,
   ],
   providers: [
     MessageService
