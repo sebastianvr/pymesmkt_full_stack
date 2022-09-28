@@ -31,6 +31,13 @@ export class PostCardPymeComponent implements OnInit {
   maxPrice!: number;
   mensaje!: string;
 
+  // Pagina actual
+  page = 0;
+  // Tamaño de elementos por página
+  size = 2;
+  // Representa a la cantidad total de publicaciones creadas
+  numElement!: number;
+
   id = this.authService.usuario.id
 
 
@@ -50,10 +57,14 @@ export class PostCardPymeComponent implements OnInit {
   })
 
   ngOnInit(): void {
-
-    this.publicacionService.getAllPublicaciones(0, 10)
+    this.getPublicaciones()
+  }
+  
+  getPublicaciones(){
+    this.publicacionService.getAllPublicaciones(this.page - 1, this.size)
       .subscribe(({ content, totalPages }) => {
         this.publicaciones = content
+        this.numElement = totalPages * this.size;
         console.log(this.publicaciones)
       })
   }
@@ -116,6 +127,10 @@ export class PostCardPymeComponent implements OnInit {
       && this.formularioOferta.get(campo)?.touched
   }
 
+
+  done() {
+    this.getPublicaciones();
+  }
 
 
 
