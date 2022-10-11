@@ -18,8 +18,20 @@ export class SidebarAdminComponent implements OnInit {
 
     this.itemsPanelMenu = [
       {
-        label: 'Buscar empresa',
-        icon: 'pi pi-fw pi-search',
+        label: 'Usuarios',
+        icon: 'pi pi-users',
+        items: [
+          {
+            label: 'Usuarios activos',
+            icon: 'pi pi-fw pi-user-plus',
+            routerLink: '/admin/view-users',
+          },
+          {
+            label: 'Usuarios eliminados',
+            icon: 'pi pi-fw pi-user-minus',
+            routerLink: '/admin/view-deleted-users',
+          },
+        ]
       },
       {
         label: 'Reclamos',
@@ -27,12 +39,12 @@ export class SidebarAdminComponent implements OnInit {
         items: [
           {
             label: 'Reclamos nuevos',
-            icon: 'pi pi-fw pi-user-plus',
+            icon: 'pi pi-fw pi-bookmark',
             routerLink: '/admin/new-report',
           },
           {
             label: 'Reclamos finalizados',
-            icon: 'pi pi-fw pi-user-minus',
+            icon: 'pi pi-fw pi-bookmark-fill',
           },
         ]
       },
