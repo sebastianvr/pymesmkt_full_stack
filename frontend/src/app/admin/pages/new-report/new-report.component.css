@@ -1,0 +1,7 @@
+.titleReclamo p {
+    text-transform: lowercase;
+}
+
+.titleReclamo p:first-letter {
+    text-transform: uppercase;
+}
