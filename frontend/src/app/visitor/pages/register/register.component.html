@@ -167,16 +167,18 @@
 
             <div class="col-md-6">
               <label for="lineOfBusiness" class="form-label">Rubro</label>
-              <select class="form-select" id="lineOfBusiness" formControlName="rubro">
-                <option value="">Selecciona una opción</option>
-                <option>Agricultura, Ganaderia, Silvicultura y Pesca</option>
-                <option>Confección de textiles</option>
-                <option>Panadería, Pastelería</option>
-              </select>
+              <input type="text" class="form-control" id="lineOfBusiness" placeholder="Panadería" formControlName="rubro">
               <span *ngIf="campoInvalido('rubro', 'infoEmpresa')" class="form-text text-danger">
-                Seleccione una opción.
+                El rubro es obligatorio.
               </span>
             </div>
+            <!-- <div class="col-md-5">
+              <label for="myRUT" class="form-label">RUT</label>
+              <input type="text" class="form-control" id="myRUT" placeholder="12.345.678-9" formControlName="rut">
+              <span *ngIf="campoInvalido('rut', 'infoEmpresa')" class="form-text text-danger">
+                El RUT es inválido o ya existe.
+              </span>
+            </div> -->
 
             <div class="col-md-3"></div>
 

@@ -35,7 +35,18 @@ export class SeePublicationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.publicacionService.getAllPublicacionById(this.usuario.id).subscribe(data => {
+      // this.data = data
+      // if(data.publicacion.count === 0){
+      //   console.log('no hay publicaciones de este ususario creadas')
+
+      // }
       this.cards = data.content
+      // console.log('data ',data.publicacion.count)
+      // console.log('data ',data)
+      console.log(this.cards)
+      // if(!this.cards){
+
+      // }
       // console.log(data)
       // console.log(this.cards)
     })

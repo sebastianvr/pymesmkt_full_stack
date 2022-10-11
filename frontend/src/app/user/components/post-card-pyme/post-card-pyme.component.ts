@@ -106,12 +106,12 @@ export class PostCardPymeComponent implements OnInit {
     }).then((result) => {
       if (result) {
         
-        
-        // console.log(this.closebutton.nativeElement)
         this.ofertaService.postOferta(nuevaOferta).subscribe();
-        // this.closebutton.nativeElement.hide();
         this.formularioOferta.reset();
-        this.router.navigate(['/user/offers-made']);
+        
+        // Mensaje de oferta Swal
+        // window.location.reload()
+        this.router.navigate(['/user/home']);
       }
     }
     )

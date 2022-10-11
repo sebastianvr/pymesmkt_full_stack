@@ -1,7 +1,7 @@
-.descriptionCard{
+.titleReclamo p {
     text-transform: lowercase;
 }
 
-.descriptionCard::first-letter {
+.titleReclamo p:first-letter {
     text-transform: uppercase;
 }

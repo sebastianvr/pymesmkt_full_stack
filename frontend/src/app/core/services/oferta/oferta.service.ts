@@ -20,8 +20,13 @@ export class OfertaService {
     return this.http.post<any>(`${this.url}/api/oferta/`, oferta)
   }
 
-  getOfertas(idUsuario: string): Observable<any> {
+
+  getOfertasRecibidas(idUsuario: string): Observable<any> {
     return this.http.get<any>(`${this.url}/api/oferta/${idUsuario}`)
+  }
+  
+  getOfertasRealizadas(idUsuario: string): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/oferta/created/${idUsuario}`)
   }
 
   deleteOferta(idOferta: string): Observable<any> {

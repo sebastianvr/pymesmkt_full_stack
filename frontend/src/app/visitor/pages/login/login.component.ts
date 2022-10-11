@@ -44,18 +44,17 @@ export class LoginComponent implements OnInit {
       return
     }
 
-    console.log(this.formularioLogin.value)
+    // console.log(this.formularioLogin.value)
 
     this.AuthService.login(this.formularioLogin.value).subscribe(ok => {
-      console.log(ok)
+      // console.log(ok)
       if (ok === true) {
         
         Swal.fire({
-          position: 'top-end',
           icon: 'success',
           title: 'Accediendo',
           showConfirmButton: false,
-          timer: 800,
+          timer: 1000,
         })
         
         this.router.navigate(['/user'])
@@ -64,14 +63,14 @@ export class LoginComponent implements OnInit {
        
         // mostrar mensaje de error
         Swal.fire({
-          position: 'top-end',
           icon: 'error',
           title: 'Error',
           text: ok,
           showConfirmButton: false,
-          timer: 1500,
+          timer: 1000,
         })
-        // this.formularioLogin.reset()
+
+        this.formularioLogin.get('contrasenia')?.reset()
       }
     })
 

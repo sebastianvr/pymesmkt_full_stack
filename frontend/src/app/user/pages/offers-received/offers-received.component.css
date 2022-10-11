@@ -1,4 +1,4 @@
-.card-body{
+.card-body {
     /* background-color:  #0d6efd; */
     border-radius: 3px;
     /* color: white; */
@@ -13,4 +13,16 @@
 /* .containerPrecio{
     border: 1px solid black;
     
+} */
+
+.descriptionCard{
+    text-transform: lowercase;
+}
+
+.descriptionCard::first-letter {
+    text-transform: uppercase;
+}
+
+/* .btn-pagar {
+    border-radius: 10px;
 } */

@@ -10,6 +10,11 @@ import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { SigmaComponent } from './components/sigma/sigma.component';
 import { GraphComponent } from './components/graph/graph.component';
+import { NewReportComponent } from './pages/new-report/new-report.component';
+import { FormsModule} from '@angular/forms';
+import { SearchPipe } from '../core/pipes/search.pipe';
+import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
+import { ViewUsersComponent } from './pages/view-users/view-users.component';
 
 
 
@@ -22,12 +27,18 @@ import { GraphComponent } from './components/graph/graph.component';
     FooterComponent,
     SidebarAdminComponent,
     SigmaComponent,
-    GraphComponent
+    GraphComponent,
+    NewReportComponent,
+    SearchPipe,
+    ViewDeletedUsersComponent,
+    ViewUsersComponent
   ],
   imports: [
     CommonModule,
     AdminRoutingModule,
-    PrimeNgModule
+    PrimeNgModule,
+    FormsModule,
+    // ReactiveFormsModule
   ]
 })
 export class AdminModule { }

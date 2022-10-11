@@ -8,6 +8,7 @@ import { RegionesComunasService } from '../../../core/services/regiones-comunas/
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { MessageService } from 'primeng/api';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -45,41 +46,41 @@ export class RegisterComponent implements OnInit {
     this.regionesPropietario = this.regionesComunas.getRegiones()
 
     // Reseteo el formulario para evitar llevar desde el cliente
-    // this.formulario.reset({
+    this.formulario.reset({
 
-    //   infoPropietario: {
-    //     nombre: 'Sebastian',
-    //     apellidos: 'Vidal',
-    //     run: '12.321.233-1',
-    //     correoPropietario: 'sebastian.vi@gmail.com',
-    //     contrasenia: '123.123',
-    //     contrasenia2: '123.123'
-    //   },
-    //   infoLocalidadPropietario: {
-    //     opRegion: 'Antofagasta',
-    //     opCommune: 'Mejillones',
-    //     direccionPropietario: 'Av. Lorem ipsum #123',
-    //     direccionPropietario2: '',
-    //     descripcion: 'Cerca de la plaza, Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi, nostrum.',
-    //   },
+      infoPropietario: {
+        nombre: 'Sebastian',
+        apellidos: 'Vidal',
+        run: '12.321.233-1',
+        correoPropietario: 'sebastian.vi@gmail.com',
+        contrasenia: '123.123',
+        contrasenia2: '123.123'
+      },
+      infoLocalidadPropietario: {
+        opRegion: 'Antofagasta',
+        opCommune: 'Mejillones',
+        direccionPropietario: 'Av. Lorem ipsum #123',
+        direccionPropietario2: '',
+        descripcion: 'Cerca de la plaza, Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi, nostrum.',
+      },
 
-    //   infoEmpresa: {
-    //     nombreEmpresa: 'El Molino ',
-    //     rut: '123.321.324-1',
-    //     tipoEmpresa: 'Empresa comercial',
-    //     rubro: 'Panadería, Pastelería',
-    //   },
+      infoEmpresa: {
+        nombreEmpresa: 'El Molino ',
+        rut: '123.321.324-1',
+        tipoEmpresa: 'Empresa comercial',
+        rubro: 'Panadería, Pastelería',
+      },
 
-    //   infoLocalidadEmpresa: {
-    //     usarDireccionPersonal: true,
-    //     regionEmpresa: '',
-    //     communeEmpresa: '',
-    //     direccionEmpresa: '',
-    //     descripcionEmpresa: '',
-    //   },
+      infoLocalidadEmpresa: {
+        usarDireccionPersonal: true,
+        regionEmpresa: '',
+        communeEmpresa: '',
+        direccionEmpresa: '',
+        descripcionEmpresa: '',
+      },
 
-    //   terminosYCondiciones: true
-    // });
+      terminosYCondiciones: true
+    });
   }
 
   getPercent() {
@@ -292,7 +293,17 @@ export class RegisterComponent implements OnInit {
     this.authService.registerUser(nuevoUsuario).subscribe(ok => {
 
       if (ok === true) {
-        this.router.navigate(['/user'])
+         Swal.fire({
+          // position: 'top-start',
+          icon: 'success',
+          title: 'Nuevo usuario creado',
+          showConfirmButton: false,
+          timer: 1500,
+        })
+        
+        this.router.navigate(['/visitor/login'])
+      
+        
       } else {
         // mostrar mensaje de error
         

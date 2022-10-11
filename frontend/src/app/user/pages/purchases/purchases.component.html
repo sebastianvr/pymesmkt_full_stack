@@ -1,1 +1,99 @@
-<p>purchases works!</p>
+<div class="container-fluid">
+    <div class="d-flex justify-content-center">
+
+        <div class="container">
+            <div class="col-md-12 g-5 pt-4 text-center mb-5">
+                <img class="float-end mx-auto mb-3" src="../../../../assets/icons/cart-check.svg" alt="pen.svg" width="55">
+                <h2 class="fs-1 mb-1">Mis Compras</h2>
+            </div>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 input-group input-group-sm mb-3 mx-3 ">
+                        <div class="input-group input-group-md">
+                            <input type="text" class="form-control" aria-label="Sizing example input"
+                                aria-describedby="inputGroup-sizing-lg" id="buscarOferta">
+                            <span class="input-group-text mr-3" id="inputGroup-sizing-lg">Buscar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 g-5 ">
+                <div class="container">
+                    <div class="col-12 text-center" *ngIf="!cards; else divCards">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+
+                    <ng-template #divCards>
+                        <div *ngFor="let item of this.cards; let i = index">
+                            <div class="card cardMain  shadow-sm rounded mb-2" style="width: 18rem;">
+                                <div class="card-header pt-2">
+                                    <h6 [ngClass]="{
+                                                'alert-primary' : item.estadoPublicacion.includes('ACTIVA'), 
+                                                'alert-success' : item.estadoPublicacion.includes('FINALIZADA'),
+                                                'alert-danger' : item.estadoPublicacion.includes('ELIMINADA')
+                                            }" class="stateHeader alert m-0 p-1" role="alert">Publicación {{
+                                        item.estadoPublicacion | lowercase}}
+                                    </h6>
+                                </div>
+
+                                <div class="card-body">
+                                    <h5 class="card-title"><a class="card-link">{{item.titulo | uppercase}}</a>
+                                    </h5>
+                                    <p class="card-text">{{item.descripcion | uppercase}}</p>
+
+                                    <hr style="height: 3px;">
+
+                                    <table class="tableResume table-hover table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="2" class="start-*"><strong>Fecha Publicación</strong>
+                                                </td>
+                                                <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy'}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="start-*"><strong>Precio</strong>
+                                                </td>
+                                                <td class="text-end">{{item.precioTotal | currency: 'CLP'}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="card-footer">
+                                    <button class="btn btn-primary float-end"
+                                        [routerLink]="['/user/publication-detail', item.id ]" type="button">
+                                        Más información
+                                    </button>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                    </ng-template>
+
+                    <div class="container">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-end">
+                              <li class="page-item disabled">
+                                <a class="page-link">Previous</a>
+                              </li>
+                              <li class="page-item"><a class="page-link" href="#">1</a></li>
+                              <li class="page-item"><a class="page-link" href="#">2</a></li>
+                              <li class="page-item"><a class="page-link" href="#">3</a></li>
+                              <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                              </li>
+                            </ul>
+                          </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
