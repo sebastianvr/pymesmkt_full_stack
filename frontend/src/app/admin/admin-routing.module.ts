@@ -3,6 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { MainComponent } from './pages/main/main.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ViewGraphComponent } from './pages/view-graph/view-graph.component';
+import { NewReportComponent } from './pages/new-report/new-report.component';
+import { ViewUsersComponent } from './pages/view-users/view-users.component';
+import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
 
 const routes: Routes = [
 
@@ -10,16 +13,12 @@ const routes: Routes = [
     path: '',
     component: MainComponent,
     children: [
-      { path: 'home', component: HomeComponent },
+      // { path: 'home', component: HomeComponent },
+      { path: 'view-users', component: ViewUsersComponent },
+      { path: 'view-deleted-users', component: ViewDeletedUsersComponent },
+      { path: 'new-report', component: NewReportComponent  },
       { path: 'view-graph', component: ViewGraphComponent },
-      // { path: 'new-report', component:  },
-      // { path: 'see-publications', component: SeePublicationsComponent },
-      // { path: 'publication-detail', component: PublicationDetailComponent },
-      // { path: 'offers-received', component: OffersReceivedComponent },
-      // { path: 'offers-made', component: OffersMadeComponent },
-      // { path: 'purchases', component: PurchasesComponent },
-      // { path: 'sales', component: SalesComponent },
-      { path: '**', redirectTo: 'home' }
+      { path: '**', redirectTo: 'view-users' }
     ]
   }
 
