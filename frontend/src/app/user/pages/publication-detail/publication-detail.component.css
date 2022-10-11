@@ -1,0 +1,7 @@
+.descriptionCard{
+    text-transform: lowercase;
+}
+
+.descriptionCard::first-letter {
+    text-transform: uppercase;
+}

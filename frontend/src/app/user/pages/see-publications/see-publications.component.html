@@ -4,51 +4,38 @@
         <div class="container">
             <div class="col-md-12 g-5 pt-4 text-center mb-5">
                 <img class="float-end mx-auto mb-3" src="../../../assets/icons/stickies.svg" alt="pen.svg" width="55">
-                <h2 class="fs-2 mb-1">Ver mis publicaciones</h2>
+                <h2 class="fs-1 mb-1">Mis Publicaciones</h2>
             </div>
 
             <!-- <div class="container">
                 <pre>{{this.formularioBusqueda.value | json}}</pre>
             </div> -->
 
-            <hr>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 input-group input-group-sm mb-3 mx-3 ">
+                        <div class="input-group input-group-md">
+                            <input type="text" class="form-control" aria-label="Sizing example input"
+                                aria-describedby="inputGroup-sizing-lg" id="buscarOferta">
+                            <span class="input-group-text mr-3" id="inputGroup-sizing-lg">Buscar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="col-md-12 g-5 ">
                 <div class="container">
-                    <div class="container">
-                        <h3 class="fs-3 mb-3">Filtrar una publicación</h3>
-
-                        <div class="row">
-                            <form [formGroup]="formularioBusqueda" (ngSubmit)="buscar()">
-                                <div class="col-md-12">
-                                    <label for="firstName" class="form-label">Título de la publicación</label>
-                                    <input type="text" class="form-control" id="firstName" formControlName="titulo">
-                                </div>
-
-                                <div class="col-md-12 mt-3">
-                                    <label for="dateTermination" class="form-label">Buscar según fecha de
-                                        publicación</label>
-                                    <div class="p-field">
-                                        <p-calendar class="calendarClass" [showIcon]="true" inputId="dateTermination"
-                                            name="dateTermination" dateFormat="d 'de' MM yy" formControlName="fecha">
-                                        </p-calendar>
-                                    </div>
-
-                                </div>
-                                <div class="col-md-12">
-                                    <button class="float-end btn btn-primary">Buscar</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-
                     <div class="col-12 text-center" *ngIf="!cards; else divCards">
                         <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
+
+                    <!-- <div class="col-12 text-center" *ngIf="data.publicacion.count ;">
+                        <div class="">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div> -->
 
                     <ng-template #divCards>
                         <div *ngFor="let item of this.cards; let i = index">

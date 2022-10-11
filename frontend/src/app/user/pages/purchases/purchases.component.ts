@@ -7,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PurchasesComponent implements OnInit {
 
+
+  cards : any
   constructor() { }
 
   ngOnInit(): void {
