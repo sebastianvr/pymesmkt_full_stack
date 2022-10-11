@@ -1,61 +1,85 @@
 <div class="container-fluid">
 
-    <div class="containerPublicacion py-4" *ngFor="let publicacion of publicaciones">
-        <div class="card">
-            <div class="card-body">
-                <button type="button" [routerLink]="['/user/publication-detail', publicacion.id]"
-                    class="btn btn-primary float-end">Ir al detalle</button>
-                <h3 class="fs-5">{{publicacion.titulo | uppercase}}</h3>
-                <p>Costo de la propuesta: {{publicacion.precioTotal | currency : 'CLP'}}</p>
+
+    <div class="d-flex justify-content-center">
+        <div class="container">
+
+            <div class="col-md-12 g-5 pt-4 text-center mb-5">
+                <img class="float-end mb-3" src="../../../../assets/icons/arrow-bar-left.svg" alt="pen.svg" width="55">
+                <h2 class="fs-1 mb-1">Ofertas Recibidas</h2>
             </div>
 
-            <div class="card-footer">
-                <span class="py-2">Empresas ofertantes: </span>
-                <ngb-accordion #acc="ngbAccordion" *ngFor="let oferta of publicacion.Oferta">
-                    <ngb-panel title="{{oferta.Usuario.Pyme.nombrePyme}}">
-                        <ng-template ngbPanelContent>
-                            <div class="row my-1">
-                                <span class="text-muted text-end fst-italic">Hace 50 minutos</span>
-                            </div>
-                            <p>
-                                {{oferta.mensaje}}
-                            </p>
-                            <div class="containerPrecio my-2">
-                                <h4 class="fs-4">Precio : {{oferta.precioOferta| currency : 'CLP'}}</h4>
-                            </div>
-                            <hr>
-                            <div class="row mt-3">
-                                <span class="text-muted text-start fst-italic">Contacto :</span>
-                            </div>
-                            <table class="table table-hover">
-                                <tbody class="text-center">
-                                    <tr>
-                                        <td class="fw-bold">Dueño de la empresa</td>
-                                        <td>{{ oferta.Usuario.nombreUsuario}} {{oferta.Usuario.apellidos}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Email</td>
-                                        <td>{{ oferta.Usuario.emailUsuario }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="row py-2">
-                                <div class="col-md-12">
-                                    <button type="button" (click)="eliminarOferta(oferta.id)"
-                                        class="btn btn-warning float-start">Eliminar oferta</button>
-                                    <form action="https://webpay3gint.transbank.cl/webpayserver/initTransaction"
-                                        method="POST">
-                                        <input type="hidden" name="token_ws"
-                                            value="01ab9f803a0cbf6c704ff4030535ec05628c982ecb342e82fea32c8f46c616af" />
-                                        <input type="submit" value="Pagar" />
-                                    </form>
-                                    <button type="button" class="btn btn-success float-end">Aceptar oferta</button>
-                                </div>
-                            </div>
-                        </ng-template>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 input-group input-group-sm mb-3 mx-3 ">
+                        <div class="input-group input-group-md">
+                            <input type="text" class="form-control" aria-label="Sizing example input"
+                                aria-describedby="inputGroup-sizing-lg" id="buscarOferta">
+                            <span class="input-group-text mr-3" id="inputGroup-sizing-lg">Buscar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    </ngb-panel>
-                </ngb-accordion>
+            <div class="containerPublicacion py-4" *ngFor="let publicacion of publicaciones">
+                <div class="card">
+                    <div class="card-body">
+                        <button type="button" [routerLink]="['/user/publication-detail', publicacion.id]"
+                            class="btn btn-primary float-end">Ir al detalle</button>
+                        <h3 class="fs-5">{{publicacion.titulo | uppercase}}</h3>
+                        <p>Costo de la propuesta: {{publicacion.precioTotal | currency : 'CLP'}}</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="py-2">Empresas ofertantes: </span>
+                        <ngb-accordion #acc="ngbAccordion" *ngFor="let oferta of publicacion.Oferta">
+                            <ngb-panel title="{{oferta.Usuario.Pyme.nombrePyme}}">
+                                <ng-template ngbPanelContent>
+                                    <div class="row my-1">
+                                        <span class="text-muted text-end fst-italic">{{publicacion.createdAt | date : 'dd MMMM yyyy'}}</span>
+                                    </div>
+                                    <p class=descriptionCard>
+                                        {{oferta.mensaje}}
+                                    </p>
+                                    <div class="containerPrecio my-2">
+                                        <h4 class="fs-4">Precio : {{oferta.precioOferta| currency : 'CLP'}}</h4>
+                                    </div>
+                                    <hr>
+                                    <div class="row mt-3">
+                                        <span class="text-muted text-start fst-italic">Contacto :</span>
+                                    </div>
+                                    <table class="table table-hover">
+                                        <tbody class="text-center">
+                                            <tr>
+                                                <td class="fw-bold">Dueño de la empresa</td>
+                                                <td>{{ oferta.Usuario.nombreUsuario}} {{oferta.Usuario.apellidos}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Email</td>
+                                                <td>{{ oferta.Usuario.emailUsuario }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="row py-2">
+                                        <div class="col-md-12">
+                                            <button type="button" (click)="eliminarOferta(oferta.id)"
+                                                class="btn btn-warning float-start">Eliminar oferta</button>
+
+                                            <form [action]="url" method="POST">
+                                                <input type="hidden" name="token_ws" [value]="token" />
+                                                <input class="btn btn-pagar btn-success float-end" type="submit"
+                                                    value="Pagar" />
+                                            </form>
+                                        </div>
+                                    </div>
+                                </ng-template>
+
+                            </ngb-panel>
+                        </ngb-accordion>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
+</div>

@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
-import { MessageService, PrimeNGConfig} from 'primeng/api';
+import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-publication',
@@ -185,12 +186,12 @@ export class CreatePublicationComponent implements OnInit {
   }
 
   enviarPublicacion() {
-    
+
     if (this.formularioPublicacion.invalid) {
       this.formularioPublicacion.markAllAsTouched()
       return
     }
-    
+
     // creacion de objeto para enviar a la petición
     const nuevaPublicacion = {
       titulo: this.formularioPublicacion.get('titulo')?.value,
@@ -207,22 +208,38 @@ export class CreatePublicationComponent implements OnInit {
       garantia: this.formularioPublicacion.get('garantia')?.value,
       aniosGarantia: this.formularioPublicacion.get('aniosGarantia')?.value,
       archivos: this.formularioPublicacion.get('archivos')?.value,
-      
+
       // UsuarioId referencia el ususario creador
       UsuarioId: this.authService.usuario.id
     }
-    
+
     // Parseo la fecha para que la bd la reconozca como valida
     if (nuevaPublicacion.productoOServicio === 'Servicio') {
       nuevaPublicacion.fechaFinServicio = moment(nuevaPublicacion.fechaFinServicio).format()
       nuevaPublicacion.fechaInicioServicio = moment(nuevaPublicacion.fechaInicioServicio).format()
     }
-    
+
     // Envio de datos con el servicio
     this.publicacionService.postPublicacion(nuevaPublicacion).subscribe(data => {
-      // this.showMessageToast('success', 'Nueva publicación creada')
-      this.router.navigate([`user/publication-detail/${data.id}`])
-      console.log('Publicacion Enviada! : ', data)
+
+      // console.log(data)
+      if (data.ok === true) {
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Publicación creada!',
+          showConfirmButton: false,
+          timer: 1200,
+        })
+
+        this.router.navigate([`user/publication-detail/${data.id}`])
+
+      }
+
+      // console.log('Publicacion Enviada! : ', data)
+
+
+
     });
   }
 
@@ -230,8 +247,8 @@ export class CreatePublicationComponent implements OnInit {
     return this.formularioPublicacion.get(campo)?.errors
       && this.formularioPublicacion.get(campo)?.touched
   }
-  
-  showMessageToast(severity : string, summary : string, detail : string = ''){
+
+  showMessageToast(severity: string, summary: string, detail: string = '') {
     this.messageService.add({ severity: severity, summary: summary, detail: detail })
   }
 

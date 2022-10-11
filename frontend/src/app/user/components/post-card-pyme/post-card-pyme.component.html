@@ -33,12 +33,16 @@
                   </tr>
                   <tr>
                     <td colspan="2" class="start-*"><strong>Empresa</strong></td>
-                    <td class="text-end">{{item.Usuario.Pyme.nombrePyme}}</td>
+                    <td class="text-end">{{item.Usuario.Pyme.nombrePyme | titlecase}}</td>
                   </tr>
                   <tr>
-                    <td colspan="2" class="start-*"><strong>Calificación</strong></td>
-                    <!-- <td class="text-end">{{item.Usuario.Calificacions[i].promedio}}</td> -->
+                    <td colspan="2" class="start-*"><strong>Propietario</strong></td>
+                    <td class="text-end">{{item.Usuario.nombreUsuario | titlecase}} {{item.Usuario.apellidos | titlecase}}</td>
                   </tr>
+                  <!-- <tr>
+                    <td colspan="2" class="start-*"><strong>Calificación</strong></td>
+                    <td class="text-end">{{item.Usuario.Calificacions[i].promedio}}</td>
+                  </tr> -->
                 </tbody>
               </table>
 
@@ -114,7 +118,6 @@
                     </div>
 
                     <!-- Modal para ofertar-->
-
                     <form [formGroup]="formularioOferta" (ngSubmit)="enviarOferta(item.id)">
                       <div class="modal fade" id="exampleModal" data-bs-backdrop="static" tabindex="-1"
                         aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -125,10 +128,10 @@
                               <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                             </div>
-
+  
                             <div class="modal-body">
                               <div class="container">
-
+  
                                 <!-- FORMULARIO PARA ENVIAR EL MANSAJE DE OFERTA -->
                                 <div class="col-md-12">
                                   <h3 class="fs-5 mb-2">Escribe tu propuesta y empieza a colaborar con esta empresa.
@@ -162,9 +165,9 @@
                         </div>
                       </div>
                     </form>
-
+                     
                   </div>
-
+                  
 
                 </div>
               </div>
