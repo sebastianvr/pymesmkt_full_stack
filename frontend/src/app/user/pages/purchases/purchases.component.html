@@ -3,7 +3,8 @@
 
         <div class="container">
             <div class="col-md-12 g-5 pt-4 text-center mb-5">
-                <img class="float-end mx-auto mb-3" src="../../../../assets/icons/cart-check.svg" alt="pen.svg" width="55">
+                <img class="float-end mx-auto mb-3" src="../../../../assets/icons/cart-check.svg" alt="pen.svg"
+                    width="55">
                 <h2 class="fs-1 mb-1">Mis Compras</h2>
             </div>
 
@@ -22,9 +23,10 @@
             <div class="col-md-12 g-5 ">
                 <div class="container">
                     <div class="col-12 text-center" *ngIf="!cards; else divCards">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
+                        <!-- <div class="spinner-border" role="status">
+                            <span class="visually-hidden">...</span>
+                        </div> -->
+                        <h4 class="fs-3 mt-5">No hay compras aún</h4>
                     </div>
 
 
@@ -75,21 +77,21 @@
                         </div>
                     </ng-template>
 
-                    <div class="container">
+                    <!-- <div class="container">
                         <nav aria-label="Page navigation example">
                             <ul class="pagination justify-content-end">
-                              <li class="page-item disabled">
-                                <a class="page-link">Previous</a>
-                              </li>
-                              <li class="page-item"><a class="page-link" href="#">1</a></li>
-                              <li class="page-item"><a class="page-link" href="#">2</a></li>
-                              <li class="page-item"><a class="page-link" href="#">3</a></li>
-                              <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                              </li>
+                                <li class="page-item disabled">
+                                    <a class="page-link">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
                             </ul>
-                          </nav>
-                    </div>
+                        </nav>
+                    </div> -->
 
                 </div>
             </div>
