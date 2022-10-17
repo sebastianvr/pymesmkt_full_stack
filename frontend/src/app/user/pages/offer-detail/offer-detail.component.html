@@ -1,0 +1,6 @@
+<p>offer-detail works!</p>
+
+<form [action]="transactionButton.url" method="POST">
+    <input type="hidden" name="token_ws" [value]="transactionButton.token" />
+    <input class="btn btn-pagar btn-success float-end" type="submit" value="Pagar" />
+</form>

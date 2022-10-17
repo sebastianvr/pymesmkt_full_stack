@@ -23,6 +23,7 @@ import { PostCardPymeComponent } from './components/post-card-pyme/post-card-pym
 import { MainComponent } from './pages/main/main.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from 'primeng/api';
+import { OfferDetailComponent } from './pages/offer-detail/offer-detail.component';
 
 
 const components = [
@@ -41,6 +42,7 @@ const components = [
   SearchPublicationComponent,
   PostCardPymeComponent,
   MainComponent,
+  OfferDetailComponent,
 ]
 
 @NgModule({
