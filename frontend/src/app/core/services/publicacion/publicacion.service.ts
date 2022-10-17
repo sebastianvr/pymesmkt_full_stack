@@ -20,24 +20,28 @@ export class PublicacionService {
     return this.http.post(`${this.url}/api/publicacion`, nuevaPublicacion)
   }
 
-  getPublicacionById(id : string) : Observable<any>{
+  getPublicacionById(id: string): Observable<any> {
     return this.http.get<any>(`${this.url}/api/publicacion/${id}`)
   }
 
-  getAllPublicaciones(page : number = 0 , size : number = 0){
-    return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
-    
+  getPublicacionesPagadasById(id: string, page: number = 0, size: number = 0): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/publicacion/usuario/paid/${id}?size=${size}&page=${page}`)
   }
 
-  getAllPublicacionById(id : string) : Observable<any>{
+  getAllPublicaciones(page: number = 0, size: number = 0): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
+
+  }
+
+  getAllPublicacionById(id: string): Observable<any> {
     return this.http.get<any>(`${this.url}/api/publicacion/usuario/${id}`)
   }
 
-  putPublicacion(){
-
+  deletePublicacion(id: any): Observable<any> {
+    return this.http.delete<any>(`${this.url}/api/publicacion/${id}`);
   }
 
-  deletePublicacion(id : any){
-    return this.http.delete<any>(`${this.url}/api/publicacion/${id}`);
+  putPublicacion() {
+
   }
 }

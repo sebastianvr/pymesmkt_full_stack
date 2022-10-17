@@ -15,7 +15,7 @@ export class PagoService {
   ) { }
 
   getTransaccion(data: any): Observable<any> {
-    return this.http.get(`${this.url}/api/pago/create?amount=${data.amount}&returnUrl=${data.address}`)
+    return this.http.get(`${this.url}/api/pago/create?amount=${data.amount}&returnUrl=${data.returnUrl}`)
   }
 
   getCommitPago(token: any): Observable<any> {
