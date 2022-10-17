@@ -1,29 +1,45 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, OnDestroy } from '@angular/core';
 import { UsuarioService } from '../../../core/services/usuario/usuario.service';
 import Swal from 'sweetalert2';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-view-users',
   templateUrl: './view-users.component.html',
   styleUrls: ['./view-users.component.css']
 })
-export class ViewUsersComponent implements OnInit {
+export class ViewUsersComponent implements OnInit, OnDestroy{
 
   searchText: string = '';
   allUsuarios: any
+
+  suscription!: Subscription;
+
+
   constructor(
     private usuarioService: UsuarioService
   ) { }
 
   ngOnInit(): void {
-    this.usuarioService.getAllUsuarios(0, 10).subscribe((data) => {
-      this.allUsuarios = data.content
-      console.log('data', data)
-      console.log('this.allReclamos', this.allUsuarios)
+    this.getAll();
+
+    this.suscription = this.usuarioService.refresh.subscribe(() => {
+      this.getAll();
     })
   }
 
-  eliminarUsuario(idUsuario : string) {
+  ngOnDestroy(): void {
+      this.suscription.unsubscribe();
+      console.log('observable cerrado')
+  }
+
+  getAll() {
+    this.usuarioService.getAllUsuarios(0, 10).subscribe((data) => {
+      this.allUsuarios = data.content
+    })
+  }
+
+  eliminarUsuario(idUsuario: string) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: 'btn btn-success',
@@ -31,7 +47,7 @@ export class ViewUsersComponent implements OnInit {
       },
       buttonsStyling: false
     })
-    
+
     swalWithBootstrapButtons.fire({
       title: '¿Estás seguro de eliminar este usuario?',
       icon: 'warning',
@@ -47,11 +63,17 @@ export class ViewUsersComponent implements OnInit {
           'success'
         )
         this.usuarioService.deleteUsuario(idUsuario).subscribe()
+        // this.usuarioService.refresh.subscribe(response => {
+        //   this.getAll();
+        // })
         // this.router.navigate(['/user/see-publications'])
 
-      
-      } 
+
+      }
     })
   }
 
+  OnDestroy() {
+    this.usuarioService.refresh.unsubscribe()
+  }
 }

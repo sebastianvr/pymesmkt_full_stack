@@ -1,25 +1,41 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UsuarioService } from '../../../core/services/usuario/usuario.service';
 import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-view-deleted-users',
   templateUrl: './view-deleted-users.component.html',
   styleUrls: ['./view-deleted-users.component.css']
 })
-export class ViewDeletedUsersComponent implements OnInit {
+export class ViewDeletedUsersComponent implements OnInit, OnDestroy {
 
   searchText: string = '';
   allUsuariosDeleted: any;
+
+  suscription!: Subscription
 
   constructor(
     private usuarioService: UsuarioService
   ) { }
 
   ngOnInit(): void {
+    this.getAll();
+
+    this.suscription = this.usuarioService.refresh.subscribe(() => {
+      this.getAll();
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.suscription.unsubscribe();
+    console.log('observable cerrado')
+  }
+
+
+  getAll() {
     this.usuarioService.getAllUsuariosDeleted(0, 10).subscribe((data) => {
       this.allUsuariosDeleted = data.content
-      // console.log('data', data)
       console.log('this.allUsuariosDeleted', this.allUsuariosDeleted)
     })
   }
