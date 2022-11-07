@@ -43,8 +43,8 @@ export class ViewDeletedUsersComponent implements OnInit, OnDestroy {
   activarUsuario(usuario: any) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
+        confirmButton: 'btn btn-success mx-3',
+        cancelButton: 'btn btn-danger mx-3'
       },
       buttonsStyling: false
     })
@@ -52,9 +52,10 @@ export class ViewDeletedUsersComponent implements OnInit, OnDestroy {
     swalWithBootstrapButtons.fire({
       title: '¿Estás seguro de reintegrar este usuario?',
       icon: 'warning',
+      iconColor: 'red',
       showCancelButton: true,
-      confirmButtonText: 'Si, reintegrar!',
-      cancelButtonText: 'No, cancelar!',
+      confirmButtonText: 'Reintegrar',
+      cancelButtonText: 'Cancelar',
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {

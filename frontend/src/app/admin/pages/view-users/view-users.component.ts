@@ -39,11 +39,45 @@ export class ViewUsersComponent implements OnInit, OnDestroy{
     })
   }
 
-  eliminarUsuario(idUsuario: string) {
+  suspenderUsuario(idUsuario: string) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
+        confirmButton: 'btn btn-success mx-3',
+        cancelButton: 'btn btn-danger mx-3'
+      },
+      buttonsStyling: false
+    })
+
+    swalWithBootstrapButtons.fire({
+      title: '¿Estás seguro de suspender a este usuario?',
+      icon: 'warning',
+      iconColor: '#ffc108',
+      showCancelButton: true,
+      confirmButtonText: 'Suspender',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        swalWithBootstrapButtons.fire(
+          'Usuario suspendido',
+          'Usuario añadido a la sección de usuarios suspendidos.',
+          'success'
+        )
+        this.usuarioService.suspenderUsuario(idUsuario).subscribe()
+        // this.usuarioService.refresh.subscribe(response => {
+        //   this.getAll();
+        // })
+        // this.router.navigate(['/user/see-publications']; 
+      }
+    })
+  }
+
+
+  eliminarUsuario(idUsuario : string){
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-success mx-3',
+        cancelButton: 'btn btn-danger mx-3'
       },
       buttonsStyling: false
     })
@@ -51,24 +85,23 @@ export class ViewUsersComponent implements OnInit, OnDestroy{
     swalWithBootstrapButtons.fire({
       title: '¿Estás seguro de eliminar este usuario?',
       icon: 'warning',
+      iconColor: 'red',
       showCancelButton: true,
-      confirmButtonText: 'Si, eliminar!',
-      cancelButtonText: 'No, cancelar!',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
         swalWithBootstrapButtons.fire(
-          'Eliminado!',
+          'Eliminado',
           'Este usuario ha sido eliminado del sistema.',
           'success'
         )
-        this.usuarioService.deleteUsuario(idUsuario).subscribe()
+        // this.usuarioService.deleteUsuario(idUsuario).subscribe()
         // this.usuarioService.refresh.subscribe(response => {
         //   this.getAll();
         // })
-        // this.router.navigate(['/user/see-publications'])
-
-
+        // this.router.navigate(['/user/see-publications']; 
       }
     })
   }
