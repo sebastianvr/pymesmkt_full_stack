@@ -10,7 +10,6 @@ import { FooterComponent } from './components/footer/footer.component';
 import { MainComponent } from './pages/main/main.component';
 import { PostCardVisitorComponent } from './components/post-card-visitor/post-card-visitor.component';
 import { SearchPublicationComponent } from './components/search-publication/search-publication.component';
-import { MessageService } from 'primeng/api';
 import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
