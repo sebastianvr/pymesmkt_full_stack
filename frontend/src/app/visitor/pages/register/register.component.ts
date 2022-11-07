@@ -7,7 +7,6 @@ import { EmailValidatorService } from '../../../core/validations/email-validator
 import { RegionesComunasService } from '../../../core/services/regiones-comunas/regiones-comunas.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
-import { MessageService } from 'primeng/api';
 import Swal from 'sweetalert2';
 
 @Component({

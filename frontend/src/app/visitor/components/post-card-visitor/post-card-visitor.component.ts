@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import { PymeServiceService } from '../../../core/services/pyme/pyme-service.service';
+
 
 @Component({
   selector: 'app-post-card-visitor',
@@ -33,8 +32,6 @@ export class PostCardVisitorComponent implements OnInit {
 
   constructor(
     private publicacionService: PublicacionService,
-    private authService: AuthService,
-    private pymeService: PymeServiceService
   ) { }
 
   ngOnInit(): void {
