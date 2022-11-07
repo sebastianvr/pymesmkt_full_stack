@@ -26,31 +26,8 @@ export class OffersReceivedComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private ofertaService: OfertaService,
     private authService: AuthService,
-    private pagoService: PagoService,
     private modalService: NgbModal
-
-
-
   ) {
-
-    // this.activatedRoute.queryParams.subscribe(({ token_ws }) => {
-
-    //   if (token_ws) {
-    //     this.pagoService.getCommitPago(this.token).subscribe((data)=>{
-    //       console.log(data)
-    //     })
-
-    //     // console.log('data', token_ws)
-    //     // Mostrar pago aceptado
-    //     // Swal.fire({
-    //     //   icon: 'success',
-    //     //   title: 'Tu pago se ha realizado con exito',
-    //     //   text: "Revisa tus compras en el menú principal",
-    //     //   showConfirmButton: true,
-    //     //   // timer: 2500
-    //     // })
-    //   }
-    // })
   }
 
   ngOnInit(): void {
@@ -58,13 +35,6 @@ export class OffersReceivedComponent implements OnInit, OnDestroy {
     this.suscription = this.ofertaService.refresh$.subscribe(() => {
       this.getOfertas();
     })
-
-    // this.pagoService.getTransaccion(this.data).subscribe((data) => {
-    //   // console.log(data)
-    //   this.token = data.token
-    //   this.url = data.url
-    //   // console.log('location.href', location.xhref)
-    // })
   }
 
   ngOnDestroy(): void {
@@ -101,7 +71,6 @@ export class OffersReceivedComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.ofertaService.deleteOferta(idOferta).subscribe((data) => {
           console.log(data)
-          // window.location.reload()
         })
 
         swalWithBootstrapButtons.fire(
@@ -112,12 +81,6 @@ export class OffersReceivedComponent implements OnInit, OnDestroy {
 
       }
     })
-  }
-
-
-  data = {
-    amount: 70000,
-    address: location.href
   }
 
   aceptarOferta() {

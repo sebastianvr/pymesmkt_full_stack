@@ -2,10 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
-import { PagoService } from 'src/app/core/services/pago/pago.service';
 import Swal from 'sweetalert2';
-import { Subscription, Observable } from 'rxjs';
-import { ThisReceiver } from '@angular/compiler';
+import { Subscription } from 'rxjs';
+;
 
 @Component({
   selector: 'app-offers-made',
@@ -39,6 +38,7 @@ export class OffersMadeComponent implements OnInit, OnDestroy {
   getOfertas() {
     this.ofertaService.getOfertasRealizadas(this.authService.usuario.id).subscribe((data) => {
       this.ofertas = data.content
+      console.log('getOfertasRealizadas: ', data)
       console.log('this.ofertas: ', this.ofertas)
     })
   }

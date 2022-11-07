@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
 import { switchMap } from 'rxjs';
-import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 import Swal from 'sweetalert2'
+import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 
 @Component({
   selector: 'app-publication-detail',
@@ -20,7 +19,7 @@ export class PublicationDetailComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private router : Router,
+    private router: Router,
     private publicacionService: PublicacionService
   ) { }
 
@@ -40,19 +39,20 @@ export class PublicationDetailComponent implements OnInit {
   eliminarPublicacion() {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
+        confirmButton: 'btn btn-success mx-3',
+        cancelButton: 'btn btn-danger mx-3'
       },
       buttonsStyling: false
     })
-    
+
     swalWithBootstrapButtons.fire({
-      title: '¿Estás seguro de eliminar la publicación?',
-      text: "No podrás revertir esto!",
+      title: '¿Estás seguro de eliminar esta publicación?',
+      text: "No podrás revertir esto",
       icon: 'warning',
+      iconColor: 'red',
       showCancelButton: true,
-      confirmButtonText: 'Si, eliminar!',
-      cancelButtonText: 'No, cancelar!',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
@@ -64,20 +64,11 @@ export class PublicationDetailComponent implements OnInit {
         this.publicacionService.deletePublicacion(this.publicacion.id).subscribe()
         this.router.navigate(['/user/see-publications'])
 
-      
-      } else if (
-        /* Read more about handling dismissals below */
-        result.dismiss === Swal.DismissReason.cancel
-      ) {
-        swalWithBootstrapButtons.fire(
-          'Cancelado',
-          '',
-          'error'
-        )
+
       }
     })
   }
 
 
-  
+
 }

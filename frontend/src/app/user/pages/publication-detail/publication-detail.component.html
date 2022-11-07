@@ -11,7 +11,7 @@
             <hr class="m-0">
 
             <div class="col-12 text-center my-5" *ngIf="!publicacion; else divPublicacion">
-                <div class="spinner-border" role="status">
+                <div class="spinner-border  text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
@@ -20,11 +20,11 @@
                 <div class="col-md-12 g-5 mt-4">
                     <div class="container d-grid gap-2 text-center">
                         <button [ngClass]="{
-                            'alert-primary' : publicacion.procesoDeCompra.includes('INICIADA'), 
-                            'alert-warning' : publicacion.procesoDeCompra.includes('EN PROCESO'),
-                            'alert-success' : publicacion.procesoDeCompra.includes('FINALIZADA')
+                            'alert-primary' : publicacion.procesoDePublicacion.includes('INICIADA'), 
+                            'alert-warning' : publicacion.procesoDePublicacion.includes('EN PROCESO'),
+                            'alert-success' : publicacion.procesoDePublicacion.includes('FINALIZADA')
                         }" class="alert alert-success alert-lg text-center" type="button">Compra
-                            {{publicacion.procesoDeCompra | lowercase}}
+                            {{publicacion.procesoDePublicacion | lowercase}}
                         </button>
                         <!-- <div class="col-md-12">
                             <img class="iconPublicacion float-end dmx-auto" src="../../../assets/icons/box-seam.svg"
@@ -192,7 +192,7 @@
 
                     <div class="container col-12 my-3">
                         <div class="col-md-12">
-                            <button (click)="eliminarPublicacion()" class="btn btn-warning float-start">Eliminar publicación</button>
+                            <button (click)="eliminarPublicacion()" class="btn btn-danger float-start">Eliminar publicación</button>
                         </div>
                         <div class="col-md-12">
                             <button class="btn btn-primary float-end">Editar publicación</button>

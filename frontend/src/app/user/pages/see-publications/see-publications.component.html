@@ -25,28 +25,23 @@
 
             <div class="col-md-12 g-5 ">
                 <div class="container">
-                    <div class="col-12 text-center" *ngIf="!cards; else divCards">
-                        <div class="spinner-border" role="status">
+                    
+                    <div class="col-12 text-center my-5" *ngIf="!this.cards; else divPublicaciones">
+                        <div class="spinner-border  text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
 
-                    <!-- <div class="col-12 text-center" *ngIf="data.publicacion.count ;">
-                        <div class="">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div> -->
-
-                    <ng-template #divCards>
-                        <div *ngFor="let item of this.cards; let i = index">
+                    <ng-template #divPublicaciones>
+                        <div *ngFor="let item of cards; let i = index">
                             <div class="card cardMain  shadow-sm rounded mb-2" style="width: 18rem;">
                                 <div class="card-header pt-2">
                                     <h6 [ngClass]="{
-                                                'alert-primary' : item.estadoPublicacion.includes('ACTIVA'), 
-                                                'alert-success' : item.estadoPublicacion.includes('FINALIZADA'),
-                                                'alert-danger' : item.estadoPublicacion.includes('ELIMINADA')
+                                                'alert-primary' : item.procesoDePublicacion.includes('INICIADA'), 
+                                                'alert-success' : item.procesoDePublicacion.includes('FINALIZADA'),
+                                                'alert-danger' : item.procesoDePublicacion.includes('ELIMINADA')
                                             }" class="stateHeader alert m-0 p-1" role="alert">Publicación {{
-                                        item.estadoPublicacion | lowercase}}
+                                        item.procesoDePublicacion | lowercase}}
                                     </h6>
                                 </div>
 
@@ -84,21 +79,7 @@
                         </div>
                     </ng-template>
 
-                    <div class="container">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-end">
-                              <li class="page-item disabled">
-                                <a class="page-link">Previous</a>
-                              </li>
-                              <li class="page-item"><a class="page-link" href="#">1</a></li>
-                              <li class="page-item"><a class="page-link" href="#">2</a></li>
-                              <li class="page-item"><a class="page-link" href="#">3</a></li>
-                              <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                              </li>
-                            </ul>
-                          </nav>
-                    </div>
+
 
                 </div>
             </div>

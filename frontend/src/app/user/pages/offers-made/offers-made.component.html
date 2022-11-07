@@ -73,12 +73,12 @@
                                                 <div class="col-md-12 g-5 mt-4">
                                                     <div class="container d-grid gap-2 text-center">
                                                         <button [ngClass]="{
-                                                            'alert-primary' : oferta.Publicacion.procesoDeCompra.includes('INICIADA'), 
-                                                            'alert-warning' : oferta.Publicacion.procesoDeCompra.includes('EN PROCESO'),
-                                                            'alert-success' : oferta.Publicacion.procesoDeCompra.includes('FINALIZADA')
+                                                            'alert-primary' : oferta.Publicacion.procesoDePublicacion.includes('INICIADA'), 
+                                                            'alert-warning' : oferta.Publicacion.procesoDePublicacion.includes('EN PROCESO'),
+                                                            'alert-success' : oferta.Publicacion.procesoDePublicacion.includes('FINALIZADA')
                                                         }" class="alert alert-success alert-lg text-center"
                                                             type="button">Publicación
-                                                            {{oferta.Publicacion.procesoDeCompra | lowercase}}
+                                                            {{oferta.Publicacion.procesoDePublicacion | lowercase}}
                                                         </button>
                                                     </div>
 
