@@ -30,7 +30,7 @@ export class UsuarioService {
     return this.http.get<any>(`${this.url}/api/usuario/deleted/?size=${size}&page=${page}`)
   }
 
-  deleteUsuario(id: any) {
+  suspenderUsuario(id: any) {
     return this.http.delete<any>(`${this.url}/api/usuario/${id}`)
     .pipe(
       tap( ()=> {

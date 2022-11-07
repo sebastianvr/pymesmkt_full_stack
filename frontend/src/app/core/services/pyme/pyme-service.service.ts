@@ -14,19 +14,11 @@ export class PymeServiceService {
     private http: HttpClient
   ) { }
 
-
   getPymeById(id: string): Observable<any> {
     return this.http.get<any>(`${this.url}/api/pyme/${id}`)
   }
 
   getAllPymes(page: number = 0, size: number = 10) {
     return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
-  }
-
-
-  putPyme() {
-  }
-
-  deletePyme() {
   }
 }

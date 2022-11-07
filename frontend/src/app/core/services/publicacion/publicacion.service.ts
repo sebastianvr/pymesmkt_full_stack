@@ -2,13 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment.prod';
-import { query } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PublicacionService {
-
 
   private url: string = environment.baseUrl
 
@@ -24,9 +22,11 @@ export class PublicacionService {
     return this.http.get<any>(`${this.url}/api/publicacion/${id}`)
   }
 
+  // Mostrar la seccion de MIS COMPRAS, compras de un usuario en especifico
   getPublicacionesPagadasById(id: string, page: number = 0, size: number = 0): Observable<any> {
     return this.http.get<any>(`${this.url}/api/publicacion/usuario/paid/${id}?size=${size}&page=${page}`)
   }
+
 
   getAllPublicaciones(page: number = 0, size: number = 0): Observable<any> {
     return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
@@ -41,7 +41,8 @@ export class PublicacionService {
     return this.http.delete<any>(`${this.url}/api/publicacion/${id}`);
   }
 
-  putPublicacion() {
-
+  aceptarPublicacion(publicacion: any): Observable<any> {
+    return this.http.put<any>(`${this.url}/api/publicacion/aceptar/${publicacion}`, null);
   }
+
 }

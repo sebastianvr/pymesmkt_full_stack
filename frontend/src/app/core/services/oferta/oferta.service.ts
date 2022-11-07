@@ -45,16 +45,8 @@ export class OfertaService {
         })
       );
   }
-  // getPymeById(id: string): Observable<any> {
-  //   return this.http.get<any>(`${this.url}/api/pyme/${id}`)
-  // }
 
-  // getAllPymes(page: number = 0, size: number = 10) {
-  //   return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
-  // }
-
-
-  // putPyme() {
-  // }
-
+  aceptaOferta(oferta: any): Observable<any> {
+    return this.http.put<any>(`${this.url}/api/oferta/aceptar/${oferta}`, null);
+  }
 }
