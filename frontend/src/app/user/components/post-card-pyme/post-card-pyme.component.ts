@@ -65,7 +65,7 @@ export class PostCardPymeComponent implements OnInit {
       .subscribe(({ content, totalPages }) => {
         this.publicaciones = content
         this.numElement = totalPages * this.size;
-        console.log(this.publicaciones)
+        console.log('this.publicaciones :', this.publicaciones)
       })
   }
 

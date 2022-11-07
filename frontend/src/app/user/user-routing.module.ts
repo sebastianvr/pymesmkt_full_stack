@@ -11,6 +11,7 @@ import { OffersMadeComponent } from './pages/offers-made/offers-made.component';
 import { PurchasesComponent } from './pages/purchases/purchases.component';
 import { SalesComponent } from './pages/sales/sales.component';
 import { MainComponent } from './pages/main/main.component';
+import { OfferDetailComponent } from './pages/offer-detail/offer-detail.component';
 
 
 
@@ -26,6 +27,7 @@ const routes: Routes = [
       { path: 'see-publications', component: SeePublicationsComponent },
       { path: 'publication-detail/:id', component: PublicationDetailComponent },
       { path: 'offers-received', component: OffersReceivedComponent },
+      { path: 'offer-detail/:id', component: OfferDetailComponent },
       { path: 'offers-made', component: OffersMadeComponent },
       { path: 'purchases', component: PurchasesComponent },
       { path: 'sales', component: SalesComponent },

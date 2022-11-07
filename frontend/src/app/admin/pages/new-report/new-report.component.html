@@ -18,62 +18,81 @@
                     <button class="btn btn-primary" type="button" id="button-addon">Buscar</button>
                 </div>
 
-                <div class="col-md-12 containerTable pt-1">
+                <div class="col-12 text-center" *ngIf="!allReclamos; else allReclamosTemplate">
+                    <div class="container mt-5">
+    
+                        <div class="spinner-border text-primary text-center my-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                     
+                        <br>
+                     
+                    </div>
+                </div>
 
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Empresa emisora</th>
-                                <th scope="col">Empresa reclamada</th>
-                                <th scope="col">Fecha del reclamo</th>
-                                <th scope="col">Ver reclamo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let reclamo of allReclamos | search : searchText; index as i">
-                                <th scope="row">{{i+1}}</th>
-                                <td>{{reclamo.Usuario.Pyme.nombrePyme | titlecase }}</td>
-                                <td>{{reclamo.Publicacion.Usuario.Pyme.nombrePyme | titlecase }}</td>
-                                <td>{{reclamo.createdAt | date : 'dd MMMM yyyy' }}</td>
-                                <td>
-                                    <div class="container">
-                                        <button class="btn btn-primary" (click)="open(content)">Ver</button>
-                                    </div>
-
-                                    <ng-template #content let-modal>
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="modal-basic-title">Detalles del
-                                                reclamo</h4>
-                                            <button type="button" class="btn-close" aria-label="Close"
-                                                (click)="modal.dismiss('Cross click')"></button>
+                <ng-template #allReclamosTemplate>
+                    <div class="col-md-12 containerTable pt-1">
+    
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Empresa emisora</th>
+                                    <th scope="col">Empresa reclamada</th>
+                                    <th scope="col">Fecha del reclamo</th>
+                                    <th scope="col">Ver reclamo</th>
+                                    <th scope="col">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let reclamo of allReclamos | search : searchText; index as i">
+                                    <th scope="row">{{i+1}}</th>
+                                    <td>{{reclamo.Publicacion.Usuario.Pyme.nombrePyme | titlecase }}</td>
+                                    <td>{{reclamo.Usuario.Pyme.nombrePyme | titlecase }}</td>
+                                    <td>{{reclamo.createdAt | date : 'dd MMMM yyyy' }}</td>
+                                    <td>
+                                        <div class="container">
+                                            <button class="btn btn-primary" (click)="open(content)">Ver</button>
                                         </div>
-                                        <div class="modal-body">
-                                            <h6 class="fs-5 titleReclamo">{{ reclamo.titulo }}</h6>
-                                            <p>{{ reclamo.mensaje }}</p>
-                                            <hr>
-                                            <div class="container p-0 text-center">
-                                                <div class="col-md-4 col-sm-12">
-                                                    <h3 class="fs-6">Archivo adjunto</h3>
-                                                    <img class="d-block mx-auto" width="50"
-                                                        src="../../../../assets/icons/file-earmark-arrow-down.svg"
-                                                        alt="ile-earmark-arrow-down.svg">
-                                                    <button class="btn btn-secondary btn-sm my-2"
-                                                        type="button">Descargar</button>
-
+    
+                                        <ng-template #content let-modal>
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-basic-title">Detalles del
+                                                    reclamo</h4>
+                                                <button type="button" class="btn-close" aria-label="Close"
+                                                    (click)="modal.dismiss('Cross click')"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h6 class="fs-5 titleReclamo">{{ reclamo.titulo }}</h6>
+                                                <p>{{ reclamo.mensaje }}</p>
+                                                <hr>
+                                                <div class="container p-0 text-center">
+                                                    <div class="col-md-4 col-sm-12">
+                                                        <h3 class="fs-6">Archivo adjunto</h3>
+                                                        <img class="d-block mx-auto" width="50"
+                                                            src="../../../../assets/icons/file-earmark-arrow-down.svg"
+                                                            alt="ile-earmark-arrow-down.svg">
+                                                        <button class="btn btn-secondary btn-sm my-2"
+                                                            type="button">Descargar</button>
+    
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button (click)="modal.dismiss('Close button')" type="button"
-                                                class="btn btn-primary">Cerrar</button>
-                                        </div>
-                                    </ng-template>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                            <div class="modal-footer">
+                                                <button (click)="modal.dismiss('Close button')" type="button"
+                                                    class="btn btn-primary">Cerrar</button>
+                                            </div>
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary" (click)="finalizarReclamo(reclamo.id)">Finalizar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-template>
+                
             </div>
         </div>
     </div>

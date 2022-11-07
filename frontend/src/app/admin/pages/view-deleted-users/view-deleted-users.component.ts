@@ -1,25 +1,41 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UsuarioService } from '../../../core/services/usuario/usuario.service';
 import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-view-deleted-users',
   templateUrl: './view-deleted-users.component.html',
   styleUrls: ['./view-deleted-users.component.css']
 })
-export class ViewDeletedUsersComponent implements OnInit {
+export class ViewDeletedUsersComponent implements OnInit, OnDestroy {
 
   searchText: string = '';
   allUsuariosDeleted: any;
+
+  suscription!: Subscription
 
   constructor(
     private usuarioService: UsuarioService
   ) { }
 
   ngOnInit(): void {
+    this.getAll();
+
+    this.suscription = this.usuarioService.refresh.subscribe(() => {
+      this.getAll();
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.suscription.unsubscribe();
+    console.log('observable cerrado')
+  }
+
+
+  getAll() {
     this.usuarioService.getAllUsuariosDeleted(0, 10).subscribe((data) => {
       this.allUsuariosDeleted = data.content
-      // console.log('data', data)
       console.log('this.allUsuariosDeleted', this.allUsuariosDeleted)
     })
   }
@@ -27,8 +43,8 @@ export class ViewDeletedUsersComponent implements OnInit {
   activarUsuario(usuario: any) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
+        confirmButton: 'btn btn-success mx-3',
+        cancelButton: 'btn btn-danger mx-3'
       },
       buttonsStyling: false
     })
@@ -36,9 +52,10 @@ export class ViewDeletedUsersComponent implements OnInit {
     swalWithBootstrapButtons.fire({
       title: '¿Estás seguro de reintegrar este usuario?',
       icon: 'warning',
+      iconColor: 'red',
       showCancelButton: true,
-      confirmButtonText: 'Si, reintegrar!',
-      cancelButtonText: 'No, cancelar!',
+      confirmButtonText: 'Reintegrar',
+      cancelButtonText: 'Cancelar',
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {

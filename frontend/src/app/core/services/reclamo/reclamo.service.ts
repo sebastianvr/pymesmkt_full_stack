@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment.prod';
+import { Injectable } from '@angular/core';
+import { environment } from '../../../../environments/environment.prod';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -14,6 +14,10 @@ export class ReclamoService {
     private http: HttpClient
   ) { }
 
+  // postReclamo(nuevoReclamo: any): Observable<any> {
+  //   return this.http.post(`${this.url}/api/reclamo`, nuevoReclamo)
+  // }
+
   postReclamo(nuevoReclamo: any): Observable<any> {
     return this.http.post(`${this.url}/api/reclamo`, nuevoReclamo)
   }
@@ -25,18 +29,4 @@ export class ReclamoService {
   deleteReclamo(id: any) {
     return this.http.delete<any>(`${this.url}/api/reclamo/${id}`);
   }
-
-  // getPublicacionById(id : string) : Observable<any>{
-  //   return this.http.get<any>(`${this.url}/api/publicacion/${id}`)
-  // }
-
-
-  // getAllPublicacionById(id : string) : Observable<any>{
-  //   return this.http.get<any>(`${this.url}/api/publicacion/usuario/${id}`)
-  // }
-
-  // putPublicacion(){
-
-  // }
-
 }

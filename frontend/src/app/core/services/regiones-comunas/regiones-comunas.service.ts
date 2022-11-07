@@ -83,7 +83,6 @@ export class RegionesComunasService {
   regiones: any[] = [];
   comunas: any[] | undefined = [];
 
-
   getRegiones() {
     // mostrar solo las regiones en un arreglo
     for (let index = 0; index < this.regionesYComunas.length; index++) {
@@ -94,15 +93,7 @@ export class RegionesComunasService {
   }
 
   getComunas(regionSeleccionada: string) {
-    // en base a la region seleccionada, retornar las comunas de ella.
-    // this.comunas = this.regionesYComunas.filter((data: any) =>
-    //   data.region === regionSeleccionada
-    // )
-
-    // for (let index = 0; index < this.regionesYComunas.length; index++) {
-    //   this.comunas.push(this.regionesYComunas[index].comunas)
-    // }
-
+    // console.log('regionSeleccionada', regionSeleccionada);
     this.comunas = this.regionesYComunas.filter((data: any) =>
       data.region === regionSeleccionada
     )

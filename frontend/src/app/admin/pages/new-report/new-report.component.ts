@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ReclamoService } from '../../../core/services/reclamo.service';
+import { ReclamoService } from '../../../core/services/reclamo/reclamo.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-new-report',
@@ -44,4 +45,44 @@ export class NewReportComponent implements OnInit {
     }
   }
 
+
+
+  finalizarReclamo(id: string) {
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-primary mx-3',
+        cancelButton: 'btn btn-primary mx-3'
+      },
+      buttonsStyling: false
+    })
+
+    swalWithBootstrapButtons.fire({
+      title: '¿Quieres finalizar este reclamo?',
+      text: 'Este reclamo se moverá a la sección de reclamos finalizados',
+      icon: 'info',
+      iconColor: '#0e6ffd',
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        // cambiar estado de reclamo a finalizado
+
+        // actualizar tabla
+
+        // swalWithBootstrapButtons.fire(
+        //   'Reclamo finalizado',
+        //   '',
+        //   'success'
+        // )
+        // this.usuarioService.deleteUsuario(idUsuario).subscribe()
+        // this.usuarioService.refresh.subscribe(response => {
+        //   this.getAll();
+        // })
+        // this.router.navigate(['/user/see-publications']; 
+      }
+    })
+  }
 }

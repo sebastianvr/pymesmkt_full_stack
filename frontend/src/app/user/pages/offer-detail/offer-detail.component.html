@@ -1,0 +1,120 @@
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-center">
+        <div class="container">
+
+            <div class="col-md-12 g-5 pt-4 text-center mb-5">
+                <img class="float-end mb-3" src="../../../../assets/icons/dollar.svg" alt="pen.svg" width="55">
+                <h2 class="fs-1 mb-1">Detalle Completo</h2>
+            </div>
+
+
+            <div class="col-12 text-center" *ngIf="!oferta; else divOfertas">
+                <div class="container mt-5">
+
+                    <div class="spinner-border text-primary text-center my-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                    <br>
+
+                </div>
+            </div>
+
+            <ng-template #divOfertas>
+                <div class="card text-bg-light mb-3 containerPublicacion">
+                    <div class="card-header">
+                        <span class="float-end text-muted"> {{oferta.Publicacion.createdAt | date : 'dd MMMM
+                            yyyy'}}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="container mt-3">
+                            <h3 class="text-center">{{oferta.Publicacion.titulo | uppercase }}</h3>
+                            <p class="descriptionCard">{{oferta.Publicacion.descripcion}}</p>
+    
+                            <table class="table ">
+                                <tbody>
+                                    <!-- <tr>
+                                        <td>Precio </td>
+                                        <td>{{oferta.Publicacion.precioTotal | currency : 'CLP'}}</td>
+                                    </tr> -->
+                                    <tr>
+                                        <td>Cantidad</td>
+                                        <td>{{this.oferta.Publicacion.cantidadElementos}}</td>
+                                    </tr>
+                                    <tr *ngIf="oferta.Publicacion.precioUnidad">
+                                        <td>Precio por unidad</td>
+                                        <td>{{oferta.Publicacion.precioUnidad | currency : 'CLP'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Garantía</td>
+                                        <td>{{oferta.Publicacion.garantia.toString() | i18nSelect:garantiaMapa}}</td>
+                                    </tr>
+                                    <tr *ngIf="oferta.Publicacion.aniosGarantia">
+                                        <td>Años de garantía</td>
+                                        <td>{{oferta.Publicacion.aniosGarantia}}</td>
+                                    </tr>
+                                    <tr *ngIf="oferta.Publicacion.fechaInicioServicio">
+                                        <td>Fecha inicio del servicio</td>
+                                        <td>{{oferta.Publicacion.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
+                                    </tr>
+                                    <tr *ngIf="oferta.Publicacion.fechaFinServicio">
+                                        <td>Fecha finalización del servicio </td>
+                                        <td>{{oferta.Publicacion.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
+                                    </tr>
+                                    <tr *ngIf="oferta.Publicacion.horasATrabajar">
+                                        <td>Cantidad de horas a trabajar </td>
+                                        <td>{{oferta.Publicacion.horasATrabajar}}</td>
+                                    </tr>
+                                    <tr *ngIf="oferta.Publicacion.modelo">
+                                        <td>Modelo</td>
+                                        <td>{{oferta.Publicacion.modelo}}</td>
+                                    </tr>
+                                    <tr *ngIf="oferta.Publicacion.color">
+                                        <td>Color</td>
+                                        <td>{{oferta.Publicacion.color | titlecase}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+    
+                        </div>
+
+
+                        <hr>
+
+                        <div class="container">
+                            <div class="row my-2">
+                                <div class="col-12">
+                                    <span class="text mb-3"> Mensaje de {{oferta.Usuario.nombreUsuario | titlecase}} {{oferta.Usuario.apellidos | titlecase}} : </span>
+                                    <br>
+                                    <p>{{oferta.mensaje}}</p>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <span class="text fs-2 mb-3">Total a pagar</span>
+                                    <h5 class="fs-1">{{oferta.precioOferta | currency : 'CLP'}}</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="container">
+                            <div class="row my-2">
+                                <div class="col-12 text-center">
+                                    <img src="../../../../assets/icons/webpayNegro.png" class=" ml-3" height="50px"
+                                        alt="webpay logo">
+                                </div>
+                            </div>
+                            <form [action]="transactionButton.url" method="POST" class="text-center">
+                                <input type="hidden" name="token_ws" [value]="transactionButton.token" />
+                                <input class="btn btn-pagar btn-success text-center" type="submit" value="Pagar" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+
+        </div>
+
+    </div>
+</div>

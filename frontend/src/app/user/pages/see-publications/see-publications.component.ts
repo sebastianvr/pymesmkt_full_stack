@@ -21,9 +21,9 @@ export class SeePublicationsComponent implements OnInit {
     private fb: FormBuilder,
     private publicacionService: PublicacionService,
     private authService: AuthService
-
   ) {
     this.usuario = this.authService.usuario
+    // console.log('this.usuario :', this.usuario)
 
   }
 
@@ -35,20 +35,14 @@ export class SeePublicationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.publicacionService.getAllPublicacionById(this.usuario.id).subscribe(data => {
-      // this.data = data
-      // if(data.publicacion.count === 0){
-      //   console.log('no hay publicaciones de este ususario creadas')
-
-      // }
+      console.log('data ',data)
+      
       this.cards = data.content
-      // console.log('data ',data.publicacion.count)
-      // console.log('data ',data)
-      console.log(this.cards)
+      console.log('this.cards', this.cards)
+      
       // if(!this.cards){
 
       // }
-      // console.log(data)
-      // console.log(this.cards)
     })
   }
 
