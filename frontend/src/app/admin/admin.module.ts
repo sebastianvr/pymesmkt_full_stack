@@ -1,5 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import { SearchPipe } from '../core/pipes/search.pipe';
+
 import { MainComponent } from './pages/main/main.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ViewGraphComponent } from './pages/view-graph/view-graph.component';
@@ -8,11 +12,7 @@ import { FooterComponent } from './components/footer/footer.component';
 import { SidebarAdminComponent } from './components/sidebar-admin/sidebar-admin.component';
 import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 import { AdminRoutingModule } from './admin-routing.module';
-import { SigmaComponent } from './components/sigma/sigma.component';
-import { GraphComponent } from './components/graph/graph.component';
 import { NewReportComponent } from './pages/new-report/new-report.component';
-import { FormsModule} from '@angular/forms';
-import { SearchPipe } from '../core/pipes/search.pipe';
 import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
 
@@ -26,8 +26,6 @@ import { ViewUsersComponent } from './pages/view-users/view-users.component';
     NavbarAdminComponent,
     FooterComponent,
     SidebarAdminComponent,
-    SigmaComponent,
-    GraphComponent,
     NewReportComponent,
     SearchPipe,
     ViewDeletedUsersComponent,

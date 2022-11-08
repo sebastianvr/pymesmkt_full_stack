@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NewReportComponent } from './new-report.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('NewReportComponent', () => {
   let component: NewReportComponent;
@@ -8,7 +10,11 @@ describe('NewReportComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NewReportComponent ]
+      declarations: [ NewReportComponent ],
+      imports : [
+        HttpClientTestingModule,
+        NgbModule
+      ]
     })
     .compileComponents();
   });
