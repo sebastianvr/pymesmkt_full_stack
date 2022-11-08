@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
+import moment from 'moment';
 import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
@@ -10,7 +10,8 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-create-publication',
   templateUrl: './create-publication.component.html',
-  styleUrls: ['./create-publication.component.css']
+  styleUrls: ['./create-publication.component.css'],
+  providers: [MessageService]
 })
 export class CreatePublicationComponent implements OnInit {
 

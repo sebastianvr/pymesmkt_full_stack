@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing'
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { PublicationDetailComponent } from './publication-detail.component';
 
@@ -8,9 +10,15 @@ describe('PublicationDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PublicationDetailComponent ]
+      declarations: [
+        PublicationDetailComponent
+      ],
+      imports : [
+        RouterTestingModule,
+        HttpClientTestingModule,
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

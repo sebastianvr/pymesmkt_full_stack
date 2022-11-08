@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PostCardVisitorComponent } from './post-card-visitor.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('PostCardVisitorComponent', () => {
   let component: PostCardVisitorComponent;
@@ -8,9 +10,15 @@ describe('PostCardVisitorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PostCardVisitorComponent ]
+      declarations: [
+        PostCardVisitorComponent,
+      ],
+      imports: [
+        NgbModule,
+        HttpClientTestingModule,
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

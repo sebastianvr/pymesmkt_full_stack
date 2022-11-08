@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from 'src/app/core/services/auth/auth.service';
-import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { OfertaService } from '../../../core/services/oferta/oferta.service';
+
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
 ;

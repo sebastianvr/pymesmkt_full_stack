@@ -17,7 +17,7 @@ export class ViewGraphComponent implements OnInit {
     { "Framework": "Backbone", "Stars": "27647", "Released": "2010" },
     { "Framework": "Ember", "Stars": "21471", "Released": "2011" },
   ];
-  private svg! : any;
+  private svg!: any;
   private margin = 50;
   private width = 750 - (this.margin * 2);
   private height = 400 - (this.margin * 2);
@@ -66,10 +66,10 @@ export class ViewGraphComponent implements OnInit {
       .data(data)
       .enter()
       .append("rect")
-      .attr("x", (d :any) => x(d.Framework))
-      .attr("y", (d :any)=> y(d.Stars))
+      .attr("x", (d: any) => x(d.Framework))
+      .attr("y", (d: any) => y(d.Stars))
       .attr("width", x.bandwidth())
-      .attr("height", (d : any) => this.height - y(d.Stars))
+      .attr("height", (d: any) => this.height - y(d.Stars))
       .attr("fill", "#d04a35");
   }
 
