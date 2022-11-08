@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap, map } from 'rxjs';
-import { OfertaService } from '../../../core/services/oferta/oferta.service';
-import { tap, catchError } from 'rxjs/operators';
-import { PagoService } from '../../../core/services/pago/pago.service';
 import Swal from 'sweetalert2';
+import { switchMap } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+import { OfertaService } from '../../../core/services/oferta/oferta.service';
+import { PagoService } from '../../../core/services/pago/pago.service';
 import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 import { CompraService } from '../../../core/services/compra/compra.service';
 import { AuthService } from '../../../core/services/auth/auth.service';

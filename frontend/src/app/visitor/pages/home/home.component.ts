@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { RegionesComunasService } from 'src/app/core/services/regiones-comunas/regiones-comunas.service';
+import { RegionesComunasService } from '../../../core/services/regiones-comunas/regiones-comunas.service';
 
 @Component({
   selector: 'app-home',

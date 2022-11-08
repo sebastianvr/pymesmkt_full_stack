@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { RutValidatorService } from 'src/app/core/validations/rut-validator/rut-validator.service';
+import { RutValidatorService } from '../../../core/validations/rut-validator/rut-validator.service';
 import { RunValidatorService } from '../../../core/validations/run-validator/run-validator.service';
 import { PassValidatorService } from '../../../core/validations/pass-validator/pass-validator.service';
 import { EmailValidatorService } from '../../../core/validations/email-validator/email-validator.service';
