@@ -21,14 +21,11 @@ export class PostCardVisitorComponent implements OnInit {
   // Representa a la cantidad total de publicaciones creadas
   numElement!: number;
 
+  // pipe personalizado
   garantiaMapa = {
     'true': 'Si',
     'false': 'No'
   }
-
-  // para realizar oferta
-  maxPrice!: number;
-  mensaje!: string;
 
   constructor(
     private publicacionService: PublicacionService,
