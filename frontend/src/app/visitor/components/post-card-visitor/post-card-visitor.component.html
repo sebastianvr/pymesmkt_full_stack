@@ -1,27 +1,25 @@
 <div class="container">
 
-
-  <!-- barra de carga -->
+  <!-- Spinner de carga -->
   <div class="col-12 text-center" *ngIf="this.publicaciones?.length === 0; else allPublicacionesTemplate">
     <div class="container mt-5">
-
       <div class="spinner-border text-primary text-center my-3" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-
       <br>
-
     </div>
   </div>
 
   <ng-template #allPublicacionesTemplate>
 
+    <!-- Botones de paginación -->
     <div class="row">
       <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="size"
         [collectionSize]="numElement" (pageChange)="done()">
       </ngb-pagination>
     </div>
 
+    <!-- Card de las publicaciones -->
     <div class="row">
       <div class="col-12">
         <div *ngFor="let item of publicaciones; let i = index">
@@ -135,6 +133,7 @@
       </div>
     </div>
 
+    <!-- Botones de paginación -->
     <div class="row">
       <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="size"
         [collectionSize]="numElement" (pageChange)="done()">
