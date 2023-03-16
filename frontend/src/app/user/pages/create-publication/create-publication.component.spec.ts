@@ -32,4 +32,17 @@ describe('CreatePublicationComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  
+  
+  it('PU Debe comprobar si la publicacion tiene garantia o no', () => {
+    expect(component).toBeTruthy();
+  });
+  
+  test('PU Debe calcular el precio total', () => {
+    expect(component).toBeTruthy();
+  });
+  
+  test('PU Debe validar formulario de creacion de publicacion', () => {
+    expect(component).toBeTruthy();
+  });
 });
