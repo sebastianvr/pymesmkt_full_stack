@@ -29,4 +29,21 @@ describe('RegisterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  test('PU Debe retornar una cadena de caracteres', () => {
+    component.bar = 20;
+    expect(typeof component.getPercent()).toBe('string')
+  })
+  
+  test('Debe retornar un porcentaje', () => {
+    component.bar = 20;
+    expect(component.getPercent()).toContain('%')
+  })
+
+
+  test('PU Debe validar formulario de registro', () => {
+    component.bar = 20;
+    
+  })
+
 });
