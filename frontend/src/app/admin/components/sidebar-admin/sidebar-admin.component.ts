@@ -18,6 +18,11 @@ export class SidebarAdminComponent implements OnInit {
 
     this.itemsPanelMenu = [
       {
+        label: 'Colaboraciones',
+        icon: 'pi pi-fw pi-share-alt',
+        routerLink: '/admin/view-graph'
+      },
+      {
         label: 'Usuarios',
         icon: 'pi pi-users',
         items: [
@@ -47,11 +52,6 @@ export class SidebarAdminComponent implements OnInit {
             icon: 'pi pi-fw pi-bookmark-fill',
           },
         ]
-      },
-      {
-        label: 'Colaboraciones',
-        icon: 'pi pi-fw pi-share-alt',
-        routerLink: '/admin/view-graph'
       }
     ]
   }
