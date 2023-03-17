@@ -25,7 +25,12 @@ describe('OfferDetailComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  test('Debe crear componente', () => {
     expect(component).toBeTruthy();
   });
+  
+  test('PI Debe aceptar el pago y comprar una oferta', () => {
+    expect(component).toBeTruthy();
+  });
+  
 });

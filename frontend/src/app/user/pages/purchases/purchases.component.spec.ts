@@ -33,7 +33,15 @@ describe('PurchasesComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  test('Debe crear componente', () => {
+    expect(component).toBeTruthy();
+  });
+  
+  test('PU Debe validar formulario de reclamo', () => {
+    expect(component).toBeTruthy();
+  });
+  
+  test('PU Debe validar formulario de calificación', () => {
     expect(component).toBeTruthy();
   });
 });

@@ -1,0 +1,77 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostCardPymeComponent Debe hacer match con e snapshot 1`] = `
+"<div class=\\"container\\"><div class=\\"row\\"><ngb-pagination role=\\"navigation\\" class=\\"d-flex justify-content-center\\" ng-reflect-page=\\"0\\" ng-reflect-page-size=\\"2\\"><!--container--><!--container--><!--container--><!--container--><!--container--><!--container--><!--container--><ul class=\\"pagination\\"><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"false\\"
+}--><li class=\\"page-item disabled\\"><a aria-label=\\"Previous\\" href=\\"\\" class=\\"page-link\\" tabindex=\\"-1\\" aria-disabled=\\"true\\"><span aria-hidden=\\"true\\">«</span><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--></a></li><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"true\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-for-of\\": \\"\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--><li class=\\"page-item disabled\\"><a aria-label=\\"Next\\" href=\\"\\" class=\\"page-link\\" tabindex=\\"-1\\" aria-disabled=\\"true\\"><span aria-hidden=\\"true\\">»</span><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--></a></li><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"true\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"false\\"
+}--></ul></ngb-pagination></div><div class=\\"row\\"><div class=\\"col-12\\"><!--bindings={}--></div></div><div class=\\"row\\"><ngb-pagination role=\\"navigation\\" class=\\"d-flex justify-content-center\\" ng-reflect-page=\\"0\\" ng-reflect-page-size=\\"2\\"><!--container--><!--container--><!--container--><!--container--><!--container--><!--container--><!--container--><ul class=\\"pagination\\"><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"false\\"
+}--><li class=\\"page-item disabled\\"><a aria-label=\\"Previous\\" href=\\"\\" class=\\"page-link\\" tabindex=\\"-1\\" aria-disabled=\\"true\\"><span aria-hidden=\\"true\\">«</span><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--></a></li><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"true\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-for-of\\": \\"\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--><li class=\\"page-item disabled\\"><a aria-label=\\"Next\\" href=\\"\\" class=\\"page-link\\" tabindex=\\"-1\\" aria-disabled=\\"true\\"><span aria-hidden=\\"true\\">»</span><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--></a></li><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"true\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"false\\"
+}--></ul></ngb-pagination></div><!--bindings={
+  \\"ng-reflect-ng-if-else\\": \\"[object Object]\\"
+}--><!--container--></div>"
+`;
+
+exports[`PostCardPymeComponent Debe hacer match con el snapshot 1`] = `
+"<div class=\\"container\\"><div class=\\"row\\"><ngb-pagination role=\\"navigation\\" class=\\"d-flex justify-content-center\\" ng-reflect-page=\\"0\\" ng-reflect-page-size=\\"2\\"><!--container--><!--container--><!--container--><!--container--><!--container--><!--container--><!--container--><ul class=\\"pagination\\"><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"false\\"
+}--><li class=\\"page-item disabled\\"><a aria-label=\\"Previous\\" href=\\"\\" class=\\"page-link\\" tabindex=\\"-1\\" aria-disabled=\\"true\\"><span aria-hidden=\\"true\\">«</span><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--></a></li><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"true\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-for-of\\": \\"\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--><li class=\\"page-item disabled\\"><a aria-label=\\"Next\\" href=\\"\\" class=\\"page-link\\" tabindex=\\"-1\\" aria-disabled=\\"true\\"><span aria-hidden=\\"true\\">»</span><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--></a></li><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"true\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"false\\"
+}--></ul></ngb-pagination></div><div class=\\"row\\"><div class=\\"col-12\\"><!--bindings={}--></div></div><div class=\\"row\\"><ngb-pagination role=\\"navigation\\" class=\\"d-flex justify-content-center\\" ng-reflect-page=\\"0\\" ng-reflect-page-size=\\"2\\"><!--container--><!--container--><!--container--><!--container--><!--container--><!--container--><!--container--><ul class=\\"pagination\\"><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"false\\"
+}--><li class=\\"page-item disabled\\"><a aria-label=\\"Previous\\" href=\\"\\" class=\\"page-link\\" tabindex=\\"-1\\" aria-disabled=\\"true\\"><span aria-hidden=\\"true\\">«</span><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--></a></li><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"true\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-for-of\\": \\"\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--><li class=\\"page-item disabled\\"><a aria-label=\\"Next\\" href=\\"\\" class=\\"page-link\\" tabindex=\\"-1\\" aria-disabled=\\"true\\"><span aria-hidden=\\"true\\">»</span><!--bindings={
+  \\"ng-reflect-ng-template-outlet-context\\": \\"[object Object]\\"
+}--></a></li><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"true\\"
+}--><!--bindings={
+  \\"ng-reflect-ng-if\\": \\"false\\"
+}--></ul></ngb-pagination></div><!--bindings={
+  \\"ng-reflect-ng-if-else\\": \\"[object Object]\\"
+}--><!--container--></div>"
+`;

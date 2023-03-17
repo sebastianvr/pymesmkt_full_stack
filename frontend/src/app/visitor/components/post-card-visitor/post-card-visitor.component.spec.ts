@@ -27,7 +27,12 @@ describe('PostCardVisitorComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('El componente debería crearse', () => {
     expect(component).toBeTruthy();
   });
+
+  test('deberia obtener un numero', ()=>{
+ 
+    // expect()
+  })
 });

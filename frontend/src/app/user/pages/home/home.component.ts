@@ -17,22 +17,13 @@ export class HomeComponent implements OnInit {
     return {...this.allPublicaciones}
   }  
   constructor(
-    private router : Router,
     private regionesComunas : RegionesComunasService,
-    private publicacionesService : PublicacionService,
   ) { }
 
 
 
   ngOnInit(): void {
     this.regiones = this.regionesComunas.getRegiones()
-    
-    // this.publicacionesService.getAllPublicaciones()
-    //   .subscribe( ({content}) => {
-    //     this.allPublicaciones = content
-    //     console.log(this.allPublicaciones)
-    //     // console.log(content)
-    //   })
   }
 
 }

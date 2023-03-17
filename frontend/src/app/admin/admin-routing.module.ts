@@ -13,12 +13,11 @@ const routes: Routes = [
     path: '',
     component: MainComponent,
     children: [
-      // { path: 'home', component: HomeComponent },
+      { path: 'view-graph', component: ViewGraphComponent },
       { path: 'view-users', component: ViewUsersComponent },
       { path: 'view-deleted-users', component: ViewDeletedUsersComponent },
-      { path: 'new-report', component: NewReportComponent  },
-      { path: 'view-graph', component: ViewGraphComponent },
-      { path: '**', redirectTo: 'view-users' }
+      { path: 'new-report', component: NewReportComponent },
+      { path: '**', redirectTo: 'view-graph' }
     ]
   }
 

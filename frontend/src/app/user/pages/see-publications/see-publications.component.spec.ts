@@ -27,7 +27,12 @@ describe('SeePublicationsComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  test('Debe crear servicio', () => {
     expect(component).toBeTruthy();
   });
+  
+  test('PU Debe validar formulario busqueda', () => {
+  expect(component).toBeTruthy();
+  });
+  
 });

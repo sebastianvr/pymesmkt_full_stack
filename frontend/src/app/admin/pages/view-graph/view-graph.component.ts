@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import * as d3 from "d3";
+import * as d3 from 'd3';
+import { GraphService } from '../../../core/services/graph/graph.service';
+
 
 @Component({
   selector: 'app-view-graph',
@@ -10,68 +12,167 @@ import * as d3 from "d3";
 
 export class ViewGraphComponent implements OnInit {
 
-  private data = [
-    { "Framework": "Vue", "Stars": "166443", "Released": "2014" },
-    { "Framework": "React", "Stars": "150793", "Released": "2013" },
-    { "Framework": "Angular", "Stars": "62342", "Released": "2016" },
-    { "Framework": "Backbone", "Stars": "27647", "Released": "2010" },
-    { "Framework": "Ember", "Stars": "21471", "Released": "2011" },
+  allData  : any = {}
+
+  nodes = [
+    { index: 0, name: 'El Molino', group: 0 },
+    { index: 1, name: 'El Nogal', group: 1 },
+    { index: 2, name: 'Doña Carmen', group: 2 },
+    { index: 3, name: 'Superpan', group: 1 },
+    { index: 4, name: 'Pasteles Sweet', group: 1 },
+    { index: 5, name: 'Banana', group: 1 },
+    { index: 6, name: 'Peach', group: 1 },
+    { index: 7, name: 'Bean', group: 2 },
+    { index: 8, name: 'Pea', group: 2 },
+    { index: 9, name: 'Carrot', group: 2 },
   ];
-  private svg!: any;
-  private margin = 50;
-  private width = 750 - (this.margin * 2);
-  private height = 400 - (this.margin * 2);
-  constructor() { }
+
+  links = [
+    { source: this.nodes[0], target: this.nodes[1], type: 1 },
+    { source: this.nodes[0], target: this.nodes[2], type: 3 },
+    { source: this.nodes[1], target: this.nodes[3], type: 4 },
+    { source: this.nodes[1], target: this.nodes[4], type: 2 },
+    { source: this.nodes[1], target: this.nodes[5], type: 1 },
+    { source: this.nodes[1], target: this.nodes[6], type: 4 },
+    { source: this.nodes[2], target: this.nodes[7], type: 6 },
+    { source: this.nodes[2], target: this.nodes[8], type: 9 },
+    { source: this.nodes[2], target: this.nodes[9], type: 4 },
+    { source: this.nodes[1], target: this.nodes[0], type: 1 },
+  ];
+
+  constructor(
+    private graphService : GraphService
+  ) {
+    this.graphService.getDataGraph().subscribe( (data) =>{
+      this.allData = data
+      console.log('this.allData', this.allData)
+    })
+  }
+
+  div: any = document.querySelector("#divGraph");
 
   ngOnInit(): void {
-    this.createSvg();
-    this.drawBars(this.data);
+
+    const width: any = screen.width
+    const height: any = screen.height 
+
+    const simulation = d3.forceSimulation(this.nodes)
+      .force('link', d3.forceLink(this.links).id((d: any) => d.id))
+      .force('charge', d3.forceManyBody().strength(-400))
+      .force("x", d3.forceX())
+      .force("y", d3.forceY());
+
+
+    const svg = d3.select('#divGraph').append('svg')
+      .attr("viewBox", [-width / 2, -(height - 500) / 2, width, height - 500])
+      .style("font", "12px sans-serif");
+
+    svg.append("svg:defs").selectAll("marker")
+      .data(['arrow'])
+      .enter().append("svg:marker")
+      .attr("id", String)
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 10)
+      .attr("refY", -0.5)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("fill", 'black')
+      .attr("d", "M0,-5L10,0L0,5");
+
+
+    const link = svg.append("g")
+      .attr("fill", "none")
+      .attr("stroke-width", 1.5)
+      .selectAll("path")
+      .data(this.links)
+      .join("path")
+      .attr("id", (d: any) => `${d.source.name}x${d.target.name}`)
+      .attr("stroke", "black")
+      .attr("marker-end", "url(#arrow)")
+
+    const linkLabel = svg
+      .data(this.links)
+      .append("text")
+      .append("textPath")
+      .attr("stroke", "black")
+      .attr("fill", "white")
+      .attr("startOffset", "50%")
+      .attr("text-anchor", "middle")
+      .attr("xlink:href", (d: any) => `#${d.source.name}x${d.target.name}`)
+      .text((d: any) => `${d.type}`)
+
+    const node = svg.append("g")
+      .attr("fill", "white")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+      .selectAll("g")
+      .data(this.nodes)
+      .join("g")
+
+    const circles = node
+      .append('circle')
+      .attr("stroke", "black")
+      .attr("stroke-width", 1.5)
+      .attr("r", 4)
+      .style('fill', "#0d6efd")
+      .style('cursor', 'pointer')
+      .call(
+        d3.drag<SVGCircleElement, any>()
+          .on('start', (e, d) => dragstarted(e, d))
+          .on('drag', (e, d) => dragged(e, d))
+          .on('end', (e, d) => dragended(e, d))
+      );
+
+    const labelsCircles = node.append('text')
+      .attr("x", 0)
+      .attr("y", "1em")
+      .text((d: any) => d.name)
+      .clone(true).lower()
+      .attr("fill", "none")
+      .attr("stroke", "black")
+      .attr("stroke-width", 3);
+
+    simulation.on("tick", () => {
+      link.attr("d", this.linkArc);
+      node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+    });
+
+    const dragstarted = (e: any, d: any) => {
+      if (!e.active) {
+        simulation.alphaTarget(0.3).restart();
+      }
+      d.fx = d.x;
+      d.fy = d.y;
+    };
+
+    const dragged = (e: any, d: any) => {
+      d.fx = e.x;
+      d.fy = e.y;
+    };
+
+    const dragended = (e: any, d: any) => {
+      if (!e.active) {
+        simulation.alphaTarget(0);
+      }
+      d.fx = null;
+      d.fy = null;
+    };
   }
 
-  private createSvg(): void {
-    this.svg = d3.select("figure#bar")
-      .append("svg")
-      .attr("width", this.width + (this.margin * 2))
-      .attr("height", this.height + (this.margin * 2))
-      .append("g")
-      .attr("transform", "translate(" + this.margin + "," + this.margin + ")");
+  linkArc(d: any) {
+    const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+    return `
+      M${d.source.x},${d.source.y}
+      A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+    `;
   }
 
-  private drawBars(data: any[]): void {
-    // Create the X-axis band scale
-    const x = d3.scaleBand()
-      .range([0, this.width])
-      .domain(data.map(d => d.Framework))
-      .padding(0.2);
 
-    // Draw the X-axis on the DOM
-    this.svg.append("g")
-      .attr("transform", "translate(0," + this.height + ")")
-      .call(d3.axisBottom(x))
-      .selectAll("text")
-      .attr("transform", "translate(-10,0)rotate(-45)")
-      .style("text-anchor", "end");
 
-    // Create the Y-axis band scale
-    const y = d3.scaleLinear()
-      .domain([0, 200000])
-      .range([this.height, 0]);
 
-    // Draw the Y-axis on the DOM
-    this.svg.append("g")
-      .call(d3.axisLeft(y));
 
-    // Create and fill the bars
-    this.svg.selectAll("bars")
-      .data(data)
-      .enter()
-      .append("rect")
-      .attr("x", (d: any) => x(d.Framework))
-      .attr("y", (d: any) => y(d.Stars))
-      .attr("width", x.bandwidth())
-      .attr("height", (d: any) => this.height - y(d.Stars))
-      .attr("fill", "#d04a35");
-  }
 
 
 }

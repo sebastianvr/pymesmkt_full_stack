@@ -19,8 +19,6 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private AuthService: AuthService,
     private router: Router,
-
-    private messageService: MessageService,
     private primengConfig: PrimeNGConfig
   ) { }
 
@@ -79,9 +77,5 @@ export class LoginComponent implements OnInit {
   campoInvalido(campo: string) {
     return this.formularioLogin.controls[campo].errors
       && this.formularioLogin.controls[campo].touched
-  }
-
-  showMessageToast(severity: string, summary: string, detail: string = '') {
-    this.messageService.add({ severity: severity, summary: summary, detail: detail })
   }
 }

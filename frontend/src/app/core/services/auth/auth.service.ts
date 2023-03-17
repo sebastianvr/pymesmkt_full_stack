@@ -40,7 +40,7 @@ export class AuthService {
       );
   }
 
-
+  // Iniciar sesión
   login(login: any): Observable<any> {
     return this.http.post<any>(`${this.url}/api/auth/login`, login)
       .pipe(
@@ -76,6 +76,7 @@ export class AuthService {
       )
   }
 
+  // Cerrar sesión
   logOut() {
     sessionStorage.clear()
   }
