@@ -10,6 +10,7 @@ dist
 # system files
 .DS_Store 
 Thumbs.db
+.vscode
 
 # IDE - VSCode
 .vscode/*
