@@ -1,48 +1,80 @@
-# Proyecto PymesMarketplace
+# Para front-end en desasrrollo
 
-**Herramientas utilizadas en el backend**
+**Herramientas utilizadas este proyecto**
 
-- Node js
-- Express
+- ***Node js : v16.14.2***
+- ***Express : v4.18.1***
+- ***Angular CLI : v13.3.9***
 
-# Frontend
+<div style="display: flex; justify-content: center; align-items: center;">
+  <a href="https://angular.io/" style="width: 200px; margin: 0 10px;">
+    <img src="https://angular.io/assets/images/logos/angular/angular.svg" alt="Angular" width="200">
+  </a>
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.4.
+  <a href="https://expressjs.com/" style="width: 200px; margin: 0 10px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Expressjs.png" alt="Express" width="200">
+  </a>
 
-## Build
+  <a href="https://nodejs.org/" style="width: 200px; margin: 0 10px;">
+    <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="200">
+  </a>
+</div>
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+<div align="center">
+# Instrucciones de ejecución
+</div>
 
+ 1. Clonar repositorio
+ 2. Asegurarse de estar en la version de npm correcta
 
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+  ```bash
+    nvm use 16.14.2
+  ```
 
-# Para ejecutar en desarrollo
+# Para front-end en desasrrollo
 
-  1. Clonar repo
-  2. Ejecutar comando
+1. Moverse a la carpeta frontend
+
+  ```bash
+    cd frontend
+  ```
+
+2. Instalar dependencias, con el comando:
   
   ```bash
-    $ yarn install
+    npm install
   ```
-  3. Tener Nest CLI instalado
+
+  4. Tener Angular CLI instalado:
 
   ```bash
-    $ yarn global add @nestjs/cli
+    npm install -g @angular/cli@13.3.9
   ```
-  4. Levantar la base de datos
+
+  4. Levantar el front-end:
 
   ```bash
-    $ docker-compose up -d
+    ng serve -o
   ```
-  5. Para reconstruir la BD
+
+# Para Back-End en desasrrollo
+
+Previamente ejecutar serivdor local.
+
+1. Moverse a la carpeta backend:
+
+```bash
+  cd backend
+```
+
+ 2. Instalar dependencias, con el comando:
   
-  ```
-     http://localhost:3000/api/v2/seed
+  ```bash
+    npm install
   ```
 
-
-## Stack usado
-* NodeJS - Express - MySql 
-* Angular
+  3. Para ejecutar proyecto con el comando:
+  
+  ```bash
+    npm start
+  ```
