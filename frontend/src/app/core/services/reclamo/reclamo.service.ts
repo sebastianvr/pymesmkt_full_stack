@@ -13,11 +13,7 @@ export class ReclamoService {
   constructor(
     private http: HttpClient
   ) { }
-
-  // postReclamo(nuevoReclamo: any): Observable<any> {
-  //   return this.http.post(`${this.url}/api/reclamo`, nuevoReclamo)
-  // }
-
+  
   postReclamo(nuevoReclamo: any): Observable<any> {
     return this.http.post(`${this.url}/api/reclamo`, nuevoReclamo)
   }
