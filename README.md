@@ -1,10 +1,9 @@
-# Para front-end en desasrrollo
 
-**Herramientas utilizadas este proyecto**
+# **Tools used in this project**
 
-- ***Node js : v16.14.2***
-- ***Express : v4.18.1***
-- ***Angular CLI : v13.3.9***
+- ***Node js : ``v16.14.2``***
+- ***Express : ``v4.18.1``***
+- ***Angular CLI : ``v13.3.9``***
 
 <div style="display: flex; justify-content: center; align-items: center;">
   <a href="https://angular.io/" style="width: 200px; margin: 0 10px;">
@@ -20,60 +19,59 @@
   </a>
 </div>
 
-<div align="center">
-# Instrucciones de ejecución
-</div>
+# **Execution Instructions**
 
- 1. Clonar repositorio
- 2. Asegurarse de estar en la version de npm correcta
+ 1. Clone repository
+ 2. Make sure you are using the correct version of npm
 
   ```bash
     nvm use 16.14.2
   ```
 
-# Para front-end en desasrrollo
+# **Front-end Development**
 
-1. Moverse a la carpeta frontend
+1. Navigate to the frontend directory
 
   ```bash
     cd frontend
   ```
 
-2. Instalar dependencias, con el comando:
+2. Install dependencies by running:
   
   ```bash
     npm install
   ```
 
-  4. Tener Angular CLI instalado:
+  4. Make sure you have Angular CLI installed:
 
   ```bash
     npm install -g @angular/cli@13.3.9
   ```
 
-  4. Levantar el front-end:
+  4. Launch the front-end by running:
 
   ```bash
     ng serve -o
   ```
 
-# Para Back-End en desasrrollo
+# **Back-end Development**
 
-Previamente ejecutar serivdor local.
+Before executing the project, ensure that the local server is running.
 
-1. Moverse a la carpeta backend:
+ 1. Navigate to the backend directory:
 
 ```bash
   cd backend
 ```
 
- 2. Instalar dependencias, con el comando:
+ 2. Install dependencies by running:
   
   ```bash
     npm install
   ```
 
-  3. Para ejecutar proyecto con el comando:
+  3. Add the **``.env``** file to the project.
+  4. To run the project, run:
   
   ```bash
     npm start
