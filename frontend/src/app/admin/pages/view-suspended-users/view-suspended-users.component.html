@@ -1,0 +1,68 @@
+<div class="container-fluid">
+
+
+    <div class="d-flex justify-content-center">
+        <div class="container">
+
+            <div class="col-md-12 g-5 pt-4 text-center mb-5">
+                <img class="float-end mb-3" src="../../../../assets/icons/person-fill-slash.svg" alt="person-fill-slash.svg"
+                    width="55">
+                <h2 class="fs-1 mb-1">Usuarios Suspendidos</h2>
+            </div>
+
+            <div class="row">
+                
+                <div class="input-group mb-3">
+                    <input [(ngModel)]="searchText" type="text" class="form-control" placeholder="Buscar usuario"
+                        aria-label="Recipient's username" aria-describedby="button-addon">
+                    <button class="btn btn-primary" type="button" id="button-addon">Buscar</button>
+                </div>
+
+                <div class="col-12 text-center" *ngIf="!allUsuariosSuspended; else usersDeletedTemplate">
+                    <div class="container mt-5">
+    
+                        <div class="spinner-border text-primary text-center my-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                     
+                        <br>
+                     
+                    </div>
+                </div>
+
+                <ng-template #usersDeletedTemplate>
+                    <div class="col-md-12 containerTable pt-1">
+    
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nombre usuario</th>
+                                    <th scope="col">Apellidos</th>
+                                    <th scope="col">Email usuario</th>
+                                    <th scope="col">Empresa</th>
+                                    <th scope="col">RUT Empresa</th>
+                                    <th scope="col">Accción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let usuario of allUsuariosSuspended | search : searchText; index as i">
+                                    <th scope="row">{{i+1}}</th>
+                                    <td>{{ usuario.nombreUsuario | titlecase }}</td>
+                                    <td>{{ usuario.apellidos }}</td>
+                                    <td>{{ usuario.emailUsuario }}</td>
+                                    <td>{{ usuario.Pyme.nombrePyme }}</td>
+                                    <td>{{ usuario.Pyme.rut }}</td>
+                                    <td>
+                                        <button (click)="activarUsuario(usuario)" type="button" class="btn btn-success">Reintegar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-template>
+                
+            </div>
+        </div>
+    </div>
+</div>
