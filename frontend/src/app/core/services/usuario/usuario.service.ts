@@ -17,13 +17,17 @@ export class UsuarioService {
     private http: HttpClient
   ) { }
 
-  get refresh(){
+  get refresh() {
     return this.refreshUsuarios
   }
 
-  getAllUsuarios(page: number = 0, size: number = 0) : Observable<any> {
+  getAllUsuarios(page: number = 0, size: number = 0): Observable<any> {
     return this.http.get<any>(`${this.url}/api/usuario/?size=${size}&page=${page}`)
-    
+
+  }
+
+  getAllUsuariosSuspended(page: number = 0, size: number = 0) {
+    return this.http.get<any>(`${this.url}/api/usuario/suspended/?size=${size}&page=${page}`)
   }
 
   getAllUsuariosDeleted(page: number = 0, size: number = 0) {
@@ -31,9 +35,18 @@ export class UsuarioService {
   }
 
   suspenderUsuario(id: any) {
-    return this.http.delete<any>(`${this.url}/api/usuario/${id}`)
+    return this.http.put<any>(`${this.url}/api/usuario/suspend/${id}`, {})
+      .pipe(
+        tap(() => {
+          this.refresh.next();
+        })
+      );
+  }
+
+  deleteUsuario(id: any) {
+    return this.http.delete<any>(`${this.url}/api/usuario/delete/${id}`, {})
     .pipe(
-      tap( ()=> {
+      tap(() => {
         this.refresh.next();
       })
     );
@@ -41,10 +54,10 @@ export class UsuarioService {
 
   activarUsuario(usuario: any) {
     return this.http.put<any>(`${this.url}/api/usuario/activate/${usuario.id}`, usuario)
-    .pipe(
-      tap( ()=> {
-        this.refresh.next();
-      })
-    );
+      .pipe(
+        tap(() => {
+          this.refresh.next();
+        })
+      );
   }
 }

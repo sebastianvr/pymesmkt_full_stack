@@ -90,14 +90,13 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
             include: [
                 {
                     model: Pyme,
-                    // where: { estado: true },
+                    where: { estado: true },
                 },
             ]
 
         });
 
-
-
+        console.log({ usuarios })
         if (usuarios.count === 0) {
             res.status(200).json({
                 ok: true,
@@ -145,6 +144,7 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
         const usuarios = await DeleteUsuario.findAndCountAll({
             limit: size,
             offset: page * size,
+
         });
 
 
@@ -258,8 +258,12 @@ const usuarioPut = (req = request, res = response) => {
     })
 }
 
-// Elimina el usuario de la tabla usuario
-// Añade usuario eliminado a lista negra
+/**
+ *  Elimina el usuario de la tabla usuario, añade usuario eliminado a lista negra
+ * @param {request} req 
+ * @param {response} res 
+ * @returns Usuario eliminado de la bd 
+ */
 const usuarioDelete = async (req = request, res = response) => {
 
     const { id } = req.params
@@ -313,6 +317,41 @@ const usuarioDelete = async (req = request, res = response) => {
 
     } catch (error) {
         console.log(error)
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error al eliminar usuario'
+        })
+    }
+}
+
+const suspendUser = async (req = request, res = response) => {
+
+    const { id } = req.params
+
+    try {
+        // buscar usuario
+        const usuario = await Usuario.findByPk(id)
+
+        if (!usuario) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No existe usuario en bd'
+            })
+        }
+
+        // Encontrar usuario y actualizar su estado
+        const usuarioSuspendido = await Usuario.update(
+            { estado: false },
+            { where: { id } }
+        );
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Usuario eliminado de la bd'
+        })
+
+    } catch (error) {
+        console.log(error)
         return res.status(400).json({
             ok: false,
             msg: 'Error al eliminar usuario'
@@ -325,9 +364,7 @@ const usuarioSuspended = async (req = request, res = response) => {
     const { id } = req.params
 
     try {
-
         const busqueda = await Usuario.findByPk(id)
-        
 
         if (!busqueda) {
             return res.status(400).json({
@@ -340,16 +377,13 @@ const usuarioSuspended = async (req = request, res = response) => {
             where: { id },
         });
 
-
         console.log('usuario', usuario)
         res.status(200).json({
             ok: true,
             msg: 'Usuario suspendido de la bd'
         })
-
-
-
     } catch (error) {
+
         console.log(error)
         res.status(400).json({
             ok: false,
@@ -395,5 +429,6 @@ module.exports = {
     usuariosGetAllSuspended,
     usuarioActivatePut,
     usuarioSuspended,
-    usuariosGetAllDeleted
+    usuariosGetAllDeleted,
+    suspendUser
 };
