@@ -5,9 +5,9 @@
         <div class="container">
 
             <div class="col-md-12 g-5 pt-4 text-center mb-5">
-                <img class="float-end mb-3" src="../../../../assets/icons/person-x-fill.svg" alt="pen.svg"
+                <img class="float-end mb-3" src="../../../../assets/icons/trash.svg" alt="trash.svg"
                     width="55">
-                <h2 class="fs-1 mb-1">Usuarios Suspendidos</h2>
+                <h2 class="fs-1 mb-1">Usuarios Eliminados</h2>
             </div>
 
             <div class="row">
@@ -32,17 +32,17 @@
 
                 <ng-template #usersDeletedTemplate>
                     <div class="col-md-12 containerTable pt-1">
-    
-                        <table class="table table-hover">
+                        
+                        <table class="table table-hover table-responsive">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Nombre usuario</th>
                                     <th scope="col">Apellidos</th>
                                     <th scope="col">Email usuario</th>
-                                    <th scope="col">Empresa</th>
-                                    <th scope="col">RUT Empresa</th>
-                                    <th scope="col">Accción</th>
+                                    <th scope="col">Run</th>
+                                    <th scope="col">Región</th>
+                                    <th scope="col">Comuna</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -51,11 +51,9 @@
                                     <td>{{ usuario.nombreUsuario | titlecase }}</td>
                                     <td>{{ usuario.apellidos }}</td>
                                     <td>{{ usuario.emailUsuario }}</td>
-                                    <td>{{ usuario.Pyme.nombrePyme }}</td>
-                                    <td>{{ usuario.Pyme.rut }}</td>
-                                    <td>
-                                        <button (click)="activarUsuario(usuario)" type="button" class="btn btn-success">Reintegar</button>
-                                    </td>
+                                    <td>{{ usuario.run }}</td>
+                                    <td>{{ usuario.region }}</td>
+                                    <td>{{ usuario.comuna }}</td>
                                 </tr>
                             </tbody>
                         </table>
