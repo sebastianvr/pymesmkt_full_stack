@@ -12,19 +12,19 @@ import { GraphService } from '../../../core/services/graph/graph.service';
 
 export class ViewGraphComponent implements OnInit {
 
-  allData  : any = {}
+  allData: any = {}
 
   nodes = [
-    { index: 0, name: 'El Molino', group: 0 },
-    { index: 1, name: 'El Nogal', group: 1 },
-    { index: 2, name: 'Doña Carmen', group: 2 },
-    { index: 3, name: 'Superpan', group: 1 },
-    { index: 4, name: 'Pasteles Sweet', group: 1 },
-    { index: 5, name: 'Banana', group: 1 },
-    { index: 6, name: 'Peach', group: 1 },
-    { index: 7, name: 'Bean', group: 2 },
-    { index: 8, name: 'Pea', group: 2 },
-    { index: 9, name: 'Carrot', group: 2 },
+    { index: 0, name: 'El Molino De Oro' },
+    { index: 1, name: 'El Nogal' },
+    { index: 2, name: 'Doña Carmen' },
+    { index: 3, name: 'Dulce Tentación' },
+    { index: 4, name: 'La Baguette' },
+    { index: 5, name: 'Pastelería El Gato' },
+    { index: 6, name: 'La Cremería' },
+    { index: 7, name: 'La Boutique del Pan' },
+    { index: 8, name: 'El Horno de Mama' },
+    { index: 9, name: 'La Patisserie' },
   ];
 
   links = [
@@ -41,9 +41,9 @@ export class ViewGraphComponent implements OnInit {
   ];
 
   constructor(
-    private graphService : GraphService
+    private graphService: GraphService
   ) {
-    this.graphService.getDataGraph().subscribe( (data) =>{
+    this.graphService.getDataGraph().subscribe((data) => {
       this.allData = data
       console.log('this.allData', this.allData)
     })
@@ -54,7 +54,7 @@ export class ViewGraphComponent implements OnInit {
   ngOnInit(): void {
 
     const width: any = screen.width
-    const height: any = screen.height 
+    const height: any = screen.height
 
     const simulation = d3.forceSimulation(this.nodes)
       .force('link', d3.forceLink(this.links).id((d: any) => d.id))
@@ -92,16 +92,18 @@ export class ViewGraphComponent implements OnInit {
       .attr("stroke", "black")
       .attr("marker-end", "url(#arrow)")
 
-    const linkLabel = svg
+      const linkLabel = svg
+      .selectAll(".link-label")
       .data(this.links)
+      .enter()
       .append("text")
-      .append("textPath")
-      .attr("stroke", "black")
-      .attr("fill", "white")
-      .attr("startOffset", "50%")
+      .attr("class", "link-label")
+      .attr("dy", -4)
       .attr("text-anchor", "middle")
+      .append("textPath")
+      .attr("startOffset", "50%")
       .attr("xlink:href", (d: any) => `#${d.source.name}x${d.target.name}`)
-      .text((d: any) => `${d.type}`)
+      .text((d: any) => `${d.type}`);
 
     const node = svg.append("g")
       .attr("fill", "white")

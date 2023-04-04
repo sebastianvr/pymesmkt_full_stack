@@ -10,6 +10,7 @@ const {
     usuarioActivatePut,
     usuarioSuspended,
     usuariosGetAllDeleted,
+    suspendUser,
 } = require('../controllers/usuario.controller');
 
 const { check, param, body, query } = require('express-validator');
@@ -54,5 +55,12 @@ router.delete('/delete/:id', [
     // validarJWT,
     validarCampos
 ], usuarioDelete);
+
+router.put('/suspend/:id', [
+    check('id', 'El param id es obligatorio').not().isEmpty(),
+
+    // validarJWT,
+    validarCampos
+], suspendUser);
 
 module.exports = router;

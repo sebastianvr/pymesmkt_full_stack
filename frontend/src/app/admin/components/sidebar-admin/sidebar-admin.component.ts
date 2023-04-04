@@ -28,12 +28,17 @@ export class SidebarAdminComponent implements OnInit {
         items: [
           {
             label: 'Usuarios activos',
-            icon: 'pi pi-fw pi-user-plus',
+            icon: 'pi pi-fw pi-users',
             routerLink: '/admin/view-users',
           },
           {
+            label: 'Usuarios suspendidos',
+            icon: 'pi pi-fw pi-ban',
+            routerLink: '/admin/view-suspended-users',
+          },
+          {
             label: 'Usuarios eliminados',
-            icon: 'pi pi-fw pi-user-minus',
+            icon: 'pi pi-fw pi-trash',
             routerLink: '/admin/view-deleted-users',
           },
         ]
