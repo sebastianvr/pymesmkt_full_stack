@@ -8,7 +8,7 @@ const createJWT = async (myId = '', nombreUsuario = '') => {
 
         jwt.sign(payload,
             process.env.SECRETORPRIVATEKEY,
-            { expiresIn: '24h' },
+            { expiresIn: '72h' },
 
             (err, token) => {
                 if (err) {
