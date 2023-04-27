@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 export class LoginComponent implements OnInit {
 
   private emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
+  esAdmin : boolean = false
 
   constructor(
     private fb: FormBuilder,
@@ -42,9 +43,9 @@ export class LoginComponent implements OnInit {
       return
     }
 
-    // console.log(this.formularioLogin.value)
+    const endpoint = this.esAdmin ? 'admin/login' : 'login';
 
-    this.AuthService.login(this.formularioLogin.value).subscribe(ok => {
+    this.AuthService.login(this.formularioLogin.value, endpoint).subscribe(ok => {
       // console.log(ok)
       if (ok === true) {
         
@@ -71,7 +72,6 @@ export class LoginComponent implements OnInit {
         this.formularioLogin.get('contrasenia')?.reset()
       }
     })
-
   }
 
   campoInvalido(campo: string) {

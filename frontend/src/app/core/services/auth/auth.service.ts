@@ -41,8 +41,9 @@ export class AuthService {
   }
 
   // Iniciar sesión
-  login(login: any): Observable<any> {
-    return this.http.post<any>(`${this.url}/api/auth/login`, login)
+  login(login: any, endpoint : string): Observable<any> {
+
+    return this.http.post<any>(`${this.url}/api/auth/${endpoint}`, login)
       .pipe(
         tap(resp => {
           if (resp.ok) {
