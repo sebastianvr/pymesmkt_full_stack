@@ -3,8 +3,6 @@ const jwt = require('jsonwebtoken');
 
 
 const validarJWT = async (req, res = response, next) => {
-    //Obtengo el token en el header 
-    // console.log('validarJWT() :' , req.header('token'))
     const token = req.header('token');
     if (!token) {
         return res.status(401).json({
@@ -12,12 +10,24 @@ const validarJWT = async (req, res = response, next) => {
             msg: 'No se encuentra el token',
         });
     }
+
+    const { rol } = jwt.decode(token)
+    let secretKey;
+    if (rol === 'ADMIN-USER') {
+        secretKey = process.env.ADMIN_KEY;
+    }
+
+    if (rol === 'CLIENT-USER') {
+        secretKey = process.env.CLIENT_KEY;
+    }
+
     try {
-        /* verify parametros: token del ciente, clave de la firma, retorna el payload */
-        const { myId, nombreUsuario } = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
+
+        /* verificar parametros: token del ciente, clave de la firma, retorna el payload */
+        const { myId, nombreUsuario, rol } = jwt.verify(token, secretKey);
         req.id = myId;
         req.nombreUsuario = nombreUsuario;
-
+        req.rol = rol;
 
     } catch (error) {
         console.log(error);
@@ -28,10 +38,6 @@ const validarJWT = async (req, res = response, next) => {
     }
 
     next();
-
 };
 
-
-module.exports = {
-    validarJWT
-}
+module.exports = { validarJWT }

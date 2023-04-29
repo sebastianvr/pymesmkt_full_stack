@@ -32,6 +32,7 @@ export class AuthService {
             this._usuario = {
               nombreUsuario: resp.nombreUsuario!,
               id: resp.id!,
+              rol: resp.rol!,
             }
           }
         }),
@@ -51,6 +52,7 @@ export class AuthService {
             this._usuario = {
               nombreUsuario: resp.nombreUsuario!,
               id: resp.id!,
+              rol: resp.rol!,
             }
           }
         }),
@@ -70,6 +72,7 @@ export class AuthService {
           this._usuario = {
             nombreUsuario: resp.nombreUsuario!,
             id: resp.id!,
+            rol: resp.rol!,
           }
           return resp.ok
         }),
