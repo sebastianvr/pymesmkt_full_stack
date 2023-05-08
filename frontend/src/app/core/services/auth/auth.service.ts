@@ -32,6 +32,7 @@ export class AuthService {
             this._usuario = {
               nombreUsuario: resp.nombreUsuario!,
               id: resp.id!,
+              rol: resp.rol!,
             }
           }
         }),
@@ -41,8 +42,7 @@ export class AuthService {
   }
 
   // Iniciar sesión
-  login(login: any, endpoint : string): Observable<any> {
-
+  login(login: any, endpoint: string): Observable<any> {
     return this.http.post<any>(`${this.url}/api/auth/${endpoint}`, login)
       .pipe(
         tap(resp => {
@@ -51,6 +51,7 @@ export class AuthService {
             this._usuario = {
               nombreUsuario: resp.nombreUsuario!,
               id: resp.id!,
+              rol: resp.rol!,
             }
           }
         }),
@@ -63,6 +64,7 @@ export class AuthService {
   validarToken() {
     const headers = new HttpHeaders()
       .set('token', sessionStorage.getItem('token') || '')
+
     return this.http.get<any>(`${this.url}/api/auth/renew`, { headers })
       .pipe(
         map(resp => {
@@ -70,6 +72,7 @@ export class AuthService {
           this._usuario = {
             nombreUsuario: resp.nombreUsuario!,
             id: resp.id!,
+            rol: resp.rol!,
           }
           return resp.ok
         }),
