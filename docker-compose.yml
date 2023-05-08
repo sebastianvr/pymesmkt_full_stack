@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: pydbdev
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+
+    ports:
+      - '8889:3306'
+    networks:
+      - my-network
+    volumes:
+      - data:/var/lib/mysql
+
+  api:
+    build: ./backend
+    environment:
+      PORT: 8080
+      CLIENT_KEY: Est03sMyPub1ck3yKlY3nt.!
+      ADMIN_KEY: Est03sMyPub1ck3y@Dmin.!
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      DB_USER: root
+      DB_PASS: root
+      DB_PORT: 3306
+    depends_on:
+      - db
+    networks:
+      - my-network
+    ports:
+      - '8080:8080'
+
+  web:
+    build: ./frontend
+    ports:
+      - '4200:4200'
+    depends_on:
+      - api
+    networks:
+      - my-network
+
+networks:
+  my-network:
+
+volumes:
+  data:
