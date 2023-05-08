@@ -8,7 +8,7 @@ import { Observable, Subscription } from 'rxjs';
   templateUrl: './view-users.component.html',
   styleUrls: ['./view-users.component.css']
 })
-export class ViewUsersComponent implements OnInit, OnDestroy{
+export class ViewUsersComponent implements OnInit, OnDestroy {
 
   searchText: string = '';
   allUsuarios: any
@@ -29,8 +29,8 @@ export class ViewUsersComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy(): void {
-      this.suscription.unsubscribe();
-      console.log('observable cerrado')
+    this.suscription.unsubscribe();
+    console.log('observable cerrado')
   }
 
   getAll() {
@@ -73,7 +73,7 @@ export class ViewUsersComponent implements OnInit, OnDestroy{
   }
 
 
-  eliminarUsuario(idUsuario : string){
+  eliminarUsuario(idUsuario: string) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: 'btn btn-success mx-3',
@@ -91,17 +91,15 @@ export class ViewUsersComponent implements OnInit, OnDestroy{
       cancelButtonText: 'Cancelar',
       reverseButtons: true
     }).then((result) => {
+      this.usuarioService.deleteUsuario(idUsuario).subscribe()
+
       if (result.isConfirmed) {
         swalWithBootstrapButtons.fire(
           'Eliminado',
           'Este usuario ha sido eliminado del sistema.',
           'success'
         )
-        // this.usuarioService.deleteUsuario(idUsuario).subscribe()
-        // this.usuarioService.refresh.subscribe(response => {
-        //   this.getAll();
-        // })
-        // this.router.navigate(['/user/see-publications']; 
+
       }
     })
   }

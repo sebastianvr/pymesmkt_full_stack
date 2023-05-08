@@ -11,10 +11,8 @@ router.post('/login', [
     check('emailUsuario', 'El correo es obligatorio').not().isEmpty(),
     check('emailUsuario', 'No es un correo válido').isEmail(),
     validarCampos,
-    
     check('contrasenia', 'La contraseña es obligatoria').not().isEmpty(),
     validarCampos,
-
 ], login);
 
 router.get('/renew', validarJWT, revalidarToken)

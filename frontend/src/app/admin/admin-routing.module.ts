@@ -6,6 +6,7 @@ import { ViewGraphComponent } from './pages/view-graph/view-graph.component';
 import { NewReportComponent } from './pages/new-report/new-report.component';
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
 import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
+import { ViewSuspendedUsersComponent } from './pages/view-suspended-users/view-suspended-users.component';
 
 const routes: Routes = [
 
@@ -16,6 +17,7 @@ const routes: Routes = [
       { path: 'view-graph', component: ViewGraphComponent },
       { path: 'view-users', component: ViewUsersComponent },
       { path: 'view-deleted-users', component: ViewDeletedUsersComponent },
+      { path: 'view-suspended-users', component: ViewSuspendedUsersComponent },
       { path: 'new-report', component: NewReportComponent },
       { path: '**', redirectTo: 'view-graph' }
     ]

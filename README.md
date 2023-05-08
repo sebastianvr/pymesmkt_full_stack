@@ -1,9 +1,9 @@
 
 # **Tools used in this project**
 
-- ***Node js : ``v16.14.2``***
-- ***Express : ``v4.18.1``***
-- ***Angular CLI : ``v13.3.9``***
+- ***Node js : `v16.14.2`***
+- ***Express : `v4.18.1`***
+- ***Angular CLI : `v13.3.9`***
 
 <div style="display: flex; justify-content: center; align-items: center;">
   <a href="https://angular.io/" style="width: 200px; margin: 0 10px;">
@@ -70,8 +70,13 @@ Before executing the project, ensure that the local server is running.
     npm install
   ```
 
-  3. Add the **``.env``** file to the project.
-  4. To run the project, run:
+  3. Add the **`.env`** file to the project.
+  4. To run with nodemon.
+  
+  ```bash
+    npm run dev
+  ```
+  5. To run the project, run:
   
   ```bash
     npm start

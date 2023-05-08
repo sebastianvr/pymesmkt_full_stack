@@ -15,6 +15,7 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { NewReportComponent } from './pages/new-report/new-report.component';
 import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
+import { ViewSuspendedUsersComponent } from './pages/view-suspended-users/view-suspended-users.component';
 
 
 
@@ -30,6 +31,7 @@ import { ViewUsersComponent } from './pages/view-users/view-users.component';
     SearchPipe,
     ViewDeletedUsersComponent,
     ViewUsersComponent,
+    ViewSuspendedUsersComponent,
   ],
   imports: [
     CommonModule,
