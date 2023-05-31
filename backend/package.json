@@ -21,5 +21,8 @@
     "sequelize": "^6.19.0",
     "transbank-sdk": "^4.0.0",
     "uid": "^2.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
