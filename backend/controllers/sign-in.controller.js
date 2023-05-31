@@ -28,7 +28,7 @@ const signInPost = async (req = request, res = response) => {
         // Atributos para tabla Pymes
         nombrePyme,
         rut,
-        rubro,
+        rubro,    
         tipoEmpresa,
         regionEmpresa,
         comunaEmpresa,
@@ -42,7 +42,8 @@ const signInPost = async (req = request, res = response) => {
     const password = bcryptjs.hashSync(contrasenia, salt);
 
     // generar JWT
-    const token = await createJWT(myId, nombreUsuario);
+    console.log('before createJWT')
+    const token = await createJWT(myId, nombreUsuario, 'CLIENT-USER');
 
     const nuevoUsuario = {
         id: myId,
@@ -56,7 +57,7 @@ const signInPost = async (req = request, res = response) => {
         dir1Propietario,
         dir2Propietario,
         descripcion,
-        rol: 'CLIENT-USER',
+        rol,
         Pyme: {
             id: uid(15),
             nombrePyme,
