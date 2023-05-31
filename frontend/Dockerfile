@@ -9,7 +9,10 @@ COPY [".", "/web"]
 RUN  npm install \
     && npm install -g @angular/cli
 
-# RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
-
 EXPOSE 4200
+
+# Modo desarrollo
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
+
+# Modo produccion
 # CMD ["npm", "start"]

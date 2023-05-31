@@ -11,11 +11,11 @@ RUN npm install
 
 COPY . .
 
-# Copia la carpeta .env
-# COPY .env  d./.env
-
 # Expone el puerto de la aplicación
 EXPOSE 8080
 
-# Utiliza nodemon para reiniciar automáticamente la aplicación cuando se detectan cambios en el código
-CMD ["npm", "start"]
+# Nodemon en modo desarrollo
+# CMD ["npm", "run", "dev"]
+
+# Modo produccion
+# CMD ["npm", "start"]
