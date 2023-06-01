@@ -24,6 +24,7 @@ const signInPost = async (req = request, res = response) => {
         dir1Propietario,
         dir2Propietario,
         descripcion,
+        rol,
 
         // Atributos para tabla Pymes
         nombrePyme,

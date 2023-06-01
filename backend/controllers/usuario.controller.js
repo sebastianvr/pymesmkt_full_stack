@@ -37,8 +37,6 @@ const usuariosGetAll = async (req = request, res = response) => {
 
         });
 
-
-
         if (usuarios.count === 0) {
             res.status(200).json({
                 ok: true,

@@ -244,6 +244,7 @@ export class RegisterComponent implements OnInit {
         this.formulario.get('infoPropietario')?.get('apellidos')?.value,
       run:
         this.formulario.get('infoPropietario')?.get('run')?.value,
+      rol: 'CLIENT-USER',
       emailUsuario:
         this.formulario.get('infoPropietario')?.get('correoPropietario')?.value,
       contrasenia:
@@ -294,7 +295,15 @@ export class RegisterComponent implements OnInit {
 
       } else {
         // mostrar mensaje de error
+        Swal.fire({
+          // position: 'top-start',
+          icon: 'warning',
+          title: 'Error al crear usuario',
+          showConfirmButton: false,
+          timer: 1500,
+        })
 
+        this.router.navigate(['/visitor/'])
       }
     })
 
