@@ -2,14 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 import { GraphService } from '../../../core/services/graph/graph.service';
 
-
 @Component({
   selector: 'app-view-graph',
   templateUrl: './view-graph.component.html',
   styleUrls: ['./view-graph.component.css']
 })
-
-
 export class ViewGraphComponent implements OnInit {
 
   allData: any = {}
@@ -21,10 +18,6 @@ export class ViewGraphComponent implements OnInit {
     { index: 3, name: 'Dulce Tentación' },
     { index: 4, name: 'La Baguette' },
     { index: 5, name: 'Pastelería El Gato' },
-    { index: 6, name: 'La Cremería' },
-    { index: 7, name: 'La Boutique del Pan' },
-    { index: 8, name: 'El Horno de Mama' },
-    { index: 9, name: 'La Patisserie' },
   ];
 
   links = [
@@ -32,12 +25,6 @@ export class ViewGraphComponent implements OnInit {
     { source: this.nodes[0], target: this.nodes[2], type: 3 },
     { source: this.nodes[1], target: this.nodes[3], type: 4 },
     { source: this.nodes[1], target: this.nodes[4], type: 2 },
-    { source: this.nodes[1], target: this.nodes[5], type: 1 },
-    { source: this.nodes[1], target: this.nodes[6], type: 4 },
-    { source: this.nodes[2], target: this.nodes[7], type: 6 },
-    { source: this.nodes[2], target: this.nodes[8], type: 9 },
-    { source: this.nodes[2], target: this.nodes[9], type: 4 },
-    { source: this.nodes[1], target: this.nodes[0], type: 1 },
   ];
 
   constructor(
@@ -52,7 +39,6 @@ export class ViewGraphComponent implements OnInit {
   div: any = document.querySelector("#divGraph");
 
   ngOnInit(): void {
-
     const width: any = screen.width
     const height: any = screen.height
 
@@ -61,7 +47,6 @@ export class ViewGraphComponent implements OnInit {
       .force('charge', d3.forceManyBody().strength(-400))
       .force("x", d3.forceX())
       .force("y", d3.forceY());
-
 
     const svg = d3.select('#divGraph').append('svg')
       .attr("viewBox", [-width / 2, -(height - 500) / 2, width, height - 500])
@@ -81,7 +66,6 @@ export class ViewGraphComponent implements OnInit {
       .attr("fill", 'black')
       .attr("d", "M0,-5L10,0L0,5");
 
-
     const link = svg.append("g")
       .attr("fill", "none")
       .attr("stroke-width", 1.5)
@@ -92,7 +76,7 @@ export class ViewGraphComponent implements OnInit {
       .attr("stroke", "black")
       .attr("marker-end", "url(#arrow)")
 
-      const linkLabel = svg
+    const linkLabel = svg
       .selectAll(".link-label")
       .data(this.links)
       .enter()
@@ -170,11 +154,4 @@ export class ViewGraphComponent implements OnInit {
       A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
     `;
   }
-
-
-
-
-
-
-
 }
