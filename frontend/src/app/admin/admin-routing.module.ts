@@ -15,6 +15,7 @@ const routes: Routes = [
     component: MainComponent,
     children: [
       { path: 'view-graph', component: ViewGraphComponent },
+      // { path: 'my-profile', component: MyProfileComponent },
       { path: 'view-users', component: ViewUsersComponent },
       { path: 'view-deleted-users', component: ViewDeletedUsersComponent },
       { path: 'view-suspended-users', component: ViewSuspendedUsersComponent },
