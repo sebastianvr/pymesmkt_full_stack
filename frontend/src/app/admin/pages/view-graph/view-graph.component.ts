@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
 import { GraphService } from '../../../core/services/graph/graph.service';
+import { zoom, ZoomBehavior, ZoomTransform } from 'd3-zoom';
 
 @Component({
   selector: 'app-view-graph',
@@ -10,6 +11,9 @@ import { GraphService } from '../../../core/services/graph/graph.service';
 export class ViewGraphComponent implements OnInit {
 
   allData: any = {}
+  zoom!: ZoomBehavior<Element, unknown>;
+  svg: any;
+  div: any = document.querySelector("#divGraph");
 
   nodes = [
     { index: 0, name: 'El Molino De Oro' },
@@ -27,18 +31,18 @@ export class ViewGraphComponent implements OnInit {
     { source: this.nodes[1], target: this.nodes[4], type: 2 },
   ];
 
-  constructor(
-    private graphService: GraphService
-  ) {
-    this.graphService.getDataGraph().subscribe((data) => {
-      this.allData = data
-      console.log('this.allData', this.allData)
-    })
-  }
-
-  div: any = document.querySelector("#divGraph");
+  constructor(private graphService: GraphService) { }
 
   ngOnInit(): void {
+    this.graphService.getDataGraph().subscribe((data) => {
+      this.allData = data;
+      console.log('this.allData', this.allData);
+    });
+
+    this.initializeGraph()
+  }
+
+  initializeGraph(): void {
     const width: any = screen.width
     const height: any = screen.height
 
@@ -51,6 +55,16 @@ export class ViewGraphComponent implements OnInit {
     const svg = d3.select('#divGraph').append('svg')
       .attr("viewBox", [-width / 2, -(height - 500) / 2, width, height - 500])
       .style("font", "12px sans-serif");
+
+    this.zoom = d3.zoom()
+      .scaleExtent([0.5, 5]) // Define los límites de escala del zoom
+      .on('zoom', this.zoomed.bind(this)); // Llama a la función zoomed cuando se realiza el zoom
+
+    // Obtén el elemento SVG
+    this.svg = d3.select('#divGraph svg');
+
+    // Aplica el comportamiento de zoom al elemento SVG
+    this.svg.call(this.zoom);
 
     svg.append("svg:defs").selectAll("marker")
       .data(['arrow'])
@@ -147,6 +161,7 @@ export class ViewGraphComponent implements OnInit {
     };
   }
 
+
   linkArc(d: any) {
     const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
     return `
@@ -154,4 +169,38 @@ export class ViewGraphComponent implements OnInit {
       A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
     `;
   }
+
+  zoomed(event: any) {
+    const transform: ZoomTransform = event.transform;
+    // Aplica la transformación al elemento SVG
+    this.svg.attr('transform', transform);
+  }
+
+  zoomIn(): void {
+    this.zoom.scaleBy(this.svg, 1.2); // Aumenta la escala del zoom en 1.2 veces
+  }
+
+  zoomOut(): void {
+    this.zoom.scaleBy(this.svg, 0.8); // Reduce la escala del zoom en 0.8 veces
+  }
+
+  centerGraph(): void {
+    const svgElement = this.svg.node();
+    const svgWidth = +svgElement.getAttribute("width");
+    const svgHeight = +svgElement.getAttribute("height");
+
+    // Calcula el centro del gráfico
+    const centerX = svgWidth / 2;
+    const centerY = svgHeight / 2;
+
+    // Realiza la transición para centrar el gráfico
+    this.svg
+      .transition()
+      .duration(750) // Duración de la transición en milisegundos
+      .call(
+        this.zoom.transform,
+        d3.zoomIdentity.translate(centerX, centerY)
+      );
+  }
+
 }
