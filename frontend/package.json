@@ -26,6 +26,7 @@
     "bootstrap": "^5.2.0",
     "bootstrap-icons": "^1.9.1",
     "d3": "^7.6.1",
+    "d3-zoom": "^3.0.0",
     "graphology": "^0.24.1",
     "graphology-layout": "^0.6.0",
     "jquery": "^3.6.1",
