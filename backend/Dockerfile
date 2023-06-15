@@ -5,6 +5,9 @@ WORKDIR /api
 
 # Copia los archivos de la aplicación a la imagen
 COPY package*.json ./
+COPY package-lock.json ./
+
+# RUN npm i nodemon 
 
 # Instala las dependencias de la aplicación
 RUN npm install
