@@ -22,7 +22,8 @@ class Server {
             reclamo: '/api/reclamo',
             pago: '/api/pago',
             compra: '/api/compra',
-            calificacion: '/api/calificacion'
+            calificacion: '/api/calificacion',
+            seed: '/api/seed'
         }
 
         //Conexion a la BD
@@ -68,6 +69,7 @@ class Server {
         this.app.use(this.paths.pago, require('../routes/webpay-plus-mall.routes'))
         this.app.use(this.paths.compra, require('../routes/compra.routes'))
         this.app.use(this.paths.calificacion, require('../routes/calificacion.routes'))
+        this.app.use(this.paths.seed, require('../routes/seed.routes'))
     }
 
     listen() {
