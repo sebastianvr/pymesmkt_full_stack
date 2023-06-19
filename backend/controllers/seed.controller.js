@@ -15,7 +15,6 @@ const crearUsuario = async (req = request, res = response) => {
   const publicaciones = 20
   const credencialesUsuarios = []
 
-  const usuarios = []
   try {
     for (let index = 0; index < nroUsuarios; index++) {
       //encryptar contraseña
@@ -50,13 +49,12 @@ const crearUsuario = async (req = request, res = response) => {
       }
     }
 
-    // console.log('Usuario creado:', usuario);
-
     res.status(200).json({
       ok: true,
       msg: 'Usuarios creados con éxito',
       credencialesUsuarios
     });
+
   } catch (error) {
     console.error('Error al crear el usuario:', error);
     res.status(500).json({

@@ -1,8 +1,4 @@
-.dateHeader {
-    display: inline;
-}
-
-.stateHeader {
+/* .dateHeader {
     display: inline;
 }
 
@@ -10,14 +6,13 @@
     border-bottom: 1px solid #c8c9ca;
 }
 
-.cardMain {
-    min-width: 500px;
-    /* margin: auto auto; */
-    /* width: auto; */
-}
-
 .btnMoreInformation {
     position: relative;
     left: 70%;
+} */
 
+
+
+.icon-white {
+    filter: invert(1);
 }

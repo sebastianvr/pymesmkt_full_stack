@@ -38,10 +38,8 @@ const publicacionesGetAll = async (req = request, res = response) => {
             include: [
                 {
                     model: Usuario,
-                    // raw : true
                     where: { estado: true },
                     attributes: ['nombreUsuario', 'id', 'apellidos'],
-                    // group : ['id'],
                     include: [
                         {
                             model: Calificacion,
@@ -59,27 +57,13 @@ const publicacionesGetAll = async (req = request, res = response) => {
                             where: { estado: true },
                             attributes: ['nombrePyme'],
                             group: ['nombrePyme']
-
                         },
-
                     ],
-
                 },
             ],
         });
-
-
         console.log('Publicaciones: ', publicaciones)
-        // aqui calcular el promedo de calificacion para cada publicacion
-
-        // let calificacion = await Calificacion.findAll({
-        //     attributes: [[db.fn('AVG', db.col('puntaje')), 'promedio']],
-        //     where: { UsuarioId: '281bf2c88ebe135' }
-        // })
-        // console.log('Promedio del Puntaje :', calificacion[0].dataValues.promedio)
-        // // console.log('wewewewewewe', publicacion.rows)
-        // console.log(publicacion)
-
+        
         res.status(200).json({
             totalPages: Math.ceil(publicaciones.count / size),
             content: publicaciones.rows,

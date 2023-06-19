@@ -1,47 +1,63 @@
 <div class="container">
 
-  <!-- barra de carga -->
+  <!-- Spinner de carga -->
   <div class="col-12 text-center" *ngIf="this.publicaciones?.length === 0; else allPublicacionesTemplate">
     <div class="container mt-5">
-
       <div class="spinner-border text-primary text-center my-3" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-
       <br>
-
     </div>
   </div>
 
   <ng-template #allPublicacionesTemplate>
+
+    <!-- Barra de paginación -->
     <div class="row">
-      <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="size"
-        [collectionSize]="numElement" (pageChange)="done()">
-      </ngb-pagination>
+      <div class="d-flex justify-content-center">
+        <ngb-pagination [collectionSize]="numElement" [(page)]="page" [boundaryLinks]="true"
+          (pageChange)="selectPage($event)">
+          <ng-template ngbPaginationPages let-page let-pages="pages">
+            <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+              <div class="mb-3 d-flex flex-nowrap px-2">
+                <label id="paginationInputLabel" for="paginationInput" class="col-form-label me-2 ms-1">Page</label>
+                <input #i type="text" inputmode="numeric" pattern="[0-9]*" class="form-control custom-pages-input"
+                  id="paginationInput" [value]="page" (keyup.enter)="selectPage(+i.value)" (blur)="selectPage(+i.value)"
+                  (input)="formatInput($event.target)" aria-labelledby="paginationInputLabel paginationDescription"
+                  style="width: 2.5rem" />
+                <span id="paginationDescription" class="col-form-label text-nowrap px-2"> of {{pages.length}}</span>
+              </div>
+            </li>
+          </ng-template>
+        </ngb-pagination>
+      </div>
     </div>
 
-    <div class="row">
-
-      <div class="col-12">
+    <!-- Targeta de publicaciones -->
+    <div class="row justify-content-center px-3">
+      <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4">
         <div *ngFor="let item of publicaciones; let i = index">
 
-          <div class="p-0">
-            <div class="card cardMain  shadow-sm rounded mb-2" style="width: 18rem;">
+          
+            <div class="card shadow-sm rounded mb-2">
 
               <div class="card-header pt-2">
                 <h6 class="dateHeader text-muted"> <strong class="">Id publicación:</strong> {{item.id}}</h6>
                 <!-- TODO ARREGLAR LA CANTIDAD DE OFERTAS QUE HA RECIBIDO ESTA PUBLICACION -->
-                <!--  [ngClass]="{'alert-primary' : item.ofertasRecibidas ==='Sé el primero en ofertar', 'alert-warning' : item.ofertasRecibidas.includes('ofertas recibidas')}" -->
-                <!-- <h6 class="stateHeader float-end alert m-0 p-1" role="alert">{{item.cantidadOfertasRecibidas}}</h6> -->
+
+                <!-- [ngClass]="{'alert-primary' : item.ofertasRecibidas ===, 'alert-warning' : item.ofertasRecibidas.includes('ofertas recibidas')}" -->
+                
+                <h6 class="stateHeader float-end alert m-0 p-1" role="alert"
+                >{{item.cantidadOfertasRecibidas}}</h6>
               </div>
 
               <div class="card-body">
-                <h5 class="card-title"><a href="#" class="card-link">{{item.titulo | uppercase}}</a></h5>
+                <h5 class="card-title"><a class="card-link">{{item.titulo | uppercase}}</a></h5>
                 <p class="card-text">{{item.descripcion | uppercase}}</p>
 
                 <hr style="height: 3px;">
 
-                <table class="tableResume table table-hover table-borderless">
+                <table class="table table-hover table-borderless">
                   <tbody>
                     <tr>
                       <td colspan="2" class="start-*"><strong>Monto Disponible</strong></td>
@@ -71,17 +87,14 @@
                 <button class="btn btn-primary text-center" type="button" data-bs-toggle="collapse"
                   [attr.data-bs-target]="'#collapseExample' + i" aria-expanded="false" aria-controls="collapseExample">
                   Más información
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-chevron-down" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd"
-                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-                  </svg>
+                  <img src="../../../../assets/icons/more-information.svg" alt="more-information.svg"
+                    class="icon-white">
                 </button>
 
                 <div class="cardAccordion collapse mt-2" [attr.id]="'collapseExample' + i">
                   <div class="card card-body col-12">
                     <h4 class="text-center my-2">Detalles de la publicación</h4>
-                    <table class="tableResume table table-hover table-borderless">
+                    <table class="table table-hover table-borderless">
                       <tbody>
                         <tr>
                           <td colspan="2" class="start-*"><strong>Fecha creación</strong></td>
@@ -192,17 +205,32 @@
               </div>
             </div>
             <br>
-          </div>
+          
 
         </div>
       </div>
     </div>
 
+    <!-- Barra de paginación -->
     <div class="row">
-      <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="size"
-        [collectionSize]="numElement" (pageChange)="done()">
-      </ngb-pagination>
+      <div class="d-flex justify-content-center">
+        <ngb-pagination [collectionSize]="numElement" [(page)]="page" [boundaryLinks]="true"
+          (pageChange)="selectPage($event)">
+          <ng-template ngbPaginationPages let-page let-pages="pages">
+            <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+              <div class="mb-3 d-flex flex-nowrap px-2">
+                <label id="paginationInputLabel" for="paginationInput" class="col-form-label me-2 ms-1">Page</label>
+                <input #i type="text" inputmode="numeric" pattern="[0-9]*" class="form-control custom-pages-input"
+                  id="paginationInput" [value]="page" (keyup.enter)="selectPage(+i.value)" (blur)="selectPage(+i.value)"
+                  (input)="formatInput($event.target)" aria-labelledby="paginationInputLabel paginationDescription"
+                  style="width: 2.5rem" />
+                <span id="paginationDescription" class="col-form-label text-nowrap px-2"> of {{pages.length}}</span>
+              </div>
+            </li>
+          </ng-template>
+        </ngb-pagination>
+      </div>
     </div>
-  </ng-template>
 
+  </ng-template>
 </div>
