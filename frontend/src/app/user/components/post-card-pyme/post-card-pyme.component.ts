@@ -30,9 +30,9 @@ export class PostCardPymeComponent implements OnInit {
   mensaje!: string;
 
   // Pagina actual
-  page = 0;
+  page = 1;
   // Tamaño de elementos por página
-  size = 2;
+  size = 5;
   // Representa a la cantidad total de publicaciones creadas
   numElement!: number;
 
@@ -58,11 +58,10 @@ export class PostCardPymeComponent implements OnInit {
 
   getPublicaciones() {
     this.publicacionService.getAllPublicaciones(this.page - 1, this.size)
-      .subscribe(({ content, totalPages }) => {
-        this.publicaciones = content
-        this.numElement = totalPages * this.size;
-        console.log('this.publicaciones :', this.publicaciones)
-      })
+      .subscribe(({ content, totalPages}) => {
+        this.publicaciones = content;
+        this.numElement = totalPages;
+      });
   }
 
   //Encuentra las publicaciones del propio usuario
@@ -88,11 +87,6 @@ export class PostCardPymeComponent implements OnInit {
     }
 
     console.log(nuevaOferta)
-    //conectar el servicio
-
-    // if(this.closebutton.nativeElement.click()){
-    //   console.log('dentro del close')
-    // }
 
     Swal.fire({
       position: 'top-end',
@@ -116,8 +110,20 @@ export class PostCardPymeComponent implements OnInit {
       && this.formularioOferta.get(campo)?.touched
   }
 
-  // obtiene la siguiente pagina para paginacion
-  done() {
-    this.getPublicaciones();
+  selectPage(page: number) {
+    if (page >= 1 && page <= this.numElement) {
+      this.page = page;
+      this.getPublicaciones();
+    }
+  }
+  
+  formatInput(input: any) {
+    let value = +input.value;
+    if (isNaN(value) || value < 1) {
+      value = 1;
+    } else if (value > this.numElement) {
+      value = this.numElement;
+    }
+    input.value = value;
   }
 }
