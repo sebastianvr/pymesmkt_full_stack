@@ -13,10 +13,23 @@ services:
     volumes:
       - data:/var/lib/mysql
 
+  minio:
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+
   api:
     restart: always
     depends_on:
-      - db
+      - db 
+      - minio
     build: ./backend
     environment:
       PORT: 8080
@@ -45,3 +58,4 @@ services:
 
 volumes:
   data:
+  minio_data:

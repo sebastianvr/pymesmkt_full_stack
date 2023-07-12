@@ -1,11 +1,11 @@
-const { uid } = require('uid');
-const bcryptjs = require('bcryptjs');
 const { response, request } = require('express');
+const bcryptjs = require('bcryptjs');
+const { uid } = require('uid');
 
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
 const { createJWT } = require('../helpers/create-jwt');
-
+const { minioClient } = require('../minio/connection');
 
 const signInPost = async (req = request, res = response) => {
     //Id unico de 15 caracteres, para cada nuevo usuario creado
@@ -18,6 +18,7 @@ const signInPost = async (req = request, res = response) => {
         apellidos,
         run,
         emailUsuario,
+        imagen,
         contrasenia,
         comuna,
         region,
@@ -29,7 +30,7 @@ const signInPost = async (req = request, res = response) => {
         // Atributos para tabla Pymes
         nombrePyme,
         rut,
-        rubro,    
+        rubro,
         tipoEmpresa,
         regionEmpresa,
         comunaEmpresa,
@@ -85,7 +86,7 @@ const signInPost = async (req = request, res = response) => {
             nombreUsuario,
             token
         })
-        
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -94,6 +95,26 @@ const signInPost = async (req = request, res = response) => {
         });
     }
 
+}
+
+// Configuración de multer
+const uploadFile = async (req = request, res = response) => {
+    try {
+        const file = req.file;
+        console.log({file})
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = file.originalname.split('.').pop();
+        const fileName = 'image-' + uniqueSuffix + '.' + extension;
+
+        await minioClient.putObject('files-bucket', fileName, file.buffer);
+
+        const fileUrl = minioClient.protocol + '//' + minioClient.host + ':' + minioClient.port + '/' + 'files-bucket' + '/' + fileName;
+
+        res.json({ fileUrl });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al subir la imagen' });
+    }
 }
 
 const existeCorreo = async (req = request, res = response) => {
@@ -175,5 +196,6 @@ module.exports = {
     signInPost,
     existeCorreo,
     existeRun,
-    existeRut
+    existeRut,
+    uploadFile
 };

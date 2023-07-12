@@ -21,7 +21,7 @@ const Usuario = db.define(
             unique: true
         },
         imagen: {
-            type: DataTypes.BLOB
+            type: DataTypes.STRING
         },
         estado: {
             type: DataTypes.BOOLEAN,

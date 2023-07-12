@@ -1,10 +1,13 @@
 const { Router } = require('express');
+const multer = require('multer');
 const { validarCampos } = require('../middlewares/validar-campos');
+
 const {
     signInPost,
     existeCorreo,
     existeRun,
     existeRut,
+    uploadFile,
 } = require('../controllers/sign-in.controller');
 
 const { check, param, body } = require('express-validator');
@@ -37,5 +40,10 @@ router.get('/correo/:correo', [
     param('correo', 'El campo enviado no es un correo').isEmail().normalizeEmail(),
     validarCampos
 ], existeCorreo)
+
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage }); 
+router.post('/upload', upload.single('image'), uploadFile);
 
 module.exports = router;

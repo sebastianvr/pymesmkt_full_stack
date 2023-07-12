@@ -2,13 +2,14 @@ const express = require('express')
 const cors = require('cors');
 
 const db = require('../db/connection');
+const { storage } = require('../minio/connection');
 require('./asociaciones');
 
 class Server {
 
     constructor() {
         this.app = express();
-        this.port = process.env.PORT || 8081;
+        this.port = process.env.API_PORT || 8081;
 
         // endpoints
         this.paths = {
@@ -26,13 +27,9 @@ class Server {
             seed: '/api/seed'
         }
 
-        //Conexion a la BD
         this.dbConnection();
-
-        //Middlewares
+        this.minioConnection();
         this.middlewares();
-
-        //Rutas de la app
         this.routes();
     }
 
@@ -40,7 +37,16 @@ class Server {
         try {
             // force: true ; DROP ALL TABLES
             await db.sync({ force: false });
-            console.log('Database online');
+            console.log('Mysql connected');
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
+    async minioConnection() {
+        try {
+            this.minioClient = storage
+            console.log('MinIO connected');
         } catch (error) {
             throw new Error(error);
         }
@@ -49,10 +55,8 @@ class Server {
     middlewares() {
         //Cors
         this.app.use(cors());
-
         // Lectura y parseo del body
         this.app.use(express.json());
-
         //Directorio publico
         this.app.use(express.static('public'));
     }
