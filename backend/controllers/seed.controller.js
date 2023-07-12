@@ -11,8 +11,8 @@ const Pyme = require('../models/pyme');
 
 // Crear un usuario con valores aleatorios
 const crearUsuario = async (req = request, res = response) => {
-  const nroUsuarios = 100
-  const publicaciones = 20
+  const nroUsuarios = 10
+  const publicaciones = 4
   const credencialesUsuarios = []
 
   try {
