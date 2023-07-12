@@ -13,6 +13,7 @@ import { SearchPublicationComponent } from './components/search-publication/sear
 import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FilterPublicationComponent } from './components/filter-publication/filter-publication.component';
 
 
 const components: any[] = [
@@ -24,6 +25,7 @@ const components: any[] = [
   MainComponent,
   PostCardVisitorComponent,
   SearchPublicationComponent,
+  FilterPublicationComponent,
 ]
 
 @NgModule({

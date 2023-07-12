@@ -10,11 +10,11 @@
     border-bottom: 1px solid #c8c9ca;
 }
 
-.cardMain {
+/* .cardMain {
     min-width: 490px;
     margin: auto auto;
-    /* width: auto; */
-}
+} */
+/* width: auto; */
 
 /* .btnMoreInformation {
     position: relative;
@@ -32,4 +32,23 @@
 
 .my-custom-class .arrow::after {
     border-top-color: aliceblue;
+}
+
+
+
+.icon-image {
+    width: 30%;
+    /* Ajusta el tamaño de la imagen en relación con el contenedor */
+    height: auto;
+    max-width: 150px;
+    /* Establece un ancho máximo para la imagen */
+}
+
+.empty-publications-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    /* Ajusta el margen superior según tus necesidades */
 }
