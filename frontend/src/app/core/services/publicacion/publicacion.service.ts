@@ -29,8 +29,7 @@ export class PublicacionService {
 
 
   getAllPublicaciones(page: number = 0, size: number = 0): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/publicacion/?size=${size}&page=${page}`)
-
+    return this.http.get<any>(`${this.url}/api/publicacion?size=${size}&page=${page}`)
   }
 
   getAllPublicacionById(id: string): Observable<any> {
