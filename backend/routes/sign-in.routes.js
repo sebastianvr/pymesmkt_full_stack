@@ -7,7 +7,6 @@ const {
     existeCorreo,
     existeRun,
     existeRut,
-    uploadFile,
 } = require('../controllers/sign-in.controller');
 
 const { check, param, body } = require('express-validator');
@@ -20,30 +19,23 @@ router.post('/', [
     check('apellidos', 'Los apellidos son obligatorios').not().isEmpty(),
     validarCampos,
     check('run', 'El run es obligatorio').not().isEmpty(),
-    check('run', ''),
     validarCampos,
     check('emailUsuario', 'El correo es obligatorio').not().isEmpty(),
     check('emailUsuario', 'El correo no es válido').isEmail().normalizeEmail(),
-
     validarCampos,
 ], signInPost);
 
 
 router.get('/run/:run', [
     param('run', 'El run es obligatorio').not().isEmpty(),
-    validarCampos
-], existeRun)
+    validarCampos,
+], existeRun);
 
 
 router.get('/correo/:correo', [
     param('correo', 'El correo es obligatorio').not().isEmpty(),
     param('correo', 'El campo enviado no es un correo').isEmail().normalizeEmail(),
-    validarCampos
-], existeCorreo)
-
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage }); 
-router.post('/upload', upload.single('image'), uploadFile);
+    validarCampos,
+], existeCorreo);
 
 module.exports = router;

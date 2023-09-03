@@ -4,25 +4,22 @@ import { environment } from '../../../../environments/environment.prod';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
-
-
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private url: string = environment.baseUrl
+  private url: string = environment.baseUrl;
   private _usuario!: any;
 
   get usuario() {
-    return { ...this._usuario }
+    return { ...this._usuario };
   }
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
   ) { }
-
-  // Creación de registro de usuario y pyme
+  
   registerUser(user: any): Observable<any> {
     return this.http.post<any>(`${this.url}/api/sign-in`, user)
       .pipe(
@@ -37,17 +34,16 @@ export class AuthService {
           }
         }),
         map(valido => valido.ok),
-        catchError(err => of(err.error.msj))
+        catchError(err => of(err.error.msj)),
       );
   }
 
-  // Iniciar sesión
   login(login: any): Observable<any> {
     return this.http.post<any>(`${this.url}/api/auth/login`, login)
       .pipe(
         tap(resp => {
           if (resp.ok) {
-            sessionStorage.setItem('token', resp.token)
+            sessionStorage.setItem('token', resp.token);
             this._usuario = {
               nombreUsuario: resp.nombreUsuario!,
               id: resp.id!,
@@ -56,14 +52,14 @@ export class AuthService {
           }
         }),
         map(valido => valido.ok),
-        catchError(err => of(err.error.msj))
+        catchError(err => of(err.error.msj)),
       )
   }
 
   // Obtiene el jwt guardado en LocalStorage 
   validarToken() {
     const headers = new HttpHeaders()
-      .set('token', sessionStorage.getItem('token') || '')
+      .set('token', sessionStorage.getItem('token') || '');
 
     return this.http.get<any>(`${this.url}/api/auth/renew`, { headers })
       .pipe(
@@ -74,14 +70,13 @@ export class AuthService {
             id: resp.id!,
             rol: resp.rol!,
           }
-          return resp.ok
+          return resp.ok;
         }),
-        catchError(err => of(false))
+        catchError(err => of(false)),
       )
   }
 
-  // Cerrar sesión
   logOut() {
-    sessionStorage.clear()
+    sessionStorage.clear();
   }
 } 

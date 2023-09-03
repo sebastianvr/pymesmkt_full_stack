@@ -24,11 +24,12 @@ class Server {
             pago: '/api/pago',
             compra: '/api/compra',
             calificacion: '/api/calificacion',
-            seed: '/api/seed'
-        }
+            minio: '/api/minio/',
+            seed: '/api/seed',
+        };
 
         this.dbConnection();
-        this.minioConnection();
+        this.minIOConnection();
         this.middlewares();
         this.routes();
     }
@@ -37,49 +38,50 @@ class Server {
         try {
             // force: true ; DROP ALL TABLES
             await db.sync({ force: false });
-            console.log('Mysql connected');
+            console.log('Service: MySQL connected');
         } catch (error) {
             throw new Error(error);
         }
     }
 
-    async minioConnection() {
+    async minIOConnection() {
         try {
-            this.minioClient = storage
-            console.log('MinIO connected');
+            this.minioClient = storage;
+            console.log('Service: MinIO connected');
         } catch (error) {
             throw new Error(error);
         }
     }
 
     middlewares() {
-        //Cors
+        //CORS
         this.app.use(cors());
         // Lectura y parseo del body
         this.app.use(express.json());
         //Directorio publico
-        this.app.use(express.static('public'));
+        // this.app.use(express.static('public'));
     }
 
     routes() {
-        this.app.use(this.paths.usuario, require('../routes/usuario.routes'))
-        this.app.use(this.paths.pyme, require('../routes/pyme.routes'))
-        this.app.use(this.paths.auth, require('../routes/auth.routes'))
-        this.app.use(this.paths.signIn, require('../routes/sign-in.routes'))
-        this.app.use(this.paths.publicacion, require('../routes/publicacion.routes'))
-        this.app.use(this.paths.colaboracion, require('../routes/colaboracion.routes'))
-        this.app.use(this.paths.oferta, require('../routes/oferta.routes'))
-        this.app.use(this.paths.reclamo, require('../routes/reclamo.routes'))
-        this.app.use(this.paths.pago, require('../routes/webpay-plus-mall.routes'))
-        this.app.use(this.paths.compra, require('../routes/compra.routes'))
-        this.app.use(this.paths.calificacion, require('../routes/calificacion.routes'))
-        this.app.use(this.paths.seed, require('../routes/seed.routes'))
+        this.app.use(this.paths.usuario, require('../routes/usuario.routes'));
+        this.app.use(this.paths.pyme, require('../routes/pyme.routes'));
+        this.app.use(this.paths.auth, require('../routes/auth.routes'));
+        this.app.use(this.paths.signIn, require('../routes/sign-in.routes'));
+        this.app.use(this.paths.publicacion, require('../routes/publicacion.routes'));
+        this.app.use(this.paths.colaboracion, require('../routes/colaboracion.routes'));
+        this.app.use(this.paths.oferta, require('../routes/oferta.routes'));
+        this.app.use(this.paths.reclamo, require('../routes/reclamo.routes'));
+        this.app.use(this.paths.pago, require('../routes/webpay-plus-mall.routes'));
+        this.app.use(this.paths.compra, require('../routes/compra.routes'));
+        this.app.use(this.paths.calificacion, require('../routes/calificacion.routes'));
+        this.app.use(this.paths.minio, require('../routes/minio.routes'));
+        this.app.use(this.paths.seed, require('../routes/seed.routes'));
     }
 
     listen() {
         this.app.listen(this.port, () => {
-            console.log(`API Ejecutando, puerto: ${this.port}`)
-        })
+            console.log(`API Ejecutando, puerto: ${this.port}`);
+        });
     }
 }
 

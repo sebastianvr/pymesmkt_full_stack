@@ -1,26 +1,22 @@
 <div class="d-flex justify-content-center">
 
-  <div class="container pt-4">
-    <!-- <div class="text-center">
-      <img class="mb-1" src="../../../assets/icons/book.svg" alt="" width="144" height="114">
-    </div> -->
-    <h2 class="fs-1 mb-2 text-center">Registra tu información personal</h2>
+  <div class="container">
+    <h2 class="fs-1 my-2 text-center"><strong>Registra tu información personal</strong></h2>
 
-    <div class="sticky-top container-progress-bar py-4">
+    <div class="sticky-top container-progress-bar px-4 py-2">
       <p class="lead text-center">Progreso actual de tus datos</p>
-      <div class="progress">
-        <div class="progress-bar" role="progressbar" [ngStyle]="{'width' : getPercent() }"  aria-valuemin="0"
+      <div class="progress my-1">
+        <div class="progress-bar" role="progressbar" [ngStyle]="{'width' : getPercent() }" aria-valuemin="0"
           aria-valuemax="100">{{getPercent()}}</div>
       </div>
     </div>
 
     <div class="container g-5">
-      <div class="col-md-12 col-lg-12">
-        <form [formGroup]="formulario" (ngSubmit)="enviarFormulario()">
+      <div class="col-md-12 col-lg-12 my-3">
+        <form [formGroup]="formulario" (ngSubmit)="sendForm()">
 
           <div *ngIf="step == 1" class="row g-3" formGroupName="infoPropietario">
-            <hr class="my-4">
-            <h3 class="fs-2">Información del propietario</h3>
+            <h3 class="fs-2"><strong>Información del propietario</strong></h3>
             <div class="col-sm-6">
               <label for="firstName" class="form-label">Nombre</label>
               <input type="text" class="form-control" id="firstName" placeholder="" formControlName="nombre">
@@ -55,7 +51,25 @@
               </span>
             </div>
 
-            <div class="col-md-3"></div>
+            <div class="col-md-3 ">
+              <label class="form-label" for="img" class="form-label">Foto de perfil</label>
+              <input type="file" class="form-control" id="imagen" formControlName="imagen" accept="image/*"
+                (change)="onFileInputChange($event)">
+              <span *ngIf="campoInvalido('imagen', 'infoPropietario') && 
+                formulario.get('infoPropietario.imagen')?.hasError('invalidExtension')" class="form-text text-danger">
+                La extesión del archivo no es válida.
+              </span>
+              <span
+                *ngIf="campoInvalido('imagen', 'infoPropietario') && formulario.get('infoPropietario.imagen')?.hasError('maxSizeExceeded')"
+                class="form-text text-danger">
+                El tamaño del archivo excede el límite de 2 MB.
+              </span>
+              <span
+                *ngIf="campoInvalido('imagen', 'infoPropietario') && formulario.get('infoPropietario.imagen')?.hasError('invalidFileCount')"
+                class="form-text text-danger">
+                Si va a subir una imágen, debe seleccionar un solo archivo.
+              </span>
+            </div>
 
             <div class="col-md-6">
               <label for="confirmPass1" class="form-label">Contraseña</label>
@@ -79,8 +93,8 @@
           </div>
 
           <div *ngIf="step == 2" class="row g-3" formGroupName="infoLocalidadPropietario">
-            <hr class="my-4">
-            <h3 class="fs-2">Localidad y direcciones del propietario</h3>
+            
+            <h3 class="fs-2"><strong>Localidad y direcciones del propietario</strong></h3>
 
             <div class="col-md-6">
               <label for="country" class="form-label">Región</label>
@@ -132,10 +146,9 @@
             </div>
           </div>
 
-
           <div *ngIf="step == 3" class="row g-3" formGroupName="infoEmpresa">
-            <hr class="my-4">
-            <h3 class="fs-2">Información de la empresa</h3>
+            
+            <h3 class="fs-2"><strong>Información de la empresa</strong></h3>
 
             <div class="col-sm-6">
               <label for="nameCompany" class="form-label">Nombre</label>
@@ -167,27 +180,18 @@
 
             <div class="col-md-6">
               <label for="lineOfBusiness" class="form-label">Rubro</label>
-              <input type="text" class="form-control" id="lineOfBusiness" placeholder="Panadería" formControlName="rubro">
+              <input type="text" class="form-control" id="lineOfBusiness" placeholder="Panadería"
+                formControlName="rubro">
               <span *ngIf="campoInvalido('rubro', 'infoEmpresa')" class="form-text text-danger">
                 El rubro es obligatorio.
               </span>
             </div>
-            <!-- <div class="col-md-5">
-              <label for="myRUT" class="form-label">RUT</label>
-              <input type="text" class="form-control" id="myRUT" placeholder="12.345.678-9" formControlName="rut">
-              <span *ngIf="campoInvalido('rut', 'infoEmpresa')" class="form-text text-danger">
-                El RUT es inválido o ya existe.
-              </span>
-            </div> -->
 
             <div class="col-md-3"></div>
-
-
           </div>
 
           <div *ngIf="step == 4" class="row g-3" formGroupName="infoLocalidadEmpresa">
-            <hr class="my-4">
-            <h3 class="fs-2">Localidad y dirección de la empresa</h3>
+            <h3 class="fs-2"><strong>Localidad y dirección de la empresa</strong></h3>
 
             <div class="form-check form-switch my-3">
               <input class="form-check-input" formControlName="usarDireccionPersonal" (click)="copiarCampos()"
@@ -248,22 +252,19 @@
             </span>
           </div>
 
-          <!-- [disabled]="formulario.invalid" a button -->
-          <a *ngIf="step != 1" (click)="previous()" type="button" class="btn btn-primary float-start btn-lg my-3">Atrás</a>
-          <a *ngIf="step !== 4" (click)="next()" type="button" class="btn btn-primary float-end btn-lg my-3">Siguiente</a>
-          <button *ngIf="step == 4" class="btn btn-primary float-end btn-lg my-3">Enviar</button>
-
+          <a *ngIf="step != 1" (click)="previous()" type="button"
+            class="btn btn-primary float-start btn my-3">Atrás</a>
+          <a *ngIf="step !== 4" (click)="next()" type="button"
+            class="btn btn-primary float-end btn my-3">Siguiente</a>
+          <button *ngIf="step == 4" class="btn btn-primary float-end btn my-3">Enviar</button>
         </form>
       </div>
     </div>
   </div>
 </div>
 
-<!-- JSON FORMULARIOS REACTIVOS -->
+<!-- debug -->
 <!-- <div class="container">
-  <span>formulario.value :</span>
-  <pre>{{formulario.value | json}}</pre>
-
-  <h3>Errores del formulario</h3>
-  <pre>{{formulario.errors | json}}</pre>
+  <pre><b>formulario.value: </b> {{formulario.value | json }}</pre>
+  <pre><b>formulario.errors: </b> {{formulario.errors | json }}</pre>
 </div> -->

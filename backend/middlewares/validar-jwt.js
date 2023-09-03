@@ -11,7 +11,7 @@ const validarJWT = async (req, res = response, next) => {
         });
     }
 
-    const { rol } = jwt.decode(token)
+    const { rol } = jwt.decode(token);
     let secretKey;
     if (rol === 'ADMIN-USER') {
         secretKey = process.env.ADMIN_KEY;
@@ -22,7 +22,6 @@ const validarJWT = async (req, res = response, next) => {
     }
 
     try {
-
         /* verificar parametros: token del ciente, clave de la firma, retorna el payload */
         const { myId, nombreUsuario, rol } = jwt.verify(token, secretKey);
         req.id = myId;
@@ -35,20 +34,18 @@ const validarJWT = async (req, res = response, next) => {
             console.log('Token expirado:', err.expiredAt);
             res.status(401).json({
               ok: false,
-              msg: 'Token expirado'
+              msg: 'Token expirado',
             });
             return;
         }
-        
-        console.log(error);
-        
+       
+        console.log(error);    
         res.status(401).json({
             ok: false,
-            msg: 'Token inválido'
+            msg: 'Token inválido',
         })
     }
-
     next();
 };
 
-module.exports = { validarJWT }
+module.exports = { validarJWT };
