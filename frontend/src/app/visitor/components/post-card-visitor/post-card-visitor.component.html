@@ -1,65 +1,45 @@
-<div class="container">
+<div class="container p-0">
 
   <!-- Spinner de carga -->
-  <div class="col-12 text-center">
-    <div class="container mt-5" *ngIf="!publicaciones">
+  <div class="col-12">
+    <div class="container mt-5 text-center" *ngIf="isLoading">
       <div class="spinner-border text-primary text-center my-3" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
 
-    <div class="col-md-12 text-center" *ngIf="isEmptyPublicaciones && publicaciones; else allPublicacionesTemplate">
+    <div class="col-md-12 text-center my-4" *ngIf="isEmptyPublicaciones && !isLoading; else allPublicacionesTemplate">
       <img src="../../../../assets/icons/new-publication.svg" alt="new-publication.svg" class="icon-image">
       <h3 class="my-3">Aún no hay publicaciones. Registrate y escribe una!</h3>
     </div>
-
   </div>
-
-
 
   <ng-template #allPublicacionesTemplate>
     <!-- Botones de paginación -->
-    <!-- <div class="row">
-      <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="size"
-        [collectionSize]="numElement" (pageChange)="done()">
-      </ngb-pagination>
-    </div> -->
-
-    <div class="row">
-      <ngb-pagination [collectionSize]="numElement" [(page)]="page" [boundaryLinks]="true">
+    <div class="row" *ngIf="!isEmptyPublicaciones && publicaciones">
+      <ngb-pagination class="d-flex justify-content-center align-items-center" [collectionSize]="numElement" [(page)]="page" [boundaryLinks]="true">
         <ng-template ngbPaginationPages let-page let-pages="pages">
           <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
             <div class="mb-3 d-flex flex-nowrap px-2">
               <label id="paginationInputLabel" for="paginationInput" class="col-form-label me-2 ms-1">Página</label>
-              <input
-                #i
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                class="form-control custom-pages-input"
-                id="paginationInput"
-                [value]="page"
-                (keyup.enter)="selectPage(i.value)"
-                (blur)="selectPage(i.value)"
-                (input)="formatInput($any($event).target)"
-                aria-labelledby="paginationInputLabel paginationDescription"
-                style="width: 2.5rem"
-              />
-              <span id="paginationDescription" class="col-form-label text-nowrap px-2"> of {{pages.length}}</span>
+              <input #i type="text" inputmode="numeric" pattern="[0-9]*" class="form-control custom-pages-input"
+                id="paginationInput" [value]="page" (keyup.enter)="selectPage(i.value)" (blur)="selectPage(i.value)"
+                (input)="formatInput($any($event).target)" aria-labelledby="paginationInputLabel paginationDescription"
+                style="width: 2.5rem" />
+              <span id="paginationDescription" class="col-form-label text-nowrap px-2"> de {{pages.length}}</span>
             </div>
           </li>
         </ng-template>
       </ngb-pagination>
     </div>
-    
 
     <!-- Card de las publicaciones -->
-    <div class="row">
+    <div class="row" *ngIf="!isEmptyPublicaciones && publicaciones">
       <div class="col-12">
         <div *ngFor="let item of publicaciones; let i = index">
 
           <div class="p-0">
-            <div class="card cardMain  shadow-sm rounded mb-2" style="width: 18rem;">
+            <div class="card shadow-sm rounded mb-2">
 
               <div class="card-header pt-2">
                 <h6 class="dateHeader text-muted"> <strong class="">Id publicación:</strong> {{item.id}}</h6>
@@ -168,18 +148,21 @@
     </div>
 
     <!-- Botones de paginación -->
-    <div class="row">
-      <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="size"
-        [collectionSize]="numElement" (pageChange)="done()">
+    <div class="row" *ngIf="!isEmptyPublicaciones && publicaciones">
+      <ngb-pagination class="d-flex justify-content-center align-items-center" [collectionSize]="numElement" [(page)]="page" [boundaryLinks]="true">
+        <ng-template ngbPaginationPages let-page let-pages="pages">
+          <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+            <div class="d-flex flex-nowrap px-2">
+              <label id="paginationInputLabel" for="paginationInput" class="col-form-label me-2 ms-1">Página</label>
+              <input #i type="text" inputmode="numeric" pattern="[0-9]*" class="form-control custom-pages-input"
+                id="paginationInput" [value]="page" (keyup.enter)="selectPage(i.value)" (blur)="selectPage(i.value)"
+                (input)="formatInput($any($event).target)" aria-labelledby="paginationInputLabel paginationDescription"
+                style="width: 2.5rem" />
+              <span id="paginationDescription" class="col-form-label text-nowrap px-2"> de {{pages.length}}</span>
+            </div>
+          </li>
+        </ng-template>
       </ngb-pagination>
     </div>
-
-
   </ng-template>
-
-
-
-
-
-
 </div>

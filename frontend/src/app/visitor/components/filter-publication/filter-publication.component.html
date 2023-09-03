@@ -1,50 +1,42 @@
-<div class="row mx-3">
-    <h3 class="mt-3">Filtrar búsqueda</h3>
-    <h4>Cantidad de Ofertas </h4>
-    <select class="form-select form-select mb-3" aria-label=".form-select example">
-        <option selected>0</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3 o más</option>
-    </select>
-
-    <h4>Monto máximo</h4>
-    <select class="form-select form-select mb-3" aria-label=".form-select example">
-        <option selected></option>
-        <option value="1">100.000 - 500.000</option>
-        <option value="2">500.000 - 800.000</option>
-        <option value="3">800.000 - 1.000.000</option>
-    </select>
-
-    <h3>Garantía</h3>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-        <label class="form-check-label" for="flexRadioDefault1">
-            Con garantía
-        </label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
-        <label class="form-check-label mb-3" for="flexRadioDefault2">
-            Sin garantía
-        </label>
-    </div>
-
-    <h3>Tipo</h3>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-        <label class="form-check-label" for="flexRadioDefault1">
-            Producto
-        </label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-        <label class="form-check-label" for="flexRadioDefault2">
-            Servicio
-        </label>
-    </div>
-
-    <div class="container">
-        <button class="btn float-end btn-primary" type="button">Buscar</button>
-    </div>
-</div>
+<div class="row filter-custom px-3 py-2 my-3">
+    <form [formGroup]="filterForm" class="p-0">
+      <h3 class="m-0"><strong>Filtrar búsqueda</strong></h3>
+      <hr class="mt-1 mb-3">
+      <div class="container">
+        <h4>Cantidad de ofertas</h4>
+        <select class="form-select form-select mb-3" aria-label=".form-select example" formControlName="cantOfertas">
+          <option value="0">Sin ofertas recibidas</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5 o más</option>
+        </select>
+  
+        <h4>Monto</h4>
+        <select class="form-select form-select mb-3" aria-label=".form-select example" formControlName="monto">
+          <option value="null" selected>Selecciona un rango</option>
+          <option value="{{range}}" *ngFor="let range of rangePrice">{{range}}</option>
+        </select>
+  
+        <h4>Garantía</h4>
+        <div class="container mb-3">
+            <p-toggleButton formControlName="garantia" onLabel="Si" onIcon="pi pi-check" offIcon="pi pi-times" offLabel="No"></p-toggleButton>
+        </div>
+  
+        <h4>Tipo</h4>
+        <div class="container mb-3">
+            <p-toggleButton formControlName="tipo" onLabel="Producto" onIcon="pi pi-shopping-cart" offIcon="pi pi-briefcase" offLabel="Servicio"></p-toggleButton>
+        </div>
+      </div>
+  
+      <!-- debug -->
+      <div class="container">
+        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+      </div>
+      <div class="container">
+        <button class="btn float-end btn-primary" type="button" (click)="sendForm()">Buscar</button>
+      </div>
+    </form>
+  </div>
+  

@@ -1,0 +1,11 @@
+.filter-custom {
+    border: 1px solid #cdcecf;
+    border-radius: 5px;
+}
+
+
+@media (max-width: 992px) {
+    .filter-custom {
+        margin: 10px;
+    }
+}
