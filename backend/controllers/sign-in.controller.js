@@ -1,11 +1,10 @@
 const { response, request } = require('express');
 const bcryptjs = require('bcryptjs');
 const { uid } = require('uid');
+const { createJWT } = require('../helpers/create-jwt');
 
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
-const { createJWT } = require('../helpers/create-jwt');
-const { minioClient } = require('../minio/connection');
 
 const signInPost = async (req = request, res = response) => {
     //Id unico de 15 caracteres, para cada nuevo usuario creado
@@ -52,6 +51,7 @@ const signInPost = async (req = request, res = response) => {
         nombreUsuario,
         apellidos,
         emailUsuario,
+        imagen,
         run,
         contrasenia: password,
         comuna,
@@ -97,98 +97,63 @@ const signInPost = async (req = request, res = response) => {
 
 }
 
-// Configuración de multer
-const uploadFile = async (req = request, res = response) => {
-    try {
-        const file = req.file;
-        console.log({file})
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = file.originalname.split('.').pop();
-        const fileName = 'image-' + uniqueSuffix + '.' + extension;
-
-        await minioClient.putObject('files-bucket', fileName, file.buffer);
-
-        const fileUrl = minioClient.protocol + '//' + minioClient.host + ':' + minioClient.port + '/' + 'files-bucket' + '/' + fileName;
-
-        res.json({ fileUrl });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al subir la imagen' });
-    }
-}
-
 const existeCorreo = async (req = request, res = response) => {
-
-    const { correo } = req.params
-
+    const { correo } = req.params;
     try {
         const usuario = await Usuario.findOne({ where: { emailUsuario: correo } });
         if (usuario) {
             res.status(200).json({
                 state: true,
-                msg: 'Este correo ya está registrado en la bd'
-            })
+                msg: 'Este correo ya está registrado en la bd',
+            });
         } else {
             res.status(200).json({
                 state: false,
-                msg: 'Este correo esta disponible para registrar'
-            })
+                msg: 'Este correo esta disponible para registrar',
+            });
         }
-
-
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }
 
 const existeRun = async (req = request, res = response) => {
-
-    const { run } = req.params
-
+    const { run } = req.params;
     try {
         const usuario = await Usuario.findOne({ where: { run } });
         if (usuario) {
             res.status(200).json({
                 state: true,
-                msg: 'Este run ya está registrado en la bd'
+                msg: 'Este run ya está registrado en la bd',
             })
         } else {
             res.status(200).json({
                 state: false,
-                msg: 'Este run esta disponible para registrar'
+                msg: 'Este run esta disponible para registrar',
             })
         }
-
-
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }
 
 const existeRut = async (req = request, res = response) => {
-
-    const { rut } = req.params
-
+    const { rut } = req.params;
     try {
         const usuario = await Pyme.findOne({ where: { rut } });
         if (usuario) {
             res.status(200).json({
                 state: true,
-                msg: 'Este rut ya está registrado en la bd'
-            })
+                msg: 'Este rut ya está registrado en la bd',
+            });
         } else {
             res.status(200).json({
                 state: false,
-                msg: 'Este rut esta disponible para registrar'
-            })
+                msg: 'Este rut esta disponible para registrar',
+            });
         }
-
-
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }
 
@@ -197,5 +162,4 @@ module.exports = {
     existeCorreo,
     existeRun,
     existeRut,
-    uploadFile
 };
