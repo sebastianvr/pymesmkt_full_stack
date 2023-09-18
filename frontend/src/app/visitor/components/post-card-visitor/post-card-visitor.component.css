@@ -1,15 +1,4 @@
-.dateHeader {
-    display: inline;
-}
-
-.stateHeader {
-    display: inline;
-}
-
-.tableResume tbody tr td {
-    border-bottom: 1px solid #c8c9ca;
-}
-
+/* Image for empty publications */
 .icon-image {
     width: 30%;
     height: auto;
@@ -22,4 +11,8 @@
     align-items: center;
     justify-content: center;
     margin-top: 20px;
+}
+
+.tableResume tbody tr td {
+    border-bottom: 1px solid #c8c9ca;
 }
