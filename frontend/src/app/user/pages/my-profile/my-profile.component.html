@@ -1,208 +1,197 @@
-<div class="d-flex justify-content-center">
+<div class="justify-content-center">
 
     <div class="container">
-        <div class="col-lg-12 pt-4 text-center">
-            <img class="d-block mx-auto mb-3" src="../../../assets/icons/person-bounding-box.svg" alt="pen.svg"
-                width="144" height="114">
-            <h2 class="fs-1 mb-5">Perfil Personal</h2>
+        <div class="mt-4 d-flex align-items-center justify-content-center">
+            <img src="../../../assets/icons/person-bounding-box.svg" alt="pen.svg" width="55">
+            <h2 class="fs-1 mb-2 mx-3"><strong>Perfil personal</strong></h2>
         </div>
 
         <hr>
+        <div class="container">
+            <form>
+                <!-- Información del propietario -->
+                <div class="row">
+                    <h3 class="fs-2">Información del propietario</h3>
 
-
-        <div class="col-lg-12">
-            <div class="d-inline col-9">
-                <div class="container g-5">
-                    <div class="col-md-12 col-lg-12">
-                        <form>
-
-                            <div class="row g-3" style="position: relative; height: 370px;">
-                                <h3 class="fs-2">Información del propietario</h3>
-
-                                <!-- <div class="mb-3 row">
-                                        <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
-                                        <div class="col-sm-10">
-                                            <input type="text" readonly class="form-control-plaintext" id="staticEmail"
-                                                value="email@example.com">
-                                        </div>
-                                    </div> -->
-                                <div class="col-md-3 containerPhotoProfile">
-                                    <div class="photoProfile">
-                                        <img src="../../../assets/icons/people-circle.svg" class="img-fluid"
-                                            alt="camera.jpg">
-                                    </div>
-                                    <div class="container-button my-2">
-                                        <p-fileUpload mode="basic" name="demo[]" url="./upload.php" accept="image/*"
-                                            [auto]="true" chooseLabel="Cambiar imágen">
-                                        </p-fileUpload>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <label for="firstName" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="firstName" value="Sebastián" readonly>
-                                </div>
-
-                                <div class="col-sm-3">
-                                    <label for="lastName" class="form-label">Apellidos</label>
-                                    <input type="text" class="form-control" id="lastName" value="Vidal Ramírez"
-                                        readonly>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="myDNI" class="form-label">RUN (DNI)</label>
-                                    <input type="text" class="form-control" id="myDNI" value="12.345.678-9" readonly>
-                                </div>
-
-
-                                <div class="col-md-3">
-                                    <label for="email" class="form-label">Correo electrónico</label>
-                                    <input type="email" class="form-control" id="email"
-                                        value="sebastian.vidal@correo.com" readonly>
-                                </div>
-
-                                <div class="col-md-3"></div>
-
-                                <div class="col-md-6">
-                                    <!-- <label for="confirmPass1" class="form-label">Contraseña</label> -->
-                                    <!-- <input type="password" class="form-control" id="confirmPass1" required=""> -->
-                                </div>
-
-                                <div class="col-md-6">
-                                    <!-- <label for="confirmPass2" class="form-label">Confirmar contraseña</label> -->
-                                    <!-- <input type="password" class="form-control" id="confirmPass2" required=""> -->
-                                </div>
-                            </div>
-                            <hr class="my-4">
-                            <div class="row g-3">
-                                <h3 class="fs-2">Localidad y direcciones del propietario</h3>
-
-                                <div class="col-md-6">
-                                    <label for="country" class="form-label">Región</label>
-                                    <select class="form-select" id="country" disabled>
-                                        <option value="">Valparaíso</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="state" class="form-label">Comuna</label>
-                                    <select class="form-select" id="state" disabled>
-                                        <option value="">San Antonio</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-3">
-                                </div>
-
-                                <div class="col-12">
-                                    <label for="address" class="form-label">Dirección </label>
-                                    <input type="text" class="form-control" id="address" value="Avenida Chacabuco, #314"
-                                        disabled>
-                                </div>
-
-                                <div class="col-12">
-                                    <label for="address2" class="form-label">Dirección #2 <span
-                                            class="text-muted">(Opcional)</span></label>
-                                    <input type="text" class="form-control" id="address2" value="" disabled>
-                                </div>
-
-                                <div class="col-12">
-                                    <label for="addresDescription" class="form-label">Descripción <span
-                                            class="text-muted">(Opcional)</span></label>
-                                    <textarea class="form-control" disabled id="addresDescription">Vivo cerca de la calle tipo punta de diamante
-                              </textarea>
-                                </div>
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="firstName" value="Sebastián" disabled>
                             </div>
 
-                            <hr class="my-4">
-                            <div class="row g-3">
-                                <h3 class="fs-2">Información de la empresa</h3>
-
-                                <div class="col-sm-6">
-                                    <label for="nameCompany" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="nameCompany" value="El Molino" disabled>
-                                </div>
-
-                                <div class="col-md-5">
-                                    <label for="myRUT" class="form-label">RUT</label>
-                                    <input type="text" class="form-control" id="myRUT" value="30.686.957-4" disabled>
-                                </div>
-
-
-                                <div class="col-md-4">
-                                    <label for="emailCompany" class="form-label">Correo electrónico</label>
-                                    <input type="email" class="form-control" id="emailCompany"
-                                        value="el_molino_panaderia@mail.com" disabled>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="typeCompany" class="form-label">Tipo de empresa</label>
-                                    <select class="form-select" id="typeCompany" disabled>
-                                        <option>Empresa comercial</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="lineOfBusiness" class="form-label">Rubro</label>
-                                    <select class="form-select" id="lineOfBusiness" disabled>
-                                        <option>Panadería, Pastelería</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-3"></div>
-
-
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Apellidos</label>
+                                <input type="text" class="form-control" id="lastName" value="Vidal Ramírez" disabled>
                             </div>
-                            <hr class="my-4">
-                            <div class="row g-3">
-                                <h3 class="fs-2">Localidad y dirección de la empresa</h3>
+                        </div>
 
-                                <div class="form-check form-switch my-3">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="flexSwitchCheckChecked" disabled>
-                                    <label class="form-check-label" for="flexSwitchCheckChecked">Utilizar dirección
-                                        personal</label>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="countryCompany" class="form-label">Región</label>
-                                    <select class="form-select" id="countryCompany" disabled>
-                                        <option>Valparaíso</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="communeCompany" class="form-label">Comuna</label>
-                                    <select class="form-select" id="communeCompany" disabled>
-                                        <option>Valparaíso</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-3">
-                                </div>
-
-                                <div class="col-12">
-                                    <label for="addressCompany" class="form-label">Dirección </label>
-                                    <input type="text" class="form-control" id="addressCompany"
-                                        value="Avenida Chacabuco, #314" disabled>
-                                </div>
-
-                                <div class="col-12">
-                                    <label for="addresDescriptionCompany" class="form-label">Descripción <span
-                                            class="text-muted">(Opcional)</span></label>
-                                    <textarea class="form-control" id="addresDescriptionCompany" disabled>
-                              </textarea>
-                                </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <label for="myDNI" class="form-label">RUN (DNI)</label>
+                                <input type="text" class="form-control" id="myDNI" value="12.345.678-9" disabled>
                             </div>
 
-                            <a class="btn btn-primary float-end btn-lg mt-3">
-                                Editar información
-                            </a>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" id="email" value="sebastian.vidal@correo.com"
+                                    disabled>
+                            </div>
+                        </div>
+                    </div>
 
-                        </form>
+                    <div class="col-lg-4">
+                        <div class="text-center">
+                            <div class="container">
+                                <img src="../../../assets/icons/people-circle.svg" class="imgProfile img-fluid"
+                                    alt="camera.jpg" style="height: 130px;">
+                            </div>
+                            <div class="mt-2">
+                                <p-fileUpload mode="basic" name="demo[]" accept="image/*" [auto]="true"
+                                    chooseLabel="Subir imágen"></p-fileUpload>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <hr>
+
+                <!-- Localidad y direcciones del propietario -->
+                <div class="row">
+                    <h3 class="fs-2">Localidad y direcciones del propietario</h3>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label for="country" class="form-label">Región</label>
+                            <select class="form-select" id="country" disabled>
+                                <option value="">Valparaíso</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <label for="state" class="form-label">Comuna</label>
+                            <select class="form-select" id="state" disabled>
+                                <option value="">San Antonio</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12 mt-2">
+                            <label for="address" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="address" value="Avenida Chacabuco, #314"
+                                disabled>
+                        </div>
+
+                        <div class="col-lg-12 mt-2">
+                            <label for="address2" class="form-label">Dirección #2<span
+                                    class="text-muted">(Opcional)</span></label>
+                            <input type="text" class="form-control" id="address2" value="" disabled>
+                        </div>
+
+                        <div class="col-lg-12 mt-2">
+                            <label for="addresDescription" class="form-label">
+                                Descripción <span class="text-muted">(Opcional)</span>
+                            </label>
+                            <textarea class="form-control" disabled
+                                id="addresDescription">Vivo cerca de la calle tipo punta de diamante</textarea>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <!-- Información de la empresa -->
+                <div class="row">
+                    <h3 class="fs-2">Información de la empresa</h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="nameCompany" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nameCompany" value="El Molino" disabled>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="myRUT" class="form-label">RUT</label>
+                            <input type="text" class="form-control" id="myRUT" value="30.686.957-4" disabled>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label for="typeCompany" class="form-label">Tipo de empresa</label>
+                            <select class="form-select" id="typeCompany" disabled>
+                                <option>Empresa comercial</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="lineOfBusiness" class="form-label">Rubro</label>
+                            <select class="form-select" id="lineOfBusiness" disabled>
+                                <option>Panadería, Pastelería</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Localidad y dirección de la empresa -->
+                <div class="row">
+                    <h3 class="fs-2">Localidad y dirección de la empresa</h3>
+
+                    <div class="row">
+                        <div class="col-lg-12 form-check form-switch my-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                                disabled>
+                            <label class="form-check-label" for="flexSwitchCheckChecked">Utilizar dirección
+                                personal</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label for="countryCompany" class="form-label">Región</label>
+                            <select class="form-select" id="countryCompany" disabled>
+                                <option>Valparaíso</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <label for="communeCompany" class="form-label">Comuna</label>
+                            <select class="form-select" id="communeCompany" disabled>
+                                <option>Valparaíso</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12 mt-2">
+                            <label for="addressCompany" class="form-label">Dirección </label>
+                            <input type="text" class="form-control" id="addressCompany" value="Avenida Chacabuco, #314"
+                                disabled>
+                        </div>
+
+                        <div class="col-lg-12 mt-2">
+                            <label for="addresDescriptionCompany" class="form-label">Descripción <span
+                                    class="text-muted">(Opcional)</span></label>
+                            <textarea class="form-control" id="addresDescriptionCompany" disabled>
+                                  </textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="container">
+                        <button class="btn btn-primary float-end my-3">
+                            Editar información
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
+
+        
     </div>
 </div>

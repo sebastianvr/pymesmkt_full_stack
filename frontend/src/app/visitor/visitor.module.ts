@@ -12,7 +12,7 @@ import { PostCardVisitorComponent } from './components/post-card-visitor/post-ca
 import { SearchPublicationComponent } from './components/search-publication/search-publication.component';
 import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { FilterPublicationComponent } from './components/filter-publication/filter-publication.component';
 
 
@@ -38,6 +38,7 @@ const components: any[] = [
     ReactiveFormsModule,
     PrimeNgModule,
     NgbModule,
+    NgbPaginationModule
   ],
 })
 export class VisitorModule { }

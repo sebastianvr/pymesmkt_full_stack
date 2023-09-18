@@ -6,9 +6,48 @@
         </div>
     </div>
     <div class="row">
+        <!-- <form [formGroup]="filterForm" class="input-group mb-3">
+            <div ngbDropdown class="d-inline-block" style="width: 100%;">
+                <button type="button" class="btn btn-primary" id="dropdownBasic1" ngbDropdownToggle>
+                    {{ selectedOption || 'Filtrar ' }}
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                    <button *ngFor="let option of searchOptions" class="text-center" ngbDropdownItem (click)="selectSearchOption(option)">
+                        {{ option }}
+                    </button>
+                </div>
+            </div>
+            <input type="text" class="form-control" formControlName="searchTerm" aria-label="Término de búsqueda"
+                placeholder="Buscar por {{ selectedOption?.toLowerCase() }}" />
+            <span class="input-group-text" id="basic-addon2" (click)="searchPublication()">
+                Buscar
+            </span>
+        </form> -->
         <div class="input-group mb-3">
-            <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="basic-addon2">
-            <span class="input-group-text" id="basic-addon2">Buscar</span>
-          </div>
+            <!-- <span class="input-group-text" id="basic-addon1">@</span> -->
+            <form [formGroup]="filterForm" class="input-group mb-3">
+                <div ngbDropdown class="input-group-text p-0">
+                    <button type="button" class="btn btn-primary customFilterBtn" id="dropdownBasic1" ngbDropdownToggle>
+                        {{ selectedOption || 'Filtro' }}
+                    </button>
+                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                        <button *ngFor="let option of searchOptions" ngbDropdownItem (click)="selectSearchOption(option)">
+                            {{ option }}
+                        </button>
+                    </div>
+                </div>
+                <input type="text" class="form-control" formControlName="searchTerm" aria-label="Término de búsqueda"
+                    placeholder=" Buscar por {{ selectedOption?.toLowerCase() }}" />
+                <button class="input-group-text" id="basic-addon2" (click)="searchPublication()">
+                    Buscar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Debug -->
+    <div class="container">
+        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+        <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
     </div>
 </div>

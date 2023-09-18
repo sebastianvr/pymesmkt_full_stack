@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { UsuarioService } from '../../../core/services/usuario/usuario.service';
 
 @Component({
   selector: 'app-my-profile',
@@ -7,9 +9,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MyProfileComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private authService: AuthService,
+    private usuarioService: UsuarioService,
+  ) { }
+  userId = this.authService.usuario.id;
 
   ngOnInit(): void {
+    console.log(this.userId);
+    this.usuarioService.getUsuario(this.userId)
+      .subscribe(console.log);
   }
 
 }

@@ -1,16 +1,56 @@
 const { Router } = require('express');
-const { check, param } = require('express-validator');
-const { publicacionPost, publicacionesGetAll, publicacionDelete, publicacionGet, publicacionesGet, publicacionPagada, publicacionesCompradas } = require('../controllers/publicacion.controller');
-
-
+const { check, param, query } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
+
+const {
+    publicacionPost,
+    publicacionesGetAll,
+    publicacionDelete,
+    publicacionGet,
+    publicacionesGet,
+    publicacionPagada,
+    publicacionesCompradas,
+    publicacionesFilterQuery
+} = require('../controllers/publicacion.controller');
+const { uid } = require('uid');
+
 
 const router = Router();
 
-// Ruta para obtener todas las publicaciones
 router.get('/', publicacionesGetAll);
 
-// Ruta para buscar una publicacion por id 
+router.get(
+    '/query',
+    [
+        query('page').optional().isInt({ min: 1 }).
+            withMessage('page debe ser un número entero mayor o igual a 1'),
+        query('pageSize').optional().isInt({ min: 1, max: 100 }).
+            withMessage('pageSize debe ser un número entero entre 1 y 100'),
+
+        query('id')
+            .optional()
+            .custom((value) => {
+                const uuidRegex = /^[0-9a-fA-F]{15}$/;
+                if (!uuidRegex.test(value)) {
+                    throw new Error('El ID no es válido');
+                }
+                return true;
+            })
+            .withMessage('El ID proporcionado no es válido'),
+        query('titulo').optional().isString()
+            .withMessage('El campo "titulo" debe ser una cadena (string)'),
+        query('cantidadOfertasRecibidas').optional().isInt({ min: 0 }).
+            withMessage('cantidadOfertasRecibidas debe ser un número entero'),
+        query('precioTotal').optional().isInt({ min: 1 }).
+            withMessage('precioTotal debe ser un número entero'),
+        query('garantia').optional().isBoolean().
+            withMessage('garantia debe ser un valor booleano'),
+        query('productoOServicio').optional().isIn(['PRODUCTO', 'SERVICIO']).
+            withMessage('productoOServicio debe ser PRODUCTO o SERVICIO'),
+    ],
+    publicacionesFilterQuery
+);
+
 router.get('/:id', publicacionGet);
 
 // Ruta para obtener todas las publicaciones de un usuario en especifico
@@ -19,17 +59,13 @@ router.get('/usuario/:idUsuario', publicacionesGet);
 // Ruta para obtener todas las publicaciones de un usuario en especifico
 router.get('/usuario/paid/:idUsuario', publicacionesCompradas);
 
-// Creacion de una nueva publicacion
 router.post('/', [
     check('titulo', 'El titulo es obligatorio').not().isEmpty(),
     validarCampos,
-
     check('descripcion', 'La descripcion es obligatoria').not().isEmpty(),
     validarCampos,
-
 ], publicacionPost);
 
-// Eliminacion de una publicacion
 router.delete('/:id', [
     param('id', 'El param id es obligatorio').not().isEmpty(),
     // validarJWT, 
@@ -41,5 +77,8 @@ router.put('/aceptar/:id', [
     param('id', 'El param id es obligatorio').not().isEmpty(),
     validarCampos
 ], publicacionPagada);
+
+
+
 
 module.exports = router;

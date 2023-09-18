@@ -1,42 +1,51 @@
 <div class="row filter-custom px-3 py-2 my-3">
-    <form [formGroup]="filterForm" class="p-0">
-      <h3 class="m-0"><strong>Filtrar búsqueda</strong></h3>
-      <hr class="mt-1 mb-3">
-      <div class="container">
-        <h4>Cantidad de ofertas</h4>
-        <select class="form-select form-select mb-3" aria-label=".form-select example" formControlName="cantOfertas">
-          <option value="0">Sin ofertas recibidas</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5 o más</option>
-        </select>
-  
-        <h4>Monto</h4>
-        <select class="form-select form-select mb-3" aria-label=".form-select example" formControlName="monto">
-          <option value="null" selected>Selecciona un rango</option>
-          <option value="{{range}}" *ngFor="let range of rangePrice">{{range}}</option>
-        </select>
-  
-        <h4>Garantía</h4>
-        <div class="container mb-3">
-            <p-toggleButton formControlName="garantia" onLabel="Si" onIcon="pi pi-check" offIcon="pi pi-times" offLabel="No"></p-toggleButton>
-        </div>
-  
-        <h4>Tipo</h4>
-        <div class="container mb-3">
-            <p-toggleButton formControlName="tipo" onLabel="Producto" onIcon="pi pi-shopping-cart" offIcon="pi pi-briefcase" offLabel="Servicio"></p-toggleButton>
-        </div>
+  <form [formGroup]="filterForm" class="p-0">
+    <h3 class="m-0"><strong>Filtrar búsqueda</strong></h3>
+    <hr class="mt-1 mb-3">
+    <div class="container">
+      <h4>Cantidad de ofertas</h4>
+      <select class="form-select form-select mb-3" aria-label=".form-select example" formControlName="cantOfertas">
+        <option value="" selected>Seleccione</option>
+        <option value="0">Sin ofertas</option>
+        <option value="1">1 oferta</option>
+        <option value="2">2 o menos</option>
+        <option value="5">5 o menos</option>
+        <option value="8">8 o menos</option>
+        <option value="10">10 o menos</option>
+      </select>
+
+      <h4>Monto menor que</h4>
+      <select class="form-select form-select mb-3" aria-label=".form-select example" formControlName="monto">
+        <option value="" selected>Seleccione</option>
+        <option value="{{range}}" *ngFor="let range of rangePrice">{{range | currency : 'CLP'}}</option>
+      </select>
+
+      <h4>Garantía</h4>
+      <div class="container mb-3">
+        <p-toggleButton formControlName="garantia" onLabel="Si" onIcon="pi pi-check" offIcon="pi pi-times"
+          offLabel="No"></p-toggleButton>
       </div>
-  
-      <!-- debug -->
-      <div class="container">
-        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+
+      <h4>Tipo</h4>
+      <div class="container mb-3">
+        <p-toggleButton formControlName="tipo" onLabel="Producto" onIcon="pi pi-shopping-cart" offIcon="pi pi-briefcase"
+          offLabel="Servicio"></p-toggleButton>
       </div>
-      <div class="container">
-        <button class="btn float-end btn-primary" type="button" (click)="sendForm()">Buscar</button>
-      </div>
-    </form>
-  </div>
-  
+    </div>
+
+    <!-- debug -->
+    <!-- 
+    <div class="container">
+      <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+      <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+    </div> -->
+
+
+    <div class="container">
+
+      <button class="btn float-end btn-primary" type="button" [disabled]="this.filterForm.invalid"
+        (click)="sendForm()">Buscar
+      </button>
+    </div>
+  </form>
+</div>

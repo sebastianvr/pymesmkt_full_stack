@@ -1,18 +1,23 @@
-const { uid } = require('uid');
+const { validationResult } = require('express-validator');
 const { response, request } = require('express');
+const { uid } = require('uid');
 
 const Publicacion = require('../models/publicacion');
 const Pyme = require('../models/pyme');
 const Usuario = require('../models/usuario');
 const Calificacion = require('../models/calificacion');
+const { Sequelize, Op } = require('sequelize');
 
-
-
-// Obtiene todas las publicaciones de TODOS los usuarios 
+/**
+ * Obtiene todas las publicaciones de TODOS los usuarios.
+ * @param {request} req 
+ * @param {response} res 
+ * @returns 
+ */
 const publicacionesGetAll = async (req = request, res = response) => {
+    console.log('publicacionesGetAll()');
 
     const { page, size } = req.query;
-
     const pageAsNumber = Number.parseInt(page);
     const sizeAsNumber = Number.parseInt(size);
 
@@ -50,7 +55,7 @@ const publicacionesGetAll = async (req = request, res = response) => {
                             // attributes: ['puntaje'],
                             // group: ['id'],
 
-                        // agrupar por id del usuario, y hacer el avg del puntaje
+                            // agrupar por id del usuario, y hacer el avg del puntaje
                         },
                         {
                             model: Pyme,
@@ -62,8 +67,8 @@ const publicacionesGetAll = async (req = request, res = response) => {
                 },
             ],
         });
-        console.log('Publicaciones: ', publicaciones)
-        
+
+        console.log({ publicaciones });
         res.status(200).json({
             totalPages: Math.ceil(publicaciones.count / size),
             content: publicaciones.rows,
@@ -77,7 +82,12 @@ const publicacionesGetAll = async (req = request, res = response) => {
     }
 }
 
-// Obtiene una sola publicacion segun un id
+/**
+ * Obtiene una sola publicación segun un id.
+ * @param {request} req 
+ * @param {response} res 
+ * @returns 
+ */
 const publicacionGet = async (req = request, res = response) => {
 
     const { id } = req.params;
@@ -148,7 +158,12 @@ const publicacionGet = async (req = request, res = response) => {
     }
 }
 
-// Obtiene todas las publicaciones de UN usuario especifico
+/**
+ * Obtiene todas las publicaciones de UN usuario específico.
+ * @param {request} req 
+ * @param {response} res 
+ * @returns 
+ */
 const publicacionesGet = async (req = request, res = response) => {
 
     const { idUsuario } = req.params;
@@ -289,7 +304,12 @@ const publicacionPut = (req = request, res = response) => {
     })
 }
 
-// actualiza el estado de compra de una publicacion a traves de su id
+/**
+ * Actualiza el estado de compra de una publicación a través de su id
+ * @param {request} req 
+ * @param {response} res 
+ * @returns 
+ */
 const publicacionPagada = async (req = request, res = response) => {
 
     const { id } = req.params
@@ -342,7 +362,12 @@ const publicacionDelete = async (req = request, res = response) => {
     }
 }
 
-// retorna todas las publicaciones compradas por un idUsuario
+/**
+ * Retorna todas las publicaciones compradas por un idUsuario.
+ * @param {request} req 
+ * @param {response} res 
+ * @returns 
+ */
 const publicacionesCompradas = async (req = request, res = response) => {
 
     const { idUsuario } = req.params;
@@ -402,6 +427,86 @@ const publicacionesCompradas = async (req = request, res = response) => {
     }
 }
 
+const publicacionesFilterQuery = async (req = request, res = response) => {
+
+    const page = parseInt(req.query.page) || 1; // Página actual (predeterminada: 1)
+    const pageSize = parseInt(req.query.pageSize) || 10; // Tamaño de página (predeterminado: 10)
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
+
+    try {
+        const filter = {
+            estado: true,
+            procesoDePublicacion: "INICIADA",
+        };
+
+        if (req.query.titulo) {
+            filter.titulo = {
+                [Sequelize.Op.and]: [
+                    Sequelize.fn('LOWER', Sequelize.col('titulo')),
+                    {
+                        [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                    },
+                ],
+            };
+        };
+
+        if (req.query.id) {
+            filter.id = req.query.id;
+        };
+
+        if (req.query.cantidadOfertasRecibidas) {
+            filter.cantidadOfertasRecibidas = {
+                [Sequelize.Op.lte]: parseInt(req.query.cantidadOfertasRecibidas),
+            };
+        };
+
+        if (req.query.precioTotal) {
+            filter.precioTotal = {
+                [Sequelize.Op.lte]: parseInt(req.query.precioTotal),
+            };
+        };
+
+        if (req.query.garantia) {
+            filter.garantia = (req.query.garantia === "true");
+        };
+
+        if (req.query.productoOServicio) {
+            filter.productoOServicio = req.query.productoOServicio;
+        };
+
+        console.log({ filter });
+        const { count, rows: publicaciones } =
+            await Publicacion.findAndCountAll({
+                where: filter,
+                limit: pageSize,
+                offset: (page - 1) * pageSize,
+            });
+
+        if (!publicaciones.length) {
+            return res.status(400).json({
+                message: 'No se encontraron coincidencias.',
+                publicaciones: null,
+            });
+        };
+
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize: pageSize,
+            publicaciones: publicaciones,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error en el servidor' });
+    }
+}
+
 module.exports = {
     publicacionesGetAll,
     publicacionGet,
@@ -410,5 +515,6 @@ module.exports = {
     publicacionPut,
     publicacionDelete,
     publicacionPagada,
-    publicacionesCompradas
+    publicacionesCompradas,
+    publicacionesFilterQuery,
 };

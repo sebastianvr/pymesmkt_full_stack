@@ -1,76 +1,18 @@
-<div class="container-fluid">
-    <app-search-publication></app-search-publication>
-
-    <div class="">
+<div class="container mx-auto">
+    <div class="justify-content-center">
         <div class="row">
-            <div class="col-md-1"></div>
-            <div class="col-md-3 col-xs-12 pl-5">
-                <div class="container">
-                    <h3 class="mt-3">Filtrar búsqueda</h3>
-                    <!-- 
-                    <h4>Región</h4>
-                    <select class="form-select form-select mb-3" aria-label=".form-select example">
-                        <option selected>Selecciona una región</option>
-                        <option *ngFor="let item of regiones; let i = index" [value]="i">{{item}}</option>
-                    </select> -->
-
-
-                    <h4>Cantidad de Ofertas </h4>
-                    <select class="form-select form-select mb-3" aria-label=".form-select example">
-                        <option selected>Sin ofertas</option>
-                        <option value="1">1 oferta</option>
-                        <option value="2">2 ofertas</option>
-                        <option value="3">3 o más ofertas</option>
-                    </select>
-
-                    <h4>Monto máximo</h4>
-                    <select class="form-select form-select mb-3" aria-label=".form-select example">
-                        <option selected></option>
-                        <option value="1">100.000 - 500.000</option>
-                        <option value="2">500.000 - 800.000</option>
-                        <option value="3">800.000 - 1.000.000</option>
-                    </select>
-
-                    <div class="container">
-                        <h3>Garantía</h3>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                            <label class="form-check-label" for="flexRadioDefault1">
-                                Con garantía
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-                            <label class="form-check-label mb-3" for="flexRadioDefault2">
-                                Sin garantía
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="container">
-                        <h3>Tipo</h3>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="name1" id="radioTipoProducto">
-                            <label class="form-check-label" for="radioTipoProducto">
-                                Producto
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="name1" id="radioTipoServicio">
-                            <label class="form-check-label mb-3" for="radioTipoServicio">
-                                Servicio
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="float-end mb-3">
-                        <button class="btn btn-primary" type="button">Buscar</button>
-                    </div>
-                </div>
+            <app-search-publication></app-search-publication>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-4 col-xs-12 m-0">
+                <user-filter-publication></user-filter-publication>
             </div>
-
-            <div class="col-md-8">
-                <app-post-card-pyme></app-post-card-pyme>
+    
+            <div class="col-md-8 col-sm-12 m-0">
+                <div class="row mx-3">
+                    <app-post-card-pyme></app-post-card-pyme>
+                </div>
             </div>
         </div>
     </div>

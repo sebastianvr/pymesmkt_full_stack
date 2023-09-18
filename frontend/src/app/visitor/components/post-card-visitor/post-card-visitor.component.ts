@@ -1,32 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 
-
 @Component({
   selector: 'app-post-card-visitor',
   templateUrl: './post-card-visitor.component.html',
-  styleUrls: ['./post-card-visitor.component.css']
+  styleUrls: ['./post-card-visitor.component.css'],
 })
 export class PostCardVisitorComponent implements OnInit {
 
-  publicaciones!: any[]
-  empresa!: any
-  idUsuario!: string
+  publicaciones!: any[];
+  idUsuario!: string;
+  empresa!: any;
 
-  isEmptyPublicaciones : boolean = true
-  isLoading : boolean = true
+  isEmptyPublicaciones: boolean = false;
+  isLoading: boolean = true;
 
-  // Pagina actual
-  page = 0;
-  // Tamaño de elementos por página
-  size = 5;
-  // Representa a la cantidad total de publicaciones creadas
-  numElement!: number;
+  // Paginación
+  page: number = 0;
+  size: number = 10;
+  totalPublications!: number;
+  FILTER_PAG_REGEX: RegExp = /[^0-9]/g;
 
-  // pipe personalizado
+  // Pipe
   garantiaMapa = {
     'true': 'Si',
-    'false': 'No'
+    'false': 'No',
   }
 
   constructor(
@@ -34,36 +32,31 @@ export class PostCardVisitorComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getPublicaciones();
+    this.getPublicaciones(this.page, this.size);
   }
 
-  getPublicaciones() {
-    this.publicacionService.getAllPublicaciones(this.page, this.size)
-      .subscribe(({ content, totalPages }) => {
+  getPublicaciones(page: number, size: number) {
+    // console.log('getPublicaciones()');
+    
+    // OJO QUE CONSULTA 3 VECES NO SE POR QUE
+    this.publicacionService.getAllPublicaciones(page, size)
+      .subscribe((result) => {
+        // console.log({ result });
+        const { content, totalPages } = result;
         this.publicaciones = content;
-        this.numElement = totalPages * this.size;
-        this.isEmptyPublicaciones = content.length === 0;
+        this.totalPublications = totalPages * this.size;
+
+        this.isEmptyPublicaciones =
+          content.length === 0 && totalPages === 0; // Actualiza isEmptyPublicaciones
+
         this.isLoading = false;
-      })
+      });
   }
 
-  done() {
-    this.getPublicaciones();
-  }
+  onPageChange(newPage: number) {
+    // console.log('onPageChange()');
 
-  selectPage(page: any) {
-    // Validar que la página sea un número válido
-    if (Number.isInteger(Number(page))) {
-      this.page = Number(page);
-      this.getPublicaciones();
-    }
-  }
-
-  formatInput(target: any) {
-    // Validar y formatear el valor ingresado en el campo de entrada de paginación
-    const value = target.value.trim();
-    if (value !== '') {
-      target.value = Math.max(1, Math.min(value, this.numElement));
-    }
+    this.page = newPage - 1;
+    this.getPublicaciones(this.page, this.size);
   }
 }
