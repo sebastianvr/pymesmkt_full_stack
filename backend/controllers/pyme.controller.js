@@ -6,32 +6,29 @@ const Pyme = require('../models/pyme');
 
 
 const pymesGet = async (req = request, res = response) => {
-
     try {
         const pymes = await Pyme.findAll({
-            where: { estado: true }
-        })
+            where: { estado: true },
+        });
         res.status(200).json(pymes);
-
     } catch (error) {
         console.log(error);
-    }
+    };
+};
 
-
-}
 const pymeGet = async (req = request, res = response) => {
-
     const { UsuarioId } = req.params;
-    console.log(UsuarioId)
+
+    // console.log({UsuarioId});
     try {
         const pyme = await Pyme.findOne({
             where: {
                 UsuarioId,
-                estado: 1
-            }
-        })
+                estado: 1,
+            },
+        });
 
-        // console.log('pyme: ', pyme)
+        // console.log({pyme});
         if (pyme) {
             res.status(200).json({
                 ok: true,
@@ -40,13 +37,12 @@ const pymeGet = async (req = request, res = response) => {
         }
         else res.status(400).json({
             ok: false,
-            msg: 'No existe pyme con este id'
-        })
-
+            msg: 'No existe pyme con este id',
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
-}
+};
 
 const pymePost = async (req = request, res = response) => {
 
@@ -57,11 +53,8 @@ const pymePost = async (req = request, res = response) => {
         rubro,
         rol,
         tipoEmpresa
-    } = req.body
+    } = req.body;
 
-
-    // crear id único de 15 caracteres
-    // Ex: myId = 9358105be634098
     const myId = uid(15);
 
     nuevaPyyme = {
@@ -71,57 +64,56 @@ const pymePost = async (req = request, res = response) => {
         emailPyme,
         rubro,
         rol,
-        tipoEmpresa
-    }
+        tipoEmpresa,
+    };
 
     try {
         await Pyme.create(nuevaPyyme);
 
-
         res.status(200).json({
-            msg: 'nueva pyme creada'
-        })
+            msg: 'nueva pyme creada',
+        });
     } catch (error) {
-        // console.log(error)
+        // console.log({error});
         res.status(400).json({
-            msg: error
-        })
-    }
-
-}
+            msg: error,
+        });
+    };
+};
 
 const pymePut = (req = request, res = response) => {
+    const { id } = req.params;
 
-    const { id } = req.params
-    console.log(id)
-
+    // console.log({id});
     res.status(200).json({
         ok: true,
         msg: 'Put Api desde controlador',
-        id
-    })
-}
+        id,
+    });
+};
 
 const pymeDelete = async (req = request, res = response) => {
-
-    const { id } = req.params
+    const { id } = req.params;
 
     try {
-        const usuario = await Usuario.update({ estadoUsuario: 0 }, {
-            where: {
-                estadoUsuario: 1,
-                idUsuario: id
-            }
+        const usuario = await Usuario.update(
+            { estadoUsuario: 0 },
+            {
+                where: {
+                    estadoUsuario: 1,
+                    idUsuario: id,
+                },
+            });
+
+        console.log({ usuario });
+        res.status(200).json({
+            usuario,
         });
 
-        res.status(200).json({
-            usuario
-        })
-
     } catch (error) {
-        console.log(error)
-    }
-}
+        console.log({ error });
+    };
+};
 
 module.exports = {
     pymesGet,

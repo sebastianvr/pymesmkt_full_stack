@@ -9,16 +9,15 @@ const Usuario = require('../models/usuario');
 const Publicacion = require('../models/publicacion');
 const Pyme = require('../models/pyme');
 
-// Crear un usuario con valores aleatorios
+
 const crearUsuario = async (req = request, res = response) => {
-  const nroUsuarios = 10
-  const publicaciones = 4
-  const credencialesUsuarios = []
+  const nroUsuarios = 10;
+  const publicaciones = 50;
+  const credencialesUsuarios = [];
 
   try {
     for (let index = 0; index < nroUsuarios; index++) {
-      //encryptar contraseña
-      const contrasenia = faker.internet.password()
+      const contrasenia = faker.internet.password();
       const salt = bcryptjs.genSaltSync();
       const password = bcryptjs.hashSync(contrasenia, salt);
 
@@ -28,7 +27,7 @@ const crearUsuario = async (req = request, res = response) => {
         nombreUsuario: faker.person.firstName(),
         apellidos: faker.person.lastName(),
         emailUsuario: faker.internet.email().toLowerCase(),
-        imagen: null, // Puedes ajustar este campo según tus necesidades
+        imagen: null,
         estado: true,
         run: faker.string.alphanumeric(9),
         contrasenia: password,
@@ -65,7 +64,28 @@ const crearUsuario = async (req = request, res = response) => {
   }
 };
 
-// Crear una publicación para un usuario dado con valores aleatorios
+const crearPyme = async (usuarioId) => {
+  try {
+    const pyme = await Pyme.create({
+      id: uid(15),
+      nombrePyme: faker.company.name(),
+      rut: faker.string.alphanumeric(11),
+      rubro: faker.commerce.department(),
+      tipoEmpresa: faker.helpers.arrayElement(['SERVICIO', 'PRODUCTO']),
+      regionEmpresa: faker.location.state(),
+      comunaEmpresa: faker.location.city(),
+      dirEmpresa: faker.location.streetAddress(),
+      descripcionEmpresa: faker.lorem.sentence(),
+      estado: true,
+      UsuarioId: usuarioId,
+    });
+
+    console.log({ pyme });
+  } catch (error) {
+    console.error('Error al crear la Pyme:', { error });
+  };
+};
+
 const crearPublicacion = async (usuarioId) => {
   try {
     const publicacion = await Publicacion.create({
@@ -83,41 +103,19 @@ const crearPublicacion = async (usuarioId) => {
       // horasATrabajar: faker.random.number({ min: 1, max: 8 }).toString(),
       garantia: faker.datatype.boolean(),
       aniosGarantia: faker.number.int({ min: 0, max: 5 }),
-      archivoAdjunto: null, // Puedes ajustar este campo según tus necesidades
+      archivoAdjunto: null,
       procesoDePublicacion: faker.helpers.arrayElement(['INICIADA']),
       cantidadOfertasRecibidas: faker.number.int({ min: 0, max: 10 }),
       estado: true,
-      UsuarioId: usuarioId, // Establece la relación con el usuario
+      UsuarioId: usuarioId,
     });
 
-    // console.log('Publicación creada:', publicacion);
+    // console.log({ publicacion });
   } catch (error) {
-    console.error('Error al crear la publicación:', error);
-  }
-};
-
-const crearPyme = async (usuarioId) => {
-  try {
-    const pyme = await Pyme.create({
-      id: uid(15),
-      nombrePyme: faker.company.name(),
-      rut: faker.string.alphanumeric(11),
-      rubro: faker.commerce.department(),
-      tipoEmpresa: faker.helpers.arrayElement(['SERVICIO', 'PRODUCTO']),
-      regionEmpresa: faker.location.state(),
-      comunaEmpresa: faker.location.city(),
-      dirEmpresa: faker.location.streetAddress(),
-      descripcionEmpresa: faker.lorem.sentence(),
-      estado: true,
-      UsuarioId: usuarioId, // Establece la relación con el usuario
-    });
-
-    // console.log('Pyme creada:', pyme);
-  } catch (error) {
-    console.error('Error al crear la Pyme:', error);
-  }
+    console.error('Error al crear la publicación:', { error });
+  };
 };
 
 module.exports = {
-  crearUsuario
+  crearUsuario,
 };
