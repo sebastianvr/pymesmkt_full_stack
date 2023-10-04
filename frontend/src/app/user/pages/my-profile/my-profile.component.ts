@@ -8,6 +8,8 @@ import { UsuarioService } from '../../../core/services/usuario/usuario.service';
   styleUrls: ['./my-profile.component.css']
 })
 export class MyProfileComponent implements OnInit {
+  user! : any;
+
 
   constructor(
     private authService: AuthService,
@@ -18,7 +20,10 @@ export class MyProfileComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.userId);
     this.usuarioService.getUsuario(this.userId)
-      .subscribe(console.log);
+      .subscribe((user)=>{
+        this.user = user;
+        console.log({user});
+      });
   }
 
 }
