@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
 
@@ -13,6 +13,7 @@ export class SidebarUserComponent implements OnInit {
     visibleMenu: boolean = true;
     itemsPanelMenu: MenuItem[] = [];
 
+    @Input() nameUser!: string
 
 
     constructor(
