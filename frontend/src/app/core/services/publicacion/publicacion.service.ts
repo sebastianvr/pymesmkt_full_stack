@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment.prod';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -58,7 +58,6 @@ export class PublicacionService {
       .join('&');
 
     const urlWithQuery = `${this.url}/api/publicacion/query?${queryString}`;
-    console.log({urlWithQuery});
     return this.http.get<any>(urlWithQuery);
   }
 
