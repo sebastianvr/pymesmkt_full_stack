@@ -7,7 +7,7 @@ const uploadUserImage = async (req = request, res = response) => {
         const extension = file.originalname.split('.').pop();
         const fileName = 'image-' + uniqueSuffix + '.' + extension;
 
-        const data = await minioClient.putObject('files-bucket', fileName, file.buffer);
+        const data = await minioClient.putObject('images-bucket', fileName, file.buffer);
         console.log({data});
 
         // Get the URL of the uploaded file
