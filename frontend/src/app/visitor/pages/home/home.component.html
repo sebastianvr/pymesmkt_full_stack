@@ -1,18 +1,59 @@
 <div class="container mx-auto">
     <div class="justify-content-center">
         <div class="row">
-            <app-search-publication></app-search-publication>
+            <app-search-publication (formSubmitted)="onFormFilter0Submitted($event)">
+            </app-search-publication>
         </div>
-    
+
         <div class="row">
             <div class="col-md-4 col-xs-12 m-0">
-                <app-filter-publication></app-filter-publication>
+                <app-filter-publication (formSubmitted)="onFormFilter1Submitted($event)">
+                </app-filter-publication>
             </div>
-    
+
             <div class="col-md-8 col-sm-12 m-0">
-                <div class="row mx-3">
-                    <app-post-card-visitor></app-post-card-visitor>
+                <div class="container mt-5 text-center" *ngIf="isLoading; else PublicationsResponse">
+                    <div class="spinner-border text-primary text-center my-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
+
+                
+                <ng-template #PublicationsResponse>
+                    <div class="row my-1">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Limpiar búsqueda" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary float-end">
+                                <img src="../../../../assets/icons/magic.svg" alt="magic.svg"> 
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mx-2">
+                        <!-- Botones de paginación -->
+                        <div class="d-flex justify-content-center">
+                            <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
+                                <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                    (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                    [rotate]="true" [boundaryLinks]="true">
+                                </ngb-pagination>
+                            </div>
+                        </div>
+
+
+                        <app-post-card-visitor [publicaciones]="publicaciones" [isLoading]="isLoading">
+                        </app-post-card-visitor>
+
+                        <!-- Botones de paginación -->
+                        <div class="d-flex justify-content-center">
+                            <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
+                                <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                    (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                    [rotate]="true" [boundaryLinks]="true">
+                                </ngb-pagination>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
             </div>
         </div>
     </div>

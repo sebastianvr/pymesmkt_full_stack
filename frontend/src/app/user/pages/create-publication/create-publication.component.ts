@@ -14,13 +14,7 @@ import Swal from 'sweetalert2';
   providers: [MessageService]
 })
 export class CreatePublicationComponent implements OnInit {
-
-  // fecha!: Date;
   uploadedFiles: any[] = [];
-  // maxPrice!: number;
-  // quantity!: number;
-  // isTermsAccepted!: boolean;
-  // checked2: boolean = true;
 
   constructor(
     private fb: FormBuilder,
@@ -28,13 +22,12 @@ export class CreatePublicationComponent implements OnInit {
     private messageService: MessageService,
     private publicacionService: PublicacionService,
     private authService: AuthService,
-    private primengConfig: PrimeNGConfig
+    private primengConfig: PrimeNGConfig,
   ) { }
 
   ngOnInit() {
     this.primengConfig.ripple = true;
-
-    console.log(this.authService.usuario.id)
+    console.log(this.authService.usuario.id);
   }
 
   formularioPublicacion: FormGroup = this.fb.group({
@@ -54,11 +47,10 @@ export class CreatePublicationComponent implements OnInit {
       // {value :null ,disabled: true}
     ],
     archivos: [,],
-  })
+  });
 
   onUpload(event: any) {
-    console.log('asdasdasd', this.uploadedFiles)
-
+    console.log('this.uploadedFiles', this.uploadedFiles)
     for (let file of event.files) {
       this.uploadedFiles.push(file);
     }
@@ -68,16 +60,9 @@ export class CreatePublicationComponent implements OnInit {
 
   // Limpia el formulario dependiendo se es producto o servicio
   limpiarFormulario(res: string) {
-
-    // this.tieneGarantia();
-
-
     if (res == 'Producto') {
-      // console.log(' Es Producto')
-      this.formularioPublicacion.reset()
+      this.formularioPublicacion.reset();
 
-
-      //quitar estas lineas solo test
       this.formularioPublicacion.patchValue({
         titulo: 'Adquisicion de articulos de aseo y ornato',
         descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
@@ -90,37 +75,35 @@ export class CreatePublicationComponent implements OnInit {
         garantia: true,
         aniosGarantia: 1,
         archivos: 'archivo.zip',
-
         // archivos: 'archivo.zip'
-        UsuarioId: 'cb8bcb308b7ccf1'
-      })
+        UsuarioId: 'cb8bcb308b7ccf1',
+      });
 
-      this.formularioPublicacion.setErrors(null)
+      this.formularioPublicacion.setErrors(null);
 
       // desabilitar atributos que no son para el formulario de producto
-      this.formularioPublicacion.get('fechaInicio')?.disable()
-      this.formularioPublicacion.get('fechaTermino')?.disable()
-      this.formularioPublicacion.get('horasATrabajar')?.disable()
+      this.formularioPublicacion.get('fechaInicio')?.disable();
+      this.formularioPublicacion.get('fechaTermino')?.disable();
+      this.formularioPublicacion.get('horasATrabajar')?.disable();
 
       // habilito los atributos que pudiesen estar deshabilitados
-      this.formularioPublicacion.get('cantidad')?.enable()
-      this.formularioPublicacion.get('precioPorUnidad')?.enable()
-      this.formularioPublicacion.get('modelo')?.enable()
-      this.formularioPublicacion.get('color')?.enable()
+      this.formularioPublicacion.get('cantidad')?.enable();
+      this.formularioPublicacion.get('precioPorUnidad')?.enable();
+      this.formularioPublicacion.get('modelo')?.enable();
+      this.formularioPublicacion.get('color')?.enable();
 
       this.formularioPublicacion.patchValue({
         productoOServicio: 'Producto',
         cantidad: 1,
         garantia: false,
-        aniosGarantia: null
+        aniosGarantia: null,
       });
-
     }
 
     if (res == 'Servicio') {
       // console.log(' Es Servicio')
-      this.formularioPublicacion.reset()
-      this.formularioPublicacion.setErrors(null)
+      this.formularioPublicacion.reset();
+      this.formularioPublicacion.setErrors(null);
 
       //quitar estas lineas solo test
       this.formularioPublicacion.patchValue({
@@ -134,66 +117,46 @@ export class CreatePublicationComponent implements OnInit {
         garantia: false,
         aniosGarantia: null,
         archivos: 'archivo.zip',
-
         // archivos: 'archivo.zip'
-        UsuarioId: 'cb8bcb308b7ccf1'
-      })
+        UsuarioId: 'cb8bcb308b7ccf1',
+      });
 
       // Desabilitar atributos que no son para el formulario de servicio
-      this.formularioPublicacion.get('cantidad')?.disable()
-      this.formularioPublicacion.get('precioPorUnidad')?.disable()
-      this.formularioPublicacion.get('modelo')?.disable()
-      this.formularioPublicacion.get('color')?.disable()
+      this.formularioPublicacion.get('cantidad')?.disable();
+      this.formularioPublicacion.get('precioPorUnidad')?.disable();
+      this.formularioPublicacion.get('modelo')?.disable();
+      this.formularioPublicacion.get('color')?.disable();
 
       // Habilito los atributos que pudiesen estar deshabilitados
-      this.formularioPublicacion.get('fechaInicio')?.enable()
-      this.formularioPublicacion.get('fechaTermino')?.enable()
-      this.formularioPublicacion.get('horasATrabajar')?.enable()
-
+      this.formularioPublicacion.get('fechaInicio')?.enable();
+      this.formularioPublicacion.get('fechaTermino')?.enable();
+      this.formularioPublicacion.get('horasATrabajar')?.enable();
 
       this.formularioPublicacion.patchValue({
         productoOServicio: 'Servicio',
         cantidad: 1,
         garantia: false,
-        aniosGarantia: null
+        aniosGarantia: null,
       });
     }
   }
 
-  // Obtiene valor de garantia y habilitar o desabilitar el campo años de garantia
   tieneGarantia() {
-
-    const garantia = this.formularioPublicacion.get('garantia')?.value
-    // console.log(garantia)
-    if (!garantia) {
-      // this.formularioPublicacion.get('aniosGarantia')?.reset()
-      // return this.formularioPublicacion.get('aniosGarantia')?.enable()
-      return false
-
-    } else {
-      // this.formularioPublicacion.get('aniosGarantia')?.reset()
-      // return this.formularioPublicacion.get('aniosGarantia')?.disable()
-      return true
-    }
-
+    return this.formularioPublicacion.get('garantia')?.value === true;
   }
 
-  // Calcula el total en base el precio por unidad * cantidad
   calcularTotal() {
-    const cantidad = this.formularioPublicacion.get('cantidad')?.value
-    const precioPorUnidad = this.formularioPublicacion.get('precioPorUnidad')?.value
-
-    return this.formularioPublicacion.patchValue({ 'totalPrecio': cantidad * precioPorUnidad })
+    const cantidad = this.formularioPublicacion.get('cantidad')?.value;
+    const precioPorUnidad = this.formularioPublicacion.get('precioPorUnidad')?.value;
+    return this.formularioPublicacion.patchValue({ 'totalPrecio': cantidad * precioPorUnidad });
   }
 
   enviarPublicacion() {
-
     if (this.formularioPublicacion.invalid) {
-      this.formularioPublicacion.markAllAsTouched()
-      return
+      this.formularioPublicacion.markAllAsTouched();
+      return;
     }
 
-    // creacion de objeto para enviar a la petición
     const nuevaPublicacion = {
       titulo: this.formularioPublicacion.get('titulo')?.value,
       descripcion: this.formularioPublicacion.get('descripcion')?.value,
@@ -209,49 +172,35 @@ export class CreatePublicationComponent implements OnInit {
       garantia: this.formularioPublicacion.get('garantia')?.value,
       aniosGarantia: this.formularioPublicacion.get('aniosGarantia')?.value,
       archivos: this.formularioPublicacion.get('archivos')?.value,
+      UsuarioId: this.authService.usuario.id,
+    };
 
-      // UsuarioId referencia el ususario creador
-      UsuarioId: this.authService.usuario.id
-    }
-
-    // Parseo la fecha para que la bd la reconozca como valida
+    // Parseo fecha segun formato de la BD
     if (nuevaPublicacion.productoOServicio === 'Servicio') {
-      nuevaPublicacion.fechaFinServicio = moment(nuevaPublicacion.fechaFinServicio).format()
-      nuevaPublicacion.fechaInicioServicio = moment(nuevaPublicacion.fechaInicioServicio).format()
+      nuevaPublicacion.fechaFinServicio = moment(nuevaPublicacion.fechaFinServicio).format();
+      nuevaPublicacion.fechaInicioServicio = moment(nuevaPublicacion.fechaInicioServicio).format();
     }
 
-    // Envio de datos con el servicio
     this.publicacionService.postPublicacion(nuevaPublicacion).subscribe(data => {
-
       // console.log(data)
       if (data.ok === true) {
-
         Swal.fire({
           icon: 'success',
           title: 'Publicación creada!',
           showConfirmButton: false,
           timer: 1200,
-        })
-
-        this.router.navigate([`user/publication-detail/${data.id}`])
-
+        });
+        this.router.navigate([`user/publication-detail/${data.id}`]);
       }
-
-      // console.log('Publicacion Enviada! : ', data)
-
-
-
     });
   }
 
   campoInvalido(campo: string) {
     return this.formularioPublicacion.get(campo)?.errors
-      && this.formularioPublicacion.get(campo)?.touched
+      && this.formularioPublicacion.get(campo)?.touched;
   }
 
   showMessageToast(severity: string, summary: string, detail: string = '') {
-    this.messageService.add({ severity: severity, summary: summary, detail: detail })
+    this.messageService.add({ severity: severity, summary: summary, detail: detail });
   }
-
-
 }

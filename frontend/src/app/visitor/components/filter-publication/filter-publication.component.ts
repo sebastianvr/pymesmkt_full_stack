@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 
@@ -9,14 +9,10 @@ import { PublicacionService } from '../../../core/services/publicacion/publicaci
 })
 export class FilterPublicationComponent implements OnInit {
 
+  @Output() formSubmitted: EventEmitter<any> = new EventEmitter();
+
   filterForm!: FormGroup;
-  rangePrice: number[] = [
-    1000,
-    10000,
-    50000,
-    100000,
-    100000000,
-  ];
+  rangePrice: number[] = [1000,10000,50000,100000,100000000,];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -50,22 +46,19 @@ export class FilterPublicationComponent implements OnInit {
         formValues.cantOfertas && (formValues.cantOfertas !== "") ?
           parseInt(formValues.cantOfertas) : null,
       precioTotal:
-        formValues.monto  && (formValues.monto !== "") ?
+        formValues.monto && (formValues.monto !== "") ?
           parseInt(formValues.monto) : null,
       garantia: formValues.garantia,
       productoOServicio: formValues.tipo ? 'PRODUCTO' : 'SERVICIO'
     };
-    console.log('before', { filters });
 
     for (const key in filters) {
       if (filters[key] === null || filters[key] === undefined) {
         delete filters[key];
       }
     }
-
-    console.log('after', { filters });
-    // Llamar al servicio para obtener los resultados con los filtros
-    this.getQueryPublications(filters)
+    
+    this.formSubmitted.emit(filters);
   }
 
   getQueryPublications(filters: any) {

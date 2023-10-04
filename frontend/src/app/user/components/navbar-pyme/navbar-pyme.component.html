@@ -5,7 +5,9 @@
                 <!-- Contenido a la izquierda -->
                 <div class="d-flex align-items-center">
                     <div class="mx-3">
-                        <app-sidebar-user></app-sidebar-user>
+                        <app-sidebar-user 
+                        nameUser="{{nombreUsuario}}"
+                        ></app-sidebar-user>
                     </div>
                     <a routerLink="/user" class="navbar-brand text-dark text-decoration-none hide-on-small-screen">
                         <img class="mx-2" src="../../../../assets/icons/factory.svg" alt="factory.svg">
