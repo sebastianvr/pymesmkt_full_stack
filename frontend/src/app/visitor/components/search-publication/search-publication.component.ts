@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-search-publication',
@@ -7,37 +7,69 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   styleUrls: ['./search-publication.component.css']
 })
 export class SearchPublicationComponent implements OnInit {
+
+  @Output() formSubmitted: EventEmitter<any> = new EventEmitter();
+
   filterForm!: FormGroup;
   searchOptions: string[] = ['ID', 'Título'];
   selectedOption: string | null = null;
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder) { }
+
   ngOnInit(): void {
     this.buildForm();
   }
 
   buildForm() {
     this.filterForm = this.formBuilder.group({
-      searchOption: [null],
-      searchTerm: [null],
+      searchTerm: [null, [Validators.required, this.idValidator]],
+      searchOption: [null, Validators.required]
     });
   }
 
-  searchPublication() {
+  sendForm() {
     if (!this.filterForm.valid) {
+      this.filterForm.markAllAsTouched();
+      this.filterForm.markAsDirty();
       return;
     }
 
     const formValues = this.filterForm.value;
 
-    // Realiza la búsqueda en función de formValues.searchOption y formValues.searchTerm
-    // Puedes implementar la lógica de búsqueda aquí y mostrar los resultados
-    console.log('Opción de búsqueda:', formValues.searchOption);
-    console.log('Término de búsqueda:', formValues.searchTerm);
+    console.log({ formValues });
+    let filter = {}
+    if (formValues.searchOption === 'ID') {
+      filter = {
+        id: formValues.searchTerm,
+      };
+    }
+
+    if (formValues.searchOption === 'Título') {
+      filter = {
+        titulo: formValues.searchTerm,
+      };
+    }
+
+    console.log('filter search ', { filter });
+
+    this.formSubmitted.emit(filter);
   }
 
-   selectSearchOption(option: string) {
+  selectSearchOption(option: string) {
     this.selectedOption = option;
-    this.filterForm.patchValue({ searchOption: option });
+    // this.filterForm.patchValue({ searchOption: option });
+     // Cuando cambia la opción, resetea el campo searchTerm y elimina los errores
+     this.filterForm.patchValue({ searchOption: option });
+     this.filterForm.get('searchTerm')?.setErrors(null);
+  }
+
+  idValidator(control: AbstractControl): { [key: string]: any } | null {
+    const uuidRegex = /^[0-9a-fA-F]{15}$/;
+    const value = control.value;
+  
+    if (!value || !uuidRegex.test(value)) {
+      return { invalidID: true };
+    }
+    return null;
   }
 }

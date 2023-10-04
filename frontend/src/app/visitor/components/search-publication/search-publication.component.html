@@ -6,48 +6,53 @@
         </div>
     </div>
     <div class="row">
-        <!-- <form [formGroup]="filterForm" class="input-group mb-3">
-            <div ngbDropdown class="d-inline-block" style="width: 100%;">
-                <button type="button" class="btn btn-primary" id="dropdownBasic1" ngbDropdownToggle>
-                    {{ selectedOption || 'Filtrar ' }}
-                </button>
-                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                    <button *ngFor="let option of searchOptions" class="text-center" ngbDropdownItem (click)="selectSearchOption(option)">
-                        {{ option }}
-                    </button>
-                </div>
-            </div>
-            <input type="text" class="form-control" formControlName="searchTerm" aria-label="Término de búsqueda"
-                placeholder="Buscar por {{ selectedOption?.toLowerCase() }}" />
-            <span class="input-group-text" id="basic-addon2" (click)="searchPublication()">
-                Buscar
-            </span>
-        </form> -->
         <div class="input-group mb-3">
-            <!-- <span class="input-group-text" id="basic-addon1">@</span> -->
             <form [formGroup]="filterForm" class="input-group mb-3">
                 <div ngbDropdown class="input-group-text p-0">
-                    <button type="button" class="btn btn-primary customFilterBtn" id="dropdownBasic1" ngbDropdownToggle>
-                        {{ selectedOption || 'Filtro' }}
+                    <button type="button" class="btn btn-primary customFilterBtn m-0" id="dropdownBasic1" ngbDropdownToggle>
+                        {{ selectedOption }}
                     </button>
+
+
                     <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                        <button *ngFor="let option of searchOptions" ngbDropdownItem (click)="selectSearchOption(option)">
+                        <button *ngFor="let option of searchOptions" ngbDropdownItem
+                            (click)="selectSearchOption(option)">
                             {{ option }}
                         </button>
                     </div>
                 </div>
                 <input type="text" class="form-control" formControlName="searchTerm" aria-label="Término de búsqueda"
                     placeholder=" Buscar por {{ selectedOption?.toLowerCase() }}" />
-                <button class="input-group-text" id="basic-addon2" (click)="searchPublication()">
+                <button class="input-group-text" id="basic-addon2" (click)="sendForm()">
                     Buscar
                 </button>
+
+
             </form>
+           
+            <!-- Mostrar error si se eligió "ID" y hay un problema con searchTerm -->
+            <div *ngIf="filterForm.get('searchOption')?.value === 'ID' && filterForm.get('searchTerm')?.hasError('invalidID') && filterForm.get('searchTerm')?.touched"
+                class="text-danger">
+                Id de búsqueda inválido.
+            </div>
+
+            <!-- Mostrar error si no se eligió "ID" y searchTerm es requerido -->
+            <div *ngIf="filterForm.get('searchOption')?.value !== 'ID' && filterForm.get('searchTerm')?.hasError('required') && filterForm.get('searchTerm')?.touched"
+                class="text-danger">
+                Ingrese un término de búsqueda usando el botón de filtro.
+            </div>
+
+            <!-- Mostrar error si searchOption es requerido -->
+            <div *ngIf="filterForm.get('searchOption')?.hasError('required') && filterForm.get('searchOption')?.touched"
+                class="text-danger">
+                Seleccione una opción de búsqueda.
+            </div>
         </div>
     </div>
 
     <!-- Debug -->
-    <div class="container">
+    <!-- <div class="container">
         <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
         <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
-    </div>
+    </div> -->
 </div>
