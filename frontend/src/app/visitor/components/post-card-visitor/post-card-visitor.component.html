@@ -1,29 +1,15 @@
 <div class="container p-0">
 
-  <!-- Spinner de carga -->
+  <!-- No hay Publicaciones -->
   <div class="col-lg-12">
-    <div class="container mt-5 text-center" *ngIf="isLoading">
-      <div class="spinner-border text-primary text-center my-3" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
-
-    <!-- No hay Publicaciones -->
-    <div class="col-md-12 text-center my-4" *ngIf="isEmptyPublicaciones && !isLoading; else allPublicacionesTemplate">
-      <img src="../../../../assets/icons/new-publication.svg" alt="new-publication.svg" class="icon-image">
-      <h3 class="my-3">Aún no hay publicaciones. ¡Regístrate y escribe una!</h3>
+    <div class="col-md-12 text-center my-4"
+      *ngIf="publicaciones && publicaciones.length === 0 ; else allPublicacionesTemplate">
+      <img src="../../../../assets/icons/empty.svg" alt="new-publication.svg" class="icon-image">
+      <h3 class="my-3">No existen coincidencias de búsqueda.</h3>
     </div>
   </div>
 
   <ng-template #allPublicacionesTemplate>
-    <!-- Botones de paginación -->
-    <div class="d-flex justify-content-center">
-      <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
-        <ngb-pagination [collectionSize]="totalPublications" (pageChange)="onPageChange($event)" [(page)]="page"
-          [maxSize]="3" [rotate]="true" [boundaryLinks]="true">
-        </ngb-pagination>
-      </div>
-    </div>
 
     <!-- Card de las publicaciones -->
     <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
@@ -133,15 +119,6 @@
           <br>
 
         </div>
-      </div>
-    </div>
-
-    <!-- Botones de paginación -->
-     <div class="d-flex justify-content-center">
-      <div class="row mb-3" *ngIf="publicaciones && publicaciones.length > 0">
-        <ngb-pagination [collectionSize]="totalPublications" (pageChange)="onPageChange($event)" [(page)]="page"
-          [maxSize]="3" [rotate]="true" [boundaryLinks]="true">
-        </ngb-pagination>
       </div>
     </div>
   </ng-template>
