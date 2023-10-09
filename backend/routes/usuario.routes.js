@@ -13,14 +13,31 @@ const {
     suspendUser,
 } = require('../controllers/usuario.controller');
 
-const { check, param, body, query } = require('express-validator');
+const { check, query } = require('express-validator');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
 
-router.get('/', usuariosGetAll);
+router.get('/',
+    [
+        query('page').optional().isInt({ min: 1 }).
+            withMessage('page debe ser un número entero mayor o igual a 1'),
+        query('pageSize').optional().isInt({ min: 1, max: 100 }).
+            withMessage('pageSize debe ser un número entero entre 1 y 100'),
+    ],
+    usuariosGetAll
+);
 
-router.get('/suspended/', usuariosGetAllSuspended);
+router.get('/suspended/',
+    [
+        query('page').optional().isInt({ min: 1 }).
+            withMessage('page debe ser un número entero mayor o igual a 1'),
+        query('pageSize').optional().isInt({ min: 1, max: 100 }).
+            withMessage('pageSize debe ser un número entero entre 1 y 100'),
+    ]
+    ,
+    usuariosGetAllSuspended
+);
 
 router.get('/deleted/', usuariosGetAllDeleted);
 
@@ -51,14 +68,12 @@ router.delete('/suspended/:id', [
 
 router.delete('/delete/:id', [
     check('id', 'El param id es obligatorio').not().isEmpty(),
-
     // validarJWT,
     validarCampos
 ], usuarioDelete);
 
 router.put('/suspend/:id', [
     check('id', 'El param id es obligatorio').not().isEmpty(),
-
     // validarJWT,
     validarCampos
 ], suspendUser);
