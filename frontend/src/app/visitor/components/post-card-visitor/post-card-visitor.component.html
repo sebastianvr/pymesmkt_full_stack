@@ -22,8 +22,9 @@
                 ngbTooltip="ID de la publicación">
                 {{item.id}}</h6>
               <h6 class="btn btn-sm btn-primary d-inline-block float-end mb-0 px-2 py-1"
-                ngbTooltip="Nro de ofertas recibidas">
-                {{item.cantidadOfertasRecibidas}}</h6>
+                ngbTooltip="Ofertas recibidas">
+                {{item.cantidadOfertasRecibidas === 0 ? 'Sin ofertas': item.cantidadOfertasRecibidas}}
+              </h6>
             </div>
 
             <div class="card-body">
