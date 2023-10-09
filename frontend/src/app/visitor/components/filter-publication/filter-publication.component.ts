@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
 
 @Component({
   selector: 'app-filter-publication',
@@ -12,12 +11,12 @@ export class FilterPublicationComponent implements OnInit {
   @Output() formSubmitted: EventEmitter<any> = new EventEmitter();
 
   filterForm!: FormGroup;
-  rangePrice: number[] = [1000,10000,50000,100000,100000000,];
+  rangePrice: number[] = [1000, 10000, 50000, 100000, 100000000,];
+  nroOfertasPattern: RegExp = /^[0-9]*$/;
+  montoPattern: RegExp = /^[1-9][0-9]*$/;
 
   constructor(
     private formBuilder: FormBuilder,
-    private publicacionService: PublicacionService,
-
   ) {
     this.buildForm();
   }
@@ -26,45 +25,57 @@ export class FilterPublicationComponent implements OnInit {
 
   buildForm() {
     this.filterForm = this.formBuilder.group({
-      cantOfertas: [null, [Validators.pattern(/^[0-9]*$/)]],
-      monto: [null, [Validators.pattern(/^[1-9][0-9]*$/)]],
+      cantOfertas: [null, [Validators.pattern(this.nroOfertasPattern)]],
+      monto: [null, [Validators.pattern(this.montoPattern)]],
       garantia: [false],
       tipo: [false],
     });
   }
 
-  sendForm() {
+  public sendForm() {
     if (!this.filterForm.valid) {
-      return
+      return;
     }
 
     const formValues = this.filterForm.value;
+    const filters = this.buildFilters(formValues);
+    const cleanedFilters = this.cleanFilters(filters);
 
-    // Construir los filtros en función de los valores del formulario
-    const filters: any = {
-      cantidadOfertasRecibidas:
-        formValues.cantOfertas && (formValues.cantOfertas !== "") ?
-          parseInt(formValues.cantOfertas) : null,
-      precioTotal:
-        formValues.monto && (formValues.monto !== "") ?
-          parseInt(formValues.monto) : null,
-      garantia: formValues.garantia,
-      productoOServicio: formValues.tipo ? 'PRODUCTO' : 'SERVICIO'
+    console.log({ cleanedFilters });
+
+    this.formSubmitted.emit(cleanedFilters);
+  }
+
+  private buildFilters(formValues: any) {
+    const cantidadOfertasRecibidas =
+      formValues.cantOfertas && formValues.cantOfertas !== "" ?
+        parseInt(formValues.cantOfertas) :
+        null;
+
+    const precioTotal =
+      formValues.monto && formValues.monto !== "" ?
+        parseInt(formValues.monto) :
+        null;
+
+    const productoOServicio = formValues.tipo ?
+      'PRODUCTO' : 'SERVICIO';
+
+    const garantia = formValues.garantia;
+
+    return {
+      cantidadOfertasRecibidas,
+      precioTotal,
+      garantia,
+      productoOServicio,
     };
+  }
 
+  private cleanFilters(filters: any) {
     for (const key in filters) {
       if (filters[key] === null || filters[key] === undefined) {
         delete filters[key];
       }
     }
-    
-    this.formSubmitted.emit(filters);
-  }
-
-  getQueryPublications(filters: any) {
-    this.publicacionService.getQueryPublications(filters)
-      .subscribe(data => {
-        console.log('filtros:', data);
-      });
+    return filters;
   }
 }
