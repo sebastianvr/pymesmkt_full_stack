@@ -8,45 +8,23 @@
     <div class="row">
         <div class="input-group mb-3">
             <form [formGroup]="filterForm" class="input-group mb-3">
-                <div ngbDropdown class="input-group-text p-0">
-                    <button type="button" class="btn btn-primary customFilterBtn m-0" id="dropdownBasic1" ngbDropdownToggle>
-                        {{ selectedOption }}
-                    </button>
+                <select class="form-select customSelect text-center" id="searchOptionSelect" formControlName="searchOption"
+                    (change)="selectSearchOption($event)">
+                    <option class="text-center" *ngFor="let option of searchOptions" [value]="option">{{ option | titlecase }}</option>
+                </select>
 
-
-                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                        <button *ngFor="let option of searchOptions" ngbDropdownItem
-                            (click)="selectSearchOption(option)">
-                            {{ option }}
-                        </button>
-                    </div>
-                </div>
-                <input type="text" class="form-control" formControlName="searchTerm" aria-label="Término de búsqueda"
-                    placeholder=" Buscar por {{ selectedOption?.toLowerCase() }}" />
+                <input type="text" class="form-control" formControlName="searchTerm" aria-label="Término de búsqueda" />
                 <button class="input-group-text" id="basic-addon2" (click)="sendForm()">
                     Buscar
                 </button>
 
-
+                <div class="container">
+                    <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('required')"
+                        class="text-danger">Este campo es requerido.</div>
+                    <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('invalidID')"
+                        class="text-danger">El ID no es válido.</div>
+                </div>
             </form>
-           
-            <!-- Mostrar error si se eligió "ID" y hay un problema con searchTerm -->
-            <div *ngIf="filterForm.get('searchOption')?.value === 'ID' && filterForm.get('searchTerm')?.hasError('invalidID') && filterForm.get('searchTerm')?.touched"
-                class="text-danger">
-                Id de búsqueda inválido.
-            </div>
-
-            <!-- Mostrar error si no se eligió "ID" y searchTerm es requerido -->
-            <div *ngIf="filterForm.get('searchOption')?.value !== 'ID' && filterForm.get('searchTerm')?.hasError('required') && filterForm.get('searchTerm')?.touched"
-                class="text-danger">
-                Ingrese un término de búsqueda usando el botón de filtro.
-            </div>
-
-            <!-- Mostrar error si searchOption es requerido -->
-            <div *ngIf="filterForm.get('searchOption')?.hasError('required') && filterForm.get('searchOption')?.touched"
-                class="text-danger">
-                Seleccione una opción de búsqueda.
-            </div>
         </div>
     </div>
 
