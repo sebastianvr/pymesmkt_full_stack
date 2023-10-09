@@ -1,7 +1,7 @@
-import { Component, OnChanges, OnInit, OnDestroy } from '@angular/core';
-import { UsuarioService } from '../../../core/services/usuario/usuario.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import Swal from 'sweetalert2';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { UsuarioService } from 'src/app/core/services/usuario/usuario.service';
 
 @Component({
   selector: 'app-view-users',
@@ -11,41 +11,57 @@ import { Observable, Subscription } from 'rxjs';
 export class ViewUsersComponent implements OnInit, OnDestroy {
 
   searchText: string = '';
-  allUsuarios: any
-
+  allUsuarios: any;
   suscription!: Subscription;
 
+  pageSize: number = 20;
+  page: number = 1;
+
+  isEmptyUsers: boolean = false;
+  isLoading: boolean = false;
 
   constructor(
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
   ) { }
 
   ngOnInit(): void {
-    this.getAll();
+    this.getAll(this.pageSize, this.page);
 
     this.suscription = this.usuarioService.refresh.subscribe(() => {
-      this.getAll();
+      this.getAll(this.pageSize, this.page);
     })
   }
 
   ngOnDestroy(): void {
     this.suscription.unsubscribe();
-    console.log('observable cerrado')
+    console.log('observable cerrado');
   }
 
-  getAll() {
-    this.usuarioService.getAllUsuarios(0, 10).subscribe((data) => {
-      this.allUsuarios = data.content
-    })
+  getAll(pageSize: number, page: number) {
+    console.log('getAll()');
+    this.isLoading = true;
+    this.usuarioService.getAllUsuarios(page, pageSize).subscribe((data) => {
+      console.log({ data });
+
+      this.isLoading = false;
+
+      if (data.total === 0) {
+        this.isEmptyUsers = true;
+      }else{
+        this.isEmptyUsers = false;
+        this.allUsuarios = data.usuarios;
+        console.log(this.allUsuarios)
+      }
+    });
   }
 
   suspenderUsuario(idUsuario: string) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: 'btn btn-success mx-3',
-        cancelButton: 'btn btn-danger mx-3'
+        cancelButton: 'btn btn-danger mx-3',
       },
-      buttonsStyling: false
+      buttonsStyling: false,
     })
 
     swalWithBootstrapButtons.fire({
@@ -55,31 +71,26 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
       showCancelButton: true,
       confirmButtonText: 'Suspender',
       cancelButtonText: 'Cancelar',
-      reverseButtons: true
+      reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
         swalWithBootstrapButtons.fire(
           'Usuario suspendido',
           'Usuario añadido a la sección de usuarios suspendidos.',
-          'success'
-        )
-        this.usuarioService.suspenderUsuario(idUsuario).subscribe()
-        // this.usuarioService.refresh.subscribe(response => {
-        //   this.getAll();
-        // })
-        // this.router.navigate(['/user/see-publications']; 
+          'success',
+        );
+        this.usuarioService.suspenderUsuario(idUsuario).subscribe();
       }
     })
   }
-
 
   eliminarUsuario(idUsuario: string) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: 'btn btn-success mx-3',
-        cancelButton: 'btn btn-danger mx-3'
+        cancelButton: 'btn btn-danger mx-3',
       },
-      buttonsStyling: false
+      buttonsStyling: false,
     })
 
     swalWithBootstrapButtons.fire({
@@ -89,22 +100,21 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
       showCancelButton: true,
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
-      reverseButtons: true
+      reverseButtons: true,
     }).then((result) => {
-      this.usuarioService.deleteUsuario(idUsuario).subscribe()
+      this.usuarioService.deleteUsuario(idUsuario).subscribe();
 
       if (result.isConfirmed) {
         swalWithBootstrapButtons.fire(
           'Eliminado',
           'Este usuario ha sido eliminado del sistema.',
-          'success'
-        )
-
+          'success',
+        );
       }
-    })
+    });
   }
 
   OnDestroy() {
-    this.usuarioService.refresh.unsubscribe()
+    this.usuarioService.refresh.unsubscribe();
   }
 }
