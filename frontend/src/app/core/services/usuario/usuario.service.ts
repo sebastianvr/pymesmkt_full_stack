@@ -26,11 +26,11 @@ export class UsuarioService {
   }
 
   getAllUsuarios(page: number = 0, size: number = 0): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/usuario/?size=${size}&page=${page}`);
+    return this.http.get<any>(`${this.url}/api/usuario/?pageSize=${size}&page=${page}`);
   }
 
   getAllUsuariosSuspended(page: number = 0, size: number = 0) {
-    return this.http.get<any>(`${this.url}/api/usuario/suspended/?size=${size}&page=${page}`);
+    return this.http.get<any>(`${this.url}/api/usuario/suspended/?pageSize=${size}&page=${page}`);
   }
 
   getAllUsuariosDeleted(page: number = 0, size: number = 0) {
