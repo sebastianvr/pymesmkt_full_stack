@@ -78,4 +78,10 @@ export class LoginComponent implements OnInit {
     return this.formularioLogin.controls[campo].errors
       && this.formularioLogin.controls[campo].touched
   }
+
+  resetForm() {
+    this.formularioLogin.reset();
+    this.formularioLogin.markAsUntouched(); // Establece todos los campos como no tocados.
+
+  }
 }
