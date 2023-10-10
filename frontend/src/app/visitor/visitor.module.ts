@@ -27,12 +27,12 @@ const components: any[] = [
   PostCardVisitorComponent,
   SearchPublicationComponent,
   FilterPublicationComponent,
+  TermsAndConditionsComponent,
 ]
 
 @NgModule({
   declarations: [
     ...components,
-    TermsAndConditionsComponent,
   ],
   imports: [
     CommonModule,
