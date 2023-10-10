@@ -1,6 +1,5 @@
 .container-progress-bar {
     background-color: white;
-    border: 1px solid #cdcecf;
     border-radius: 5px;
 }
 
@@ -16,10 +15,3 @@
 .custom-file-upload input[type="file"] {
     display: none;
 }
-
-/* 
-@media (max-width: 992px) {
-    .filter-custom {
-        margin: 10px;
-    }
-} */
