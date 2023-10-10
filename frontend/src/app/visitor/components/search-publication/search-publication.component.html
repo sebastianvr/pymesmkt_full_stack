@@ -8,9 +8,10 @@
     <div class="row">
         <div class="input-group mb-3">
             <form [formGroup]="filterForm" class="input-group mb-3">
-                <select class="form-select customSelect text-center" id="searchOptionSelect" formControlName="searchOption"
-                    (change)="selectSearchOption($event)">
-                    <option class="text-center" *ngFor="let option of searchOptions" [value]="option">{{ option | titlecase }}</option>
+                <select class="form-select customSelect text-center" id="searchOptionSelect"
+                    formControlName="searchOption">
+                    <option [value]="'titulo'">Título</option>
+                    <option [value]="'id'">Id</option>
                 </select>
 
                 <input type="text" class="form-control" formControlName="searchTerm" aria-label="Término de búsqueda" />
@@ -25,12 +26,12 @@
                         class="text-danger">El ID no es válido.</div>
                 </div>
             </form>
+
+            <!-- Debug -->
+            <!-- <div class="container">
+                <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+                <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+            </div> -->
         </div>
     </div>
-
-    <!-- Debug -->
-    <!-- <div class="container">
-        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
-        <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
-    </div> -->
 </div>
