@@ -1,22 +1,30 @@
 <div class="d-flex justify-content-center">
-
   <div class="container">
-    <h2 class="fs-1 my-2 text-center"><strong>Registra tu información personal</strong></h2>
+    <h2 class="fs-1 my-2 text-center">
+      <strong>Registra tu información personal</strong>
+    </h2>
 
-    <div class="sticky-top container-progress-bar px-4 py-2">
-      <p class="lead text-center">Progreso actual de tus datos</p>
+    <div class="sticky-top pb-5 pt-2 container-progress-bar">
+      <p class="lead text-center">
+        <strong>Progreso actual de tus datos</strong>
+      </p>
+
       <div class="progress my-1">
-        <div class="progress-bar" role="progressbar" [ngStyle]="{'width' : getPercent() }" aria-valuemin="0"
-          aria-valuemax="100">{{getPercent()}}</div>
+        <div class="progress-bar" role="progressbar" aria-valuemin="0" [ngStyle]="{'width' : getPercent() }"
+          aria-valuemax="100">{{getPercent()}}
+        </div>
       </div>
     </div>
 
-    <div class="container g-5">
+    <div class="container">
       <div class="col-md-12 col-lg-12 my-3">
         <form [formGroup]="formulario" (ngSubmit)="sendForm()">
 
-          <div *ngIf="step == 1" class="row g-3" formGroupName="infoPropietario">
-            <h3 class="fs-2"><strong>Información del propietario</strong></h3>
+          <div *ngIf="step == 1" class="row" formGroupName="infoPropietario">
+            <h3 class="fs-2">
+              <strong>Información del propietario</strong>
+            </h3>
+
             <div class="col-sm-6">
               <label for="firstName" class="form-label">Nombre</label>
               <input type="text" class="form-control" id="firstName" placeholder="" formControlName="nombre">
@@ -33,7 +41,7 @@
               </span>
             </div>
 
-            <div class="col-md-5">
+            <div class="col-md-5 mt-2">
               <label for="myDNI" class="form-label">Run (DNI)</label>
               <input type="text" class="form-control" id="myDNI" placeholder="12.345.678-9" formControlName="run">
               <span *ngIf="campoInvalido('run', 'infoPropietario')" class="form-text text-danger">
@@ -41,8 +49,7 @@
               </span>
             </div>
 
-
-            <div class="col-md-4">
+            <div class="col-md-4 mt-2">
               <label for="email" class="form-label">Correo electrónico</label>
               <input type="email" class="form-control" id="email" placeholder="correo@correo.com"
                 formControlName="correoPropietario">
@@ -51,7 +58,7 @@
               </span>
             </div>
 
-            <div class="col-md-3 ">
+            <div class="col-md-3 mt-2">
               <label class="form-label" for="img" class="form-label">Foto de perfil</label>
               <input type="file" class="form-control" id="imagen" formControlName="imagen" accept="image/*"
                 (change)="onFileInputChange($event)">
@@ -59,9 +66,8 @@
                 formulario.get('infoPropietario.imagen')?.hasError('invalidExtension')" class="form-text text-danger">
                 La extesión del archivo no es válida.
               </span>
-              <span
-                *ngIf="campoInvalido('imagen', 'infoPropietario') && formulario.get('infoPropietario.imagen')?.hasError('maxSizeExceeded')"
-                class="form-text text-danger">
+              <span *ngIf="campoInvalido('imagen', 'infoPropietario') &&
+                formulario.get('infoPropietario.imagen')?.hasError('maxSizeExceeded')" class="form-text text-danger">
                 El tamaño del archivo excede el límite de 2 MB.
               </span>
               <span
@@ -71,7 +77,7 @@
               </span>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 mt-2">
               <label for="confirmPass1" class="form-label">Contraseña</label>
               <input type="password" class="form-control" id="confirmPass1" formControlName="contrasenia"
                 autocomplete="on">
@@ -80,11 +86,10 @@
               </span>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 mt-2">
               <label for="confirmPass2" class="form-label">Confirmar contraseña</label>
               <input type="password" class="form-control" id="confirmPass2" autocomplete="on" data-toggle="password"
                 formControlName="contrasenia2">
-
 
               <span *ngIf="campoInvalido('contrasenia2', 'infoPropietario')" class="form-text text-danger">
                 Las contraseñas deben de ser iguales.
@@ -92,15 +97,17 @@
             </div>
           </div>
 
-          <div *ngIf="step == 2" class="row g-3" formGroupName="infoLocalidadPropietario">
-            
-            <h3 class="fs-2"><strong>Localidad y direcciones del propietario</strong></h3>
+          <div *ngIf="step == 2" class="row" formGroupName="infoLocalidadPropietario">
+
+            <h3 class="fs-2">
+              <strong>Localidad y direcciones del propietario</strong>
+            </h3>
 
             <div class="col-md-6">
               <label for="country" class="form-label">Región</label>
               <select (change)="onSelectedRegionPropietario('opRegion', 'infoLocalidadPropietario')"
                 class="form-select form-select" aria-label=".form-select example" formControlName="opRegion">
-                <option value="">Seleccione una opción</option>
+                <option value=null>Seleccione una opción</option>
                 <option *ngFor="let item of regionesPropietario; let i = index" [value]="item">{{item}}</option>
               </select>
               <span *ngIf="campoInvalido('opRegion', 'infoLocalidadPropietario')" class="form-text text-danger">
@@ -111,7 +118,7 @@
             <div class="col-md-6">
               <label for="state" class="form-label">Comuna</label>
               <select class="form-select" id="state" formControlName="opCommune">
-                <option value="">Seleccione una opción</option>
+                <option value=null>Seleccione una opción</option>
                 <option *ngFor="let item of comunasPropietario; let i = index" [value]="item">{{item}}</option>
               </select>
               <span *ngIf="campoInvalido('opCommune', 'infoLocalidadPropietario')" class="form-text text-danger">
@@ -123,8 +130,8 @@
 
             </div>
 
-            <div class="col-12">
-              <label for="address" class="form-label">Dirección </label>
+            <div class="col-12 mt-2">
+              <label for="address" class="form-label">Dirección</label>
               <input type="text" class="form-control" id="address" placeholder="Avenida Chacabuco, #314"
                 formControlName="direccionPropietario">
               <span *ngIf="campoInvalido('direccionPropietario', 'infoLocalidadPropietario')"
@@ -133,24 +140,24 @@
               </span>
             </div>
 
-            <div class="col-12">
-              <label for="address2" class="form-label">Dirección #2 <span class="text-muted">(Opcional)</span></label>
+            <div class="col-12 mt-2">
+              <label for="address2" class="form-label">Dirección #2<span class="text-muted">(Opcional)</span></label>
               <input type="text" class="form-control" id="address2" formControlName="direccionPropietario2">
             </div>
 
-            <div class="col-12">
-              <label for="addresDescription" class="form-label">Descripción <span
+            <div class="col-12 mt-2">
+              <label for="addresDescription" class="form-label">Descripción<span
                   class="text-muted">(Opcional)</span></label>
               <textarea class="form-control" placeholder="Deja un comentario aquí..." id="addresDescription"
                 formControlName="descripcion"></textarea>
             </div>
           </div>
 
-          <div *ngIf="step == 3" class="row g-3" formGroupName="infoEmpresa">
-            
+          <div *ngIf="step == 3" class="row" formGroupName="infoEmpresa">
+
             <h3 class="fs-2"><strong>Información de la empresa</strong></h3>
 
-            <div class="col-sm-6">
+            <div class="col-md-6">
               <label for="nameCompany" class="form-label">Nombre</label>
               <input type="text" class="form-control" id="nameCompany" formControlName="nombreEmpresa">
               <span *ngIf="campoInvalido('nombreEmpresa', 'infoEmpresa')" class="form-text text-danger">
@@ -158,7 +165,7 @@
               </span>
             </div>
 
-            <div class="col-md-5">
+            <div class="col-md-6">
               <label for="myRUT" class="form-label">RUT</label>
               <input type="text" class="form-control" id="myRUT" placeholder="12.345.678-9" formControlName="rut">
               <span *ngIf="campoInvalido('rut', 'infoEmpresa')" class="form-text text-danger">
@@ -166,10 +173,10 @@
               </span>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 mt-2">
               <label for="typeCompany" class="form-label">Tipo de empresa</label>
               <select class="form-select" id="typeCompany" required="" formControlName="tipoEmpresa">
-                <option value="">Selecciona una opción</option>
+                <option value=null>Selecciona una opción</option>
                 <option>Empresa comercial</option>
                 <option>Empresa de servicios</option>
               </select>
@@ -178,7 +185,7 @@
               </span>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 mt-2">
               <label for="lineOfBusiness" class="form-label">Rubro</label>
               <input type="text" class="form-control" id="lineOfBusiness" placeholder="Panadería"
                 formControlName="rubro">
@@ -190,7 +197,7 @@
             <div class="col-md-3"></div>
           </div>
 
-          <div *ngIf="step == 4" class="row g-3" formGroupName="infoLocalidadEmpresa">
+          <div *ngIf="step == 4" class="row" formGroupName="infoLocalidadEmpresa">
             <h3 class="fs-2"><strong>Localidad y dirección de la empresa</strong></h3>
 
             <div class="form-check form-switch my-3">
@@ -204,7 +211,7 @@
               <select (change)="onSelectedRegionEmpresa('regionEmpresa', 'infoLocalidadEmpresa')"
                 class="form-select form-select" aria-label=".form-select example" id="countryCompany"
                 formControlName="regionEmpresa">
-                <option value="">Seleccione una opción</option>
+                <option value=null>Seleccione una opción</option>
                 <option *ngFor="let region of regionesEmpresa; let i = index" [value]="region">{{region}}</option>
               </select>
               <span *ngIf="campoInvalido('regionEmpresa', 'infoLocalidadEmpresa')" class="form-text text-danger">
@@ -215,7 +222,7 @@
             <div class="col-md-6">
               <label for="communeCompany" class="form-label">Comuna</label>
               <select class="form-select" id="communeCompany" formControlName="communeEmpresa">
-                <option value="">Seleccione una opción</option>
+                <option value="null">Seleccione una opción</option>
                 <option *ngFor="let comuna of comunasEmpresa; let i = index" [value]="comuna">{{comuna}}</option>
               </select>
               <span *ngIf="campoInvalido('communeEmpresa', 'infoLocalidadEmpresa')" class="form-text text-danger">
@@ -225,15 +232,15 @@
 
             <div class="col-md-3"></div>
 
-            <div class="col-12">
-              <label for="addressCompany" class="form-label">Dirección </label>
+            <div class="col-md-12 mt-2">
+              <label for="addressCompany" class="form-label">Dirección</label>
               <input type="text" class="form-control" id="addressCompany" formControlName="direccionEmpresa">
               <span *ngIf="campoInvalido('direccionEmpresa', 'infoLocalidadEmpresa')" class="form-text text-danger">
                 La dirección de la empresa es oblgatoria.
               </span>
             </div>
 
-            <div class="col-12">
+            <div class="col-md-12 mt-2">
               <label for="addresDescriptionCompany" class="form-label">Descripción <span
                   class="text-muted">(Opcional)</span></label>
               <textarea class="form-control" placeholder="Deja un comentario aquí..." id="addresDescriptionCompany"
@@ -244,26 +251,26 @@
           <div *ngIf="step == 4" class="form-check form-switch my-3">
             <input class="form-check-input" formControlName="terminosYCondiciones" type="checkbox" role="switch"
               id="inputTerms">
-            <label class="form-check-label" for="inputTerms">Acepto <a href="/terms">términos y
-                condiciones</a>
+            <label class="form-check-label" for="inputTerms">Acepto
+              <a (click)="openTermsAndConditionsModal()" class="link">
+                términos y condiciones
+              </a>
             </label>
             <span *ngIf="aceptarTerminosYCondiciones('terminosYCondiciones')" class="terminos form-text text-danger">
               Se deben aceptar los términos y condiciones.
             </span>
           </div>
 
-          <a *ngIf="step != 1" (click)="previous()" type="button"
-            class="btn btn-primary float-start btn my-3">Atrás</a>
-          <a *ngIf="step !== 4" (click)="next()" type="button"
-            class="btn btn-primary float-end btn my-3">Siguiente</a>
-          <button *ngIf="step == 4" class="btn btn-primary float-end btn my-3">Enviar</button>
+          <a *ngIf="step != 1" (click)="previous()" type="button" class="btn btn-primary float-start my-3">Atrás</a>
+          <a *ngIf="step !== 4" (click)="next()" type="button" class="btn btn-primary float-end my-3">Siguiente</a>
+          <button *ngIf="step == 4" class="btn btn-primary float-end my-3">Enviar</button>
         </form>
       </div>
     </div>
   </div>
 </div>
 
-<!-- debug -->
+<!-- Debug Mode -->
 <!-- <div class="container">
   <pre><b>formulario.value: </b> {{formulario.value | json }}</pre>
   <pre><b>formulario.errors: </b> {{formulario.errors | json }}</pre>
