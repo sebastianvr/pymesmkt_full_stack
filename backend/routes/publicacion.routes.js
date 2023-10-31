@@ -72,6 +72,15 @@ router.get('/usuario/:idUsuario',
             withMessage('pageSize debe ser un número entero entre 1 y 100'),
         query('titulo').optional().isString()
             .withMessage('El campo "titulo" debe ser una cadena (string)'),
+        query('fecha').optional()
+            .custom((value) => {
+                const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+                if (!dateRegex.test(value)) {
+                    throw new Error('La fecha no es válida. Debe estar en formato DD-MM-YYYY');
+                }
+                return true;
+            })
+            .withMessage('La fecha proporcionada no es válida'),
     ],
     publicacionesGet
 );
