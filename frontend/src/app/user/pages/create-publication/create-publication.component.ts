@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import moment from 'moment';
 import { MessageService, PrimeNGConfig } from 'primeng/api';
-import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import Swal from 'sweetalert2';
+
+import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
 
 @Component({
   selector: 'app-create-publication',
@@ -15,14 +16,15 @@ import Swal from 'sweetalert2';
 })
 export class CreatePublicationComponent implements OnInit {
   uploadedFiles: any[] = [];
+  selectedOption: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private primengConfig: PrimeNGConfig,
     private messageService: MessageService,
     private publicacionService: PublicacionService,
     private authService: AuthService,
-    private primengConfig: PrimeNGConfig,
   ) { }
 
   ngOnInit() {
@@ -50,17 +52,23 @@ export class CreatePublicationComponent implements OnInit {
   });
 
   onUpload(event: any) {
-    console.log('this.uploadedFiles', this.uploadedFiles)
+    console.log('this.uploadedFiles', this.uploadedFiles);
     for (let file of event.files) {
       this.uploadedFiles.push(file);
     }
 
-    this.messageService.add({ severity: 'info', summary: 'File Uploaded', detail: '' });
+    this.messageService.add(
+      {
+        severity: 'info',
+        summary: 'File Uploaded',
+        detail: ''
+      }
+    );
   }
 
-  // Limpia el formulario dependiendo se es producto o servicio
-  limpiarFormulario(res: string) {
-    if (res == 'Producto') {
+  limpiarFormulario(option: string) {
+    this.selectedOption = option;
+    if (option == 'Producto') {
       this.formularioPublicacion.reset();
 
       this.formularioPublicacion.patchValue({
@@ -75,7 +83,6 @@ export class CreatePublicationComponent implements OnInit {
         garantia: true,
         aniosGarantia: 1,
         archivos: 'archivo.zip',
-        // archivos: 'archivo.zip'
         UsuarioId: 'cb8bcb308b7ccf1',
       });
 
@@ -100,7 +107,7 @@ export class CreatePublicationComponent implements OnInit {
       });
     }
 
-    if (res == 'Servicio') {
+    if (option == 'Servicio') {
       // console.log(' Es Servicio')
       this.formularioPublicacion.reset();
       this.formularioPublicacion.setErrors(null);
@@ -117,7 +124,6 @@ export class CreatePublicationComponent implements OnInit {
         garantia: false,
         aniosGarantia: null,
         archivos: 'archivo.zip',
-        // archivos: 'archivo.zip'
         UsuarioId: 'cb8bcb308b7ccf1',
       });
 
@@ -201,6 +207,12 @@ export class CreatePublicationComponent implements OnInit {
   }
 
   showMessageToast(severity: string, summary: string, detail: string = '') {
-    this.messageService.add({ severity: severity, summary: summary, detail: detail });
+    this.messageService.add(
+      {
+        severity: severity,
+        summary: summary,
+        detail: detail,
+      }
+    );
   }
 }
