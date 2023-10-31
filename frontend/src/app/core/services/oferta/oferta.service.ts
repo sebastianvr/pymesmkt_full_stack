@@ -25,10 +25,6 @@ export class OfertaService {
     return this.http.post<any>(`${this.url}/api/oferta/`, oferta)
   }
 
-  getOfertasRecibidas(idUsuario: string): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/oferta/received/${idUsuario}`);
-  }
-
   getOfertaById(idOferta: string): Observable<any> {
     return this.http.get<any>(`${this.url}/api/oferta/${idOferta}`);
   }
@@ -48,5 +44,15 @@ export class OfertaService {
 
   aceptaOferta(oferta: any): Observable<any> {
     return this.http.put<any>(`${this.url}/api/oferta/aceptar/${oferta}`, null);
+  }
+
+  getOfertasById(id: string, filters: any): Observable<any> {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+      
+    const urlWithQuery = `${this.url}/api/oferta/received/${id}?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
   }
 }

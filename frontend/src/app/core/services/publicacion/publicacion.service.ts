@@ -37,8 +37,15 @@ export class PublicacionService {
     return this.http.get<any>(`${this.url}/api/publicacion?size=${size}&page=${page}`);
   }
 
-  getAllPublicacionById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/publicacion/usuario/${id}`);
+  getAllPublicacionById(id: string, filters: any): Observable<any> {
+    // return this.http.get<any>(`${this.url}/api/publicacion/usuario/${id}`);
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/publicacion/usuario/${id}?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
   }
 
   deletePublicacion(id: any): Observable<any> {
