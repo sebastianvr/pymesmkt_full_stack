@@ -1,3 +1,13 @@
+.card {
+    transition: box-shadow 0.3s;
+    /* Transición suave para la sombra */
+}
+
+.card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    /* Sombras al pasar el mouse sobre la tarjeta */
+}
+
 /* Image for empty publications */
 .icon-image {
     width: 30%;
@@ -15,4 +25,10 @@
 
 .tableResume tbody tr td {
     border-bottom: 1px solid #c8c9ca;
+}
+
+.icon-button-style {
+    filter: invert(100%);
+    width: 16px;
+    height: 16px;
 }
