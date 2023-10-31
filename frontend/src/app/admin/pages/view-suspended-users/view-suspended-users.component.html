@@ -24,13 +24,23 @@
 
                 <div class="col-12 text-center" *ngIf="isEmptyUsers && !isLoading">
                     <div class="container mt-5">
-                        <img src="../../../../assets/icons/empty-users.svg" alt="empty-users.svg"
-                            class="icon-image">
+                        <img src="../../../../assets/icons/empty-users.svg" alt="empty-users.svg" class="icon-image">
                         <h3 class="my-3">No existen usuarios suspendidos aún.</h3>
                     </div>
                 </div>
 
                 <div class="col-md-12 table-responsive pt-1" *ngIf="!isEmptyUsers && !isLoading">
+
+                    <!-- Botones de paginación -->
+                    <div class="d-flex justify-content-center">
+                        <div class="row">
+                            <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3" [rotate]="true"
+                                [boundaryLinks]="true">
+                            </ngb-pagination>
+                        </div>
+                    </div>
+
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -58,6 +68,16 @@
                             </tr>
                         </tbody>
                     </table>
+
+                    <!-- Botones de paginación -->
+                    <div class="d-flex justify-content-center">
+                        <div class="row">
+                            <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3" [rotate]="true"
+                                [boundaryLinks]="true">
+                            </ngb-pagination>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
