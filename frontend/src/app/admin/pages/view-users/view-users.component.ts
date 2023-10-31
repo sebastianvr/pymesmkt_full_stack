@@ -16,6 +16,9 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
 
   pageSize: number = 20;
   page: number = 1;
+  currentPage!: number;
+  total!: number;
+  totalPages!: number;
 
   isEmptyUsers: boolean = false;
   isLoading: boolean = false;
@@ -34,7 +37,6 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.suscription.unsubscribe();
-    console.log('observable cerrado');
   }
 
   getAll(pageSize: number, page: number) {
@@ -48,9 +50,22 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
       if (data.total === 0) {
         this.isEmptyUsers = true;
       }else{
+        const {
+          usuarios,
+          total,
+          currentPage,
+          pageSize,
+          totalPages,
+        } = data;
+      
+        this.total = total;
+        this.currentPage = currentPage;
+        this.pageSize = pageSize;
+        this.totalPages = totalPages;
+        this.allUsuarios = usuarios;
         this.isEmptyUsers = false;
-        this.allUsuarios = data.usuarios;
-        console.log(this.allUsuarios)
+        
+        console.log(this.allUsuarios);
       }
     });
   }
@@ -116,5 +131,10 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
 
   OnDestroy() {
     this.usuarioService.refresh.unsubscribe();
+  }
+
+  onPageChange(newPage: number) {
+    console.log({newPage});
+    this.getAll(this.pageSize, newPage);
   }
 }
