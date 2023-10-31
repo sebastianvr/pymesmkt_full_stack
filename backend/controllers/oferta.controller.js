@@ -1,5 +1,6 @@
 const { uid } = require('uid');
 const { response, request } = require('express');
+const { validationResult } = require('express-validator');
 
 const Usuario = require('../models/usuario');
 const Oferta = require('../models/oferta');
@@ -64,58 +65,102 @@ const ofertaGetById = async (req = request, res = response) => {
 
 }
 
+// Obtiene ofertas de un usuario, usando su id
 const ofertasRecibidasGetById = async (req = request, res = response) => {
+    console.log('[ofertas] ofertasRecibidasGetById()')
+    const { idUsuario } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const { UsuarioId } = req.params;
-    // console.log('UsuarioId : ', UsuarioId)
-    try {
-        const ofertas = await Publicacion.findAll({
-            where: {
-                UsuarioId,
-                estado: true,
-                procesoDePublicacion: 'INICIADA'
-            },
-            include: [
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
+
+    const filter = {
+        UsuarioId: idUsuario,
+        estado: true,
+        procesoDeOferta: 'DISPONIBLE',
+    };
+
+    if (req.query.titulo) {
+        filter.titulo = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('titulo')),
                 {
-                    model: Oferta,
-                    where: {
-                        estado: true,
-                        procesoDeOferta: 'DISPONIBLE'
-                    },
-                    order: [['createdAt', 'DESC']],
-                    include: [{
-                        model: Usuario,
-                        where: { estado: 1 },
-
-                        include: [{
-                            model: Pyme,
-                            where: { estado: 1 }
-                        }]
-                    }]
-                }
+                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                },
             ],
-            order: [['createdAt', 'DESC'],]
+        };
+    };
 
-        })
+    if (req.query.fecha) {
+        // Verificamos que la fecha cumpla con el formato "DD-MM-YYYY"
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            // Si la fecha es válida, podemos incluirla en la consulta
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
 
-
-        if (ofertas) {
-            res.status(200).json({
-                ok: true,
-                ofertas,
-            });
+            filter.createdAt = {
+                [Sequelize.Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('createdAt')), year),
+                ]
+            };
         }
-        else res.status(400).json({
-            ok: false,
-            msg: `No existen ofertas con este usuario ${UsuarioId}`
-        })
+    }
+
+    console.log({ filter });
+    // model: Oferta,
+    //                 where: {
+    //                     estado: true,
+    //                     procesoDeOferta: 'DISPONIBLE'
+    //                 },
+    //                 order: [['createdAt', 'DESC']],
+    //                 include: [{
+    //                     model: Usuario,
+    //                     where: { estado: 1 },
+    //                     include: [{
+    //                         model: Pyme,
+    //                         where: { estado: 1 }
+    //                     }]
+    //                 }]
+
+    try {
+        const { count, rows } =
+            await Oferta.findAndCountAll({
+                where: filter,
+                limit: pageSize,
+                offset: (page - 1) * pageSize,
+            });
+
+        console.log({ count, rows });
+
+        if (!rows.length) {
+            return res.status(200).json({
+                message: 'No se encontraron coincidencias.',
+                ofertas: [],
+            });
+        };
+
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            rows,
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            ok: false,
-            msg: error
-        })
+        console.error({ error });
+        return res.status(500).json(
+            { error: 'Error en el servidor' },
+            error,
+        );
     }
 }
 
@@ -150,7 +195,7 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
             include: [
                 {
                     model: Publicacion,
-                    where: { 
+                    where: {
                         estado: true,
                         procesoDePublicacion: 'INICIADA'
                     },
