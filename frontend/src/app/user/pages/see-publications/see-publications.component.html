@@ -1,89 +1,158 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-center">
-
         <div class="container">
-            <div class="col-md-12 g-5 pt-4 text-center mb-5">
+
+            <div class="col-md-12 pt-4 text-center mb-3">
                 <img class="float-end mx-auto mb-3" src="../../../assets/icons/stickies.svg" alt="pen.svg" width="55">
-                <h2 class="fs-1 mb-1">Mis Publicaciones</h2>
+                <h2 class="fs-1 mb-1"><strong>Mis Publicaciones</strong></h2>
             </div>
 
-            <!-- <div class="container">
-                <pre>{{this.formularioBusqueda.value | json}}</pre>
-            </div> -->
+            <div class="col-md-12">
+                <div class="input-group mb-3">
+                    <form [formGroup]="filterForm" class="input-group mb-3">
+                        <select class="form-select customSelect text-center" id="searchOptionSelect"
+                            formControlName="searchOption">
+                            <option [value]="'titulo'">Título</option>
+                            <option [value]="'fecha'">Fecha</option>
+                        </select>
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 input-group input-group-sm mb-3 mx-3 ">
-                        <div class="input-group input-group-md">
-                            <input type="text" class="form-control" aria-label="Sizing example input"
-                                aria-describedby="inputGroup-sizing-lg" id="buscarOferta">
-                            <span class="input-group-text mr-3" id="inputGroup-sizing-lg">Buscar</span>
+                        <input type="text" class="form-control" formControlName="searchTerm"
+                            aria-label="Término de búsqueda" />
+                        <button class="input-group-text btn btn-primary" id="basic-addon2" (click)="sendForm()">
+                            Buscar
+                        </button>
+
+                        <div class="container">
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('required')"
+                                class="text-danger">Este campo es requerido.</div>
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('invalidDate')"
+                                class="text-danger">La fecha debe ser tipo DD-MM-YYYY.</div>
+                        </div>
+                    </form>
+
+                    <div class="row my-1">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Limpiar búsqueda" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary float-end">
+                                <img src="../../../../assets/icons/magic.svg" alt="magic.svg">
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Debug -->
+                    <!-- <div class="container">
+                        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+                        <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+                    </div> -->
                 </div>
             </div>
 
-            <div class="col-md-12 g-5 ">
+
+            <div class="col-md-12">
                 <div class="container">
-                    
-                    <div class="col-12 text-center my-5" *ngIf="!this.cards; else divPublicaciones">
-                        <div class="spinner-border  text-primary" role="status">
+                    <div class="col-md-12 mt-5 text-center" *ngIf="isLoading">
+                        <div class="spinner-border text-primary text-center my-3" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
 
-                    <ng-template #divPublicaciones>
-                        <div *ngFor="let item of cards; let i = index">
-                            <div class="card cardMain  shadow-sm rounded mb-2" style="width: 18rem;">
-                                <div class="card-header pt-2">
-                                    <h6 [ngClass]="{
-                                                'alert-primary' : item.procesoDePublicacion.includes('INICIADA'), 
-                                                'alert-success' : item.procesoDePublicacion.includes('FINALIZADA'),
-                                                'alert-danger' : item.procesoDePublicacion.includes('ELIMINADA')
-                                            }" class="stateHeader alert m-0 p-1" role="alert">Publicación {{
-                                        item.procesoDePublicacion | lowercase}}
-                                    </h6>
-                                </div>
+                    <div class="col-md-12 text-center" *ngIf="isEmptyPublications && !isLoading">
+                        <div class="container mt-5">
+                            <img src="../../../../assets/icons/empty.svg" alt="empty-users.svg" class="icon-image">
+                            <h3 class="my-3">No tienes publicaciones iniciadas.</h3>
 
-                                <div class="card-body">
-                                    <h5 class="card-title"><a class="card-link">{{item.titulo | uppercase}}</a>
-                                    </h5>
-                                    <p class="card-text">{{item.descripcion | uppercase}}</p>
+                            <div class="col-lg-12">
+                                <button ngbTooltip="Ir atrás" (click)="clearFilter()"
+                                    class="btn btn-sm btn-primary text-center">
+                                    <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg"
+                                        class="icon-button-style">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-                                    <hr style="height: 3px;">
 
-                                    <table class="tableResume table-hover table table-borderless">
-                                        <tbody>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Fecha Publicación</strong>
-                                                </td>
-                                                <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy'}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Precio</strong>
-                                                </td>
-                                                <td class="text-end">{{item.precioTotal | currency: 'CLP'}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div class="card-footer">
-                                    <button class="btn btn-primary float-end"
-                                        [routerLink]="['/user/publication-detail', item.id ]" type="button">
-                                        Más información
-                                    </button>
+                    <ng-container *ngIf="!isEmptyPublications && !isLoading">
+                        <div class="row container px-4">
+                            <!-- Botones de paginación -->
+                            <div class="row">
+                                <div class="d-flex float-start justify-content-center">
+                                    <div class="row">
+                                        <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                            (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                            [rotate]="true" [boundaryLinks]="true">
+                                        </ngb-pagination>
+                                    </div>
                                 </div>
                             </div>
-                            <br>
+
+                            <div class="mb-4" *ngFor="let item of publicaciones; let i = index">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="alert alert-success d-inline-block mb-0 px-2 py-1" role="alert"
+                                            ngbTooltip="ID de la publicación">
+                                            {{item.id}}
+                                        </h6>
+                                        <button class="btn btn-primary btn-sm float-end" pTooltip="Ofertas recibidas">
+                                            {{item.cantidadOfertasRecibidas}}
+                                        </button>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a class="card-link">{{item.titulo | uppercase}}</a>
+                                        </h5>
+                                        <p class="card-text">{{item.descripcion | uppercase}}</p>
+
+                                        <hr>
+
+                                        <table class="table table-hover table-borderless">
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="2" class="start-*">
+                                                        <strong>Fecha Publicación</strong>
+                                                    </td>
+                                                    <td class="text-end">{{ item.createdAt | date : 'dd MMMM yyyy' :
+                                                        '+0000' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" class="start-*"><strong>Precio</strong>
+                                                    </td>
+                                                    <td class="text-end">{{item.precioTotal | currency: 'CLP'}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="card-footer">
+                                        <button class="btn btn-primary float-end"
+                                            [routerLink]="['/user/publication-detail', item.id ]" type="button">
+                                            Leer más
+                                            <img src="../../../../assets/icons/info-circle.svg"
+                                                class="icon-button-style">
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Botones de paginación -->
+                            <div class="row">
+                                <div class="d-flex float-start justify-content-center">
+                                    <div class="row">
+                                        <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                            (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                            [rotate]="true" [boundaryLinks]="true">
+                                        </ngb-pagination>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </ng-template>
 
 
-
+                    </ng-container>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
