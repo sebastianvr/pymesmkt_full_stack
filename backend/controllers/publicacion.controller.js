@@ -194,6 +194,27 @@ const publicacionesGet = async (req = request, res = response) => {
         };
     };
 
+    if (req.query.fecha) {
+        // Verificamos que la fecha cumpla con el formato "DD-MM-YYYY"
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            // Si la fecha es válida, podemos incluirla en la consulta
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+
+            // Ajusta el nombre de los campos de fecha según tu modelo
+            filter.createdAt = {
+                [Sequelize.Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('createdAt')), year),
+                ]
+            };
+        }
+    }
+
     console.log({ filter });
 
     try {
