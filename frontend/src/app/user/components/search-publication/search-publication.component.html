@@ -7,8 +7,31 @@
     </div>
     <div class="row">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="basic-addon2">
-            <span class="input-group-text" id="basic-addon2">Buscar</span>
-          </div>
+            <form [formGroup]="filterForm" class="input-group mb-3">
+                <select class="form-select customSelect text-center" id="searchOptionSelect"
+                    formControlName="searchOption">
+                    <option [value]="'titulo'">Título</option>
+                    <option [value]="'id'">Id</option>
+                </select>
+
+                <input type="text" class="form-control" formControlName="searchTerm" aria-label="Término de búsqueda" />
+                <button class="input-group-text btn btn-primary" id="basic-addon2" (click)="sendForm()">
+                    Buscar
+                </button>
+
+                <div class="container">
+                    <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('required')"
+                        class="text-danger">Este campo es requerido.</div>
+                    <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('invalidID')"
+                        class="text-danger">El ID no es válido.</div>
+                </div>
+            </form>
+
+            <!-- Debug -->
+            <!-- <div class="container">
+                <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+                <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+            </div> -->
+        </div>
     </div>
 </div>
