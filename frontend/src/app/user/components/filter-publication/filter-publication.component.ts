@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'user-filter-publication',
@@ -8,29 +8,74 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 })
 export class FilterPublicationComponent implements OnInit {
 
-  filterForm!: FormGroup;
+  @Output() formSubmitted: EventEmitter<any> = new EventEmitter();
 
-  rangePrice: string[] = [
-    '100.000 - 500.000',
-    '500.000 - 1.000.000',
-    '1.000.000 - 5.000.000',
-    '5.000.000 - 10.000.000',
-  ]
+  filterForm!: FormGroup;
+  rangePrice: number[] = [1000, 10000, 50000, 100000, 100000000,];
+  nroOfertasPattern: RegExp = /^[0-9]*$/;
+  montoPattern: RegExp = /^[1-9][0-9]*$/;
 
   constructor(
     private formBuilder: FormBuilder,
   ) {
+    this.buildForm();
+  }
+
+  ngOnInit(): void { }
+
+  buildForm() {
     this.filterForm = this.formBuilder.group({
-      cantOfertas: [null],
-      monto: [null],
+      cantOfertas: [null, [Validators.pattern(this.nroOfertasPattern)]],
+      monto: [null, [Validators.pattern(this.montoPattern)]],
       garantia: [false],
       tipo: [false],
-    })
+    });
   }
 
-  ngOnInit(): void {
+  public sendForm() {
+    if (!this.filterForm.valid) {
+      return;
+    }
+
+    const formValues = this.filterForm.value;
+    const filters = this.buildFilters(formValues);
+    const cleanedFilters = this.cleanFilters(filters);
+
+    console.log({ cleanedFilters });
+
+    this.formSubmitted.emit(cleanedFilters);
   }
 
-  sendForm() {
+  private buildFilters(formValues: any) {
+    const cantidadOfertasRecibidas =
+      formValues.cantOfertas && formValues.cantOfertas !== "" ?
+        parseInt(formValues.cantOfertas) :
+        null;
+
+    const precioTotal =
+      formValues.monto && formValues.monto !== "" ?
+        parseInt(formValues.monto) :
+        null;
+
+    const productoOServicio = formValues.tipo ?
+      'PRODUCTO' : 'SERVICIO';
+
+    const garantia = formValues.garantia;
+
+    return {
+      cantidadOfertasRecibidas,
+      precioTotal,
+      garantia,
+      productoOServicio,
+    };
+  }
+
+  private cleanFilters(filters: any) {
+    for (const key in filters) {
+      if (filters[key] === null || filters[key] === undefined) {
+        delete filters[key];
+      }
+    }
+    return filters;
   }
 }
