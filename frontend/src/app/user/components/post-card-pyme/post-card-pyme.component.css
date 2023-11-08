@@ -1,18 +1,34 @@
-/* .dateHeader {
-    display: inline;
+.card {
+    transition: box-shadow 0.3s;
+    /* Transición suave para la sombra */
+}
+
+.card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    /* Sombras al pasar el mouse sobre la tarjeta */
+}
+
+/* Image for empty publications */
+.icon-image {
+    width: 30%;
+    height: auto;
+    max-width: 150px;
+}
+
+.empty-publications-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .tableResume tbody tr td {
     border-bottom: 1px solid #c8c9ca;
 }
 
-.btnMoreInformation {
-    position: relative;
-    left: 70%;
-} */
-
-
-
-.icon-white {
-    filter: invert(1);
+.icon-button-style {
+    filter: invert(100%);
+    width: 16px;
+    height: 16px;
 }
