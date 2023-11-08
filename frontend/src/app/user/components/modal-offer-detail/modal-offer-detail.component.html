@@ -1,0 +1,74 @@
+<form [formGroup]="offerForm" (ngSubmit)="sendOffer()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Redacta tu oferta</h3>
+            <button type="button" class="btn-close" aria-label="Close"
+                (click)="activeModal.dismiss('Cross click')"></button>
+        </div>
+
+        <div class="modal-body">
+            <div class="container">
+                <div class="col-lg-12 mb-3">
+                    <div class="col-lg-12 text-center">
+                        <img class="float-end mx-auto" src="../../../assets/icons/collaboration.svg"
+                            alt="collaboration.svg" width="50">
+                        <h4 class="mb-4">Escribe tu propuesta y empieza a colaborar con esta empresa.</h4>
+                    </div>
+
+                    <label for="descriptionPublication" class="form-label">Mensaje</label>
+                    <textarea pInputTextarea class="form-control" formControlName="mensaje"
+                        id="descriptionPublication"></textarea>
+                    <span *ngIf="campoInvalido('mensaje')" class="form-text text-danger">
+                        El mensaje es obligatorio.
+                    </span>
+                </div>
+                <div class="col-lg-12 mb-3">
+                    <label class="form-label" for="img" class="form-label">
+                        Subir un archivo
+                        <span class="text-muted">(Opcional)</span>
+                    </label>
+                    <input type="file" class="form-control" id="imagen" formControlName="archivo"
+                        (change)="onFileInputChange($event)">
+                    <!-- <span *ngIf="campoInvalido('imagen', 'infoPropietario') && 
+                      formulario.get('infoPropietario.imagen')?.hasError('invalidExtension')" class="form-text text-danger">
+                      La extesión del archivo no es válida.
+                    </span>
+                    <span *ngIf="campoInvalido('imagen', 'infoPropietario') &&
+                      formulario.get('infoPropietario.imagen')?.hasError('maxSizeExceeded')" class="form-text text-danger">
+                      El tamaño del archivo excede el límite de 2 MB.
+                    </span>
+                    <span
+                      *ngIf="campoInvalido('imagen', 'infoPropietario') && formulario.get('infoPropietario.imagen')?.hasError('invalidFileCount')"
+                      class="form-text text-danger">
+                      Si va a subir una imágen, debe seleccionar un solo archivo.
+                    </span> -->
+                </div>
+                <div class="col-lg-12 mb-3">
+                    <label for="maximumPrice" class="form-label d-block">Precio de oferta</label>
+                    <div class="p-inputgroup">
+                        <span class="p-inputgroup-addon">$</span>
+                        <p-inputNumber inputId="maximumPrice" mode="decimal" locale="es-CH" currency="CLP"
+                            formControlName="precioOferta">
+                        </p-inputNumber>
+                    </div>
+                    <span *ngIf="campoInvalido('precioOferta')" class="form-text d-block text-danger">
+                        El precio es obligatorio.
+                    </span>
+                </div>
+            </div>
+
+            <!-- DEBUG -->
+            <!-- <div class="container">
+                <pre><b>offerForm.value: </b>{{offerForm.value | json}}</pre>
+                <pre><b>offerForm.errors: </b>{{offerForm.errors | json}}</pre>
+            </div> -->
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss('Cross click')">Cerrar</button>
+            <button type="submit" class="btn btn-primary " data-bs-dismiss="modal" [disabled]="offerForm.invalid">
+                Enviar oferta
+            </button>
+        </div>
+    </div>
+</form>
