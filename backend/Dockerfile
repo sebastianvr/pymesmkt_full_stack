@@ -1,24 +1,19 @@
 FROM node:16-alpine
 
-# Crea el directorio de trabajo de la aplicación
+# Creation of working directory
 WORKDIR /api
 
-# Copia los archivos de la aplicación a la imagen
+# Copies the application files to the image.
 COPY package*.json ./
 COPY package-lock.json ./
 
-# RUN npm i nodemon 
-
-# Instala las dependencias de la aplicación
+# Install the application dependencies
 RUN npm install
-
 COPY . .
-
-# Expone el puerto de la aplicación
 EXPOSE 8080
 
-# Nodemon en modo desarrollo
+# DEV MODE
 # CMD ["npm", "run", "dev"]
 
-# Modo produccion
+# PROD MODE
 # CMD ["npm", "start"]
