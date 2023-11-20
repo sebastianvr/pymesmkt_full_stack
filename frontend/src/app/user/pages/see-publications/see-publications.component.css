@@ -1,23 +1,25 @@
-.dateHeader {
-    display: inline;
+.icon-image {
+    width: 30%;
+    height: auto;
+    max-width: 150px;
 }
 
-.stateHeader {
-    display: inline;
+.icon-button-style {
+    filter: invert(100%);
+    width: 16px;
+    height: 16px;
 }
 
-.tableResume tbody tr td {
-    border-bottom: 1px solid #c8c9ca;
+.card {
+    transition: box-shadow 0.3s;
+    /* Transición suave para la sombra */
 }
 
-.cardMain {
-    min-width: 600px;
-    margin: auto auto;
+.card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    /* Sombras al pasar el mouse sobre la tarjeta */
 }
 
-.p-field{
-    width: 1000px;
-}
-.calendarClass{
-    width: 1000px;
+.customSelect{
+    max-width: 95px;
 }

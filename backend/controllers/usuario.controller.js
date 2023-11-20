@@ -1,126 +1,145 @@
 const { uid } = require('uid');
 const bcryptjs = require('bcryptjs');
+const { minioClient } = require('../minio/connection');
 const { response, request } = require('express');
+const { validationResult } = require('express-validator');
 
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
 const DeleteUsuario = require('../models/deletedUsuario');
 
+
 const usuariosGetAll = async (req = request, res = response) => {
+    console.log('[usuarios] usuariosGetAll()');
 
-    const { page, size } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
+
+    const filter = { estado: true };
+
+    if (req.query.nombre) {
+        filter.titulo = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('nombreUsuario')),
+                {
+                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                },
+            ],
+        };
+    };
+
+    console.log({ filter });
 
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
+        const { count, rows: usuarios } =
+            await Usuario.findAndCountAll({
+                where: filter,
+                limit: pageSize,
+                offset: (page - 1) * pageSize,
+                include: [
+                    {
+                        model: Pyme,
+                        where: { estado: true },
+                    },
+                ]
+            });
 
-        let size = 10
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
-            size = sizeAsNumber;
-        }
+        if (!usuarios.length) {
+            return res.status(200).json({
+                message: 'No se encontraron coincidencias.',
+                usuarios: [],
+            });
+        };
 
-        const usuarios = await Usuario.findAndCountAll({
-            limit: size,
-            offset: page * size,
-            where: { estado: true },
-            include: [
-                {
-                    model: Pyme,
-                    where: { estado: true },
-                },
-            ]
-
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            usuarios,
         });
 
-
-
-        if (usuarios.count === 0) {
-            res.status(200).json({
-                ok: true,
-                usuarios,
-                msg: 'No existen usuarios en la base de datos.'
-            })
-        }
-
-        if (usuarios.count > 0) {
-            res.status(200).json({
-                ok: true,
-                totalPages: Math.ceil(usuarios.count / size),
-                content: usuarios.rows,
-            });
-        }
-
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
-            ok: false,
+        console.error({ error });
+        return res.status(500).json(
+            { error: 'Error en el servidor' },
             error,
-            msg: 'Error al obtener usuarios.'
-        })
+        );
     }
 }
 
 const usuariosGetAllSuspended = async (req = request, res = response) => {
+    console.log('[usuarios] usuariosGetAllSuspended()');
 
-    const { page, size } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
+
+    const filter = {
+        estado: false,
+    };
+
+    if (req.query.nombreUsuario) {
+        filter.titulo = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('nombreUsuario')),
+                {
+                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                },
+            ],
+        };
+    };
+
+    console.log({ filter });
 
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
+        const { count, rows: usuarios } =
+            await Usuario.findAndCountAll({
+                where: filter,
+                limit: pageSize,
+                offset: (page - 1) * pageSize,
+                include: [
+                    {
+                        model: Pyme,
+                        where: { estado: true },
+                    },
+                ]
+            });
 
-        let size = 10
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
-            size = sizeAsNumber;
-        }
+        if (!usuarios.length) {
+            return res.status(200).json({
+                message: 'No se encontraron coincidencias.',
+                usuarios: [],
+            });
+        };
 
-        const usuarios = await Usuario.findAndCountAll({
-            limit: size,
-            offset: page * size,
-            where: { estado: false },
-            include: [
-                {
-                    model: Pyme,
-                    where: { estado: true },
-                },
-            ]
-
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            usuarios,
         });
 
-        console.log({ usuarios })
-        if (usuarios.count === 0) {
-            res.status(200).json({
-                ok: true,
-                usuarios,
-                msg: 'No existen usuarios suspendidos en la base de datos.'
-            })
-        }
-
-        if (usuarios.count > 0) {
-            res.status(200).json({
-                ok: true,
-                totalPages: Math.ceil(usuarios.count / size),
-                content: usuarios.rows,
-            });
-        }
-
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
-            ok: false,
+        console.error({ error });
+        return res.status(500).json(
+            { error: 'Error en el servidor' },
             error,
-            msg: 'Error al obtener usuarios suspendidos.'
-        })
+        );
     }
+
+
+
 }
 
 const usuariosGetAllDeleted = async (req = request, res = response) => {
@@ -176,22 +195,45 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
 }
 
 const usuarioGet = async (req = request, res = response) => {
-
     const { id } = req.params;
     try {
         const usuario = await Usuario.findByPk(id, {
-            where: { estado: true }
+            where: { estado: true },
+            include: [
+                {
+                    model: Pyme,
+                    where: { estado: true },
+                },
+            ],
         })
 
-        if (usuario) {
-            res.status(200).json(usuario);
+        if (!usuario) {
+            return res.status(400).json({
+                msg: `No existe usuario con id: ${id}`
+            })
         }
-        else res.status(400).json({
-            msg: `No existe usuario con id: ${id}`
-        })
+
+        if (usuario.imagen) {
+            const method = 'GET';
+            const nameBucket = 'images-bucket';
+            const pathImage = usuario.imagen;
+            const expiration = (3600 * 24 * 7);  // (segundos * horas * dias)
+
+            const url = await minioClient.presignedUrl(
+                method,
+                nameBucket,
+                pathImage,
+                expiration
+            );
+
+            console.log({ url });
+            usuario.imagen = url;
+        }
+
+        return res.status(200).json(usuario);
 
     } catch (error) {
-        console.log(error)
+        console.log({error});
     }
 }
 
@@ -325,98 +367,90 @@ const usuarioDelete = async (req = request, res = response) => {
 }
 
 const suspendUser = async (req = request, res = response) => {
-
-    const { id } = req.params
+    const { id } = req.params;
 
     try {
-        // buscar usuario
-        const usuario = await Usuario.findByPk(id)
+        const usuario = await Usuario.findByPk(id);
 
         if (!usuario) {
             return res.status(400).json({
                 ok: false,
-                msg: 'No existe usuario en bd'
-            })
+                msg: 'No existe usuario en bd',
+            });
         }
 
-        // Encontrar usuario y actualizar su estado
         const usuarioSuspendido = await Usuario.update(
             { estado: false },
-            { where: { id } }
+            { where: { id } },
         );
 
         return res.status(200).json({
             ok: true,
-            msg: 'Usuario eliminado de la bd'
+            msg: 'Usuario suspendido de la bd',
+            usuario: usuarioSuspendido,
         })
 
     } catch (error) {
-        console.log(error)
+        console.log(error);
         return res.status(400).json({
             ok: false,
-            msg: 'Error al eliminar usuario'
-        })
+            msg: 'Error al suspender usuario',
+        });
     }
 }
 
 const usuarioSuspended = async (req = request, res = response) => {
-
-    const { id } = req.params
-
+    const { id } = req.params;
     try {
-        const busqueda = await Usuario.findByPk(id)
+        const busqueda = await Usuario.findByPk(id);
 
         if (!busqueda) {
             return res.status(400).json({
                 ok: false,
-                msg: 'No existe usuario en bd'
-            })
+                msg: 'No existe usuario en bd',
+            });
         }
 
-        const usuario = await Usuario.update({ estado: 0 }, {
-            where: { id },
-        });
+        const usuario = await Usuario.update(
+            { estado: 0 },
+            { where: { id } },
+        );
 
-        console.log('usuario', usuario)
+        console.log('usuario', usuario);
         res.status(200).json({
             ok: true,
-            msg: 'Usuario suspendido de la bd'
-        })
-    } catch (error) {
+            msg: 'Usuario suspendido de la bd',
+        });
 
-        console.log(error)
+    } catch (error) {
+        console.log(error);
         res.status(400).json({
             ok: false,
-            msg: 'Error al suspender usuario'
-        })
+            msg: 'Error al suspender usuario',
+        });
     }
 }
 
 const usuarioActivatePut = async (req = request, res = response) => {
-
-    const { id } = req.params
+    const { id } = req.params;
 
     try {
         const usuario = await Usuario.update({ estado: 1 }, {
-            where: {
-                id: id
-            },
+            where: { id },
         });
 
-        // console.log(usuario)
         res.status(200).json({
             ok: true,
-            msg: 'Usuario activado'
-        })
-
-
+            msg: 'Usuario activado',
+            usuario
+        });
 
     } catch (error) {
-        console.log(error)
+        console.log(error);
         res.status(400).json({
             ok: false,
-            msg: 'Error al activar usuario'
-        })
+            msg: 'Error al activar usuario',
+        });
     }
 }
 

@@ -1,11 +1,10 @@
-const { uid } = require('uid');
-const bcryptjs = require('bcryptjs');
 const { response, request } = require('express');
+const bcryptjs = require('bcryptjs');
+const { uid } = require('uid');
+const { createJWT } = require('../helpers/create-jwt');
 
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
-const { createJWT } = require('../helpers/create-jwt');
-
 
 const signInPost = async (req = request, res = response) => {
     //Id unico de 15 caracteres, para cada nuevo usuario creado
@@ -18,12 +17,14 @@ const signInPost = async (req = request, res = response) => {
         apellidos,
         run,
         emailUsuario,
+        imagen,
         contrasenia,
         comuna,
         region,
         dir1Propietario,
         dir2Propietario,
         descripcion,
+        rol,
 
         // Atributos para tabla Pymes
         nombrePyme,
@@ -42,13 +43,15 @@ const signInPost = async (req = request, res = response) => {
     const password = bcryptjs.hashSync(contrasenia, salt);
 
     // generar JWT
-    const token = await createJWT(myId, nombreUsuario);
+    console.log('before createJWT')
+    const token = await createJWT(myId, nombreUsuario, 'CLIENT-USER');
 
     const nuevoUsuario = {
         id: myId,
         nombreUsuario,
         apellidos,
         emailUsuario,
+        imagen,
         run,
         contrasenia: password,
         comuna,
@@ -56,7 +59,7 @@ const signInPost = async (req = request, res = response) => {
         dir1Propietario,
         dir2Propietario,
         descripcion,
-        rol: 'CLIENT-USER',
+        rol,
         Pyme: {
             id: uid(15),
             nombrePyme,
@@ -83,7 +86,7 @@ const signInPost = async (req = request, res = response) => {
             nombreUsuario,
             token
         })
-        
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -95,77 +98,62 @@ const signInPost = async (req = request, res = response) => {
 }
 
 const existeCorreo = async (req = request, res = response) => {
-
-    const { correo } = req.params
-
+    const { correo } = req.params;
     try {
         const usuario = await Usuario.findOne({ where: { emailUsuario: correo } });
         if (usuario) {
             res.status(200).json({
                 state: true,
-                msg: 'Este correo ya está registrado en la bd'
-            })
+                msg: 'Este correo ya está registrado en la bd',
+            });
         } else {
             res.status(200).json({
                 state: false,
-                msg: 'Este correo esta disponible para registrar'
-            })
+                msg: 'Este correo esta disponible para registrar',
+            });
         }
-
-
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }
 
 const existeRun = async (req = request, res = response) => {
-
-    const { run } = req.params
-
+    const { run } = req.params;
     try {
         const usuario = await Usuario.findOne({ where: { run } });
         if (usuario) {
             res.status(200).json({
                 state: true,
-                msg: 'Este run ya está registrado en la bd'
+                msg: 'Este run ya está registrado en la bd',
             })
         } else {
             res.status(200).json({
                 state: false,
-                msg: 'Este run esta disponible para registrar'
+                msg: 'Este run esta disponible para registrar',
             })
         }
-
-
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }
 
 const existeRut = async (req = request, res = response) => {
-
-    const { rut } = req.params
-
+    const { rut } = req.params;
     try {
         const usuario = await Pyme.findOne({ where: { rut } });
         if (usuario) {
             res.status(200).json({
                 state: true,
-                msg: 'Este rut ya está registrado en la bd'
-            })
+                msg: 'Este rut ya está registrado en la bd',
+            });
         } else {
             res.status(200).json({
                 state: false,
-                msg: 'Este rut esta disponible para registrar'
-            })
+                msg: 'Este rut esta disponible para registrar',
+            });
         }
-
-
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }
 
@@ -173,5 +161,5 @@ module.exports = {
     signInPost,
     existeCorreo,
     existeRun,
-    existeRut
+    existeRut,
 };

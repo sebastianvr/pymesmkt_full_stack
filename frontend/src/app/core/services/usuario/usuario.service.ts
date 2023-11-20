@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../environments/environment.prod';
+import { environment } from 'src/environments/environment.prod';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -21,17 +21,20 @@ export class UsuarioService {
     return this.refreshUsuarios
   }
 
-  getAllUsuarios(page: number = 0, size: number = 0): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/usuario/?size=${size}&page=${page}`)
+  getUsuario(id: string): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/usuario/${id}`);
+  }
 
+  getAllUsuarios(page: number = 0, size: number = 0): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/usuario/?pageSize=${size}&page=${page}`);
   }
 
   getAllUsuariosSuspended(page: number = 0, size: number = 0) {
-    return this.http.get<any>(`${this.url}/api/usuario/suspended/?size=${size}&page=${page}`)
+    return this.http.get<any>(`${this.url}/api/usuario/suspended/?pageSize=${size}&page=${page}`);
   }
 
   getAllUsuariosDeleted(page: number = 0, size: number = 0) {
-    return this.http.get<any>(`${this.url}/api/usuario/deleted/?size=${size}&page=${page}`)
+    return this.http.get<any>(`${this.url}/api/usuario/deleted/?size=${size}&page=${page}`);
   }
 
   suspenderUsuario(id: any) {
@@ -39,7 +42,7 @@ export class UsuarioService {
       .pipe(
         tap(() => {
           this.refresh.next();
-        })
+        }),
       );
   }
 
@@ -48,7 +51,7 @@ export class UsuarioService {
     .pipe(
       tap(() => {
         this.refresh.next();
-      })
+      }),
     );
   }
 
@@ -57,7 +60,7 @@ export class UsuarioService {
       .pipe(
         tap(() => {
           this.refresh.next();
-        })
+        }),
       );
   }
 }

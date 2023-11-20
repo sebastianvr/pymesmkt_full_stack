@@ -1,11 +1,9 @@
 <div class="container-fluid">
-
-
     <div *ngIf="!esAdmin">
         <!-- Inicio de sesión para clientes -->
-        <div class="container card mt-5" style="max-width:500px;">
+        <div class="container card mt-5 cardCustom">
             <div>
-                <button (click)="esAdmin = !esAdmin" class="btn btn-primary btn-sm float-end mt-3">
+                <button (click)="esAdmin = !esAdmin; resetForm()" class="btn btn-primary btn-sm float-end mt-3">
                     {{ esAdmin ? 'Iniciar sesión Pymes' : 'Iniciar sesión Administrador' }}
                 </button>
             </div>
@@ -15,7 +13,7 @@
                     <img class="mt-4" src="../../../assets/icons/user.svg" alt="user" width="106" height="85">
 
                 </div>
-                <h1 class="h3 mb-3 pt-2 fw-normal text-center">Pymes</h1>
+                <h1 class="h3 mb-3 pt-2 fw-normal text-center"><strong>Pymes</strong></h1>
 
                 <div class="mb-3">
                     <label for="exampleDropdownFormEmail1" class="form-label">Correo electrónico</label>
@@ -33,33 +31,23 @@
                         La contraseña es obligatoria.
                     </span>
                 </div>
-                <!-- <div class="mb-3">
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="dropdownCheck">
-                      <label class="form-check-label" for="dropdownCheck">
-                        Recordar cuenta
-                      </label>
-                    </div>
-                  </div> -->
                 <button role="link" class="btn btn-primary">Acceder</button>
             </form>
 
         </div>
         <p-toast></p-toast>
-        <div class="container card my-3 text-center" style="max-width:500px;">
-
+        <div class="container card cardCustom my-3 text-center">
             <p class="pt-3"> ¿No tienes cuenta?
                 <a class="link-primary" routerLink="/visitor/registro">Regístrate</a>
             </p>
-
         </div>
     </div>
 
     <div *ngIf="esAdmin">
         <!-- Inicio de sesión para administradores -->
-        <div class="container card mt-5" style="max-width:500px;">
+        <div class="container card mt-5 cardCustom">
             <div>
-                <button (click)="esAdmin = !esAdmin" class="btn btn-primary btn-sm float-end mt-3">
+                <button (click)="esAdmin = !esAdmin; resetForm()" class="btn btn-primary btn-sm float-end mt-3">
                     {{ esAdmin ? 'Iniciar sesión Pymes' : 'Iniciar sesión Administrador' }}
                 </button>
             </div>
@@ -67,9 +55,8 @@
             <form [formGroup]="formularioLogin" (ngSubmit)="login()" class="px-4 py-3">
                 <div class="container text-center">
                     <img class="mt-4" src="../../../assets/icons/user.svg" alt="user" width="106" height="85">
-
                 </div>
-                <h1 class="h3 mb-3 pt-2 fw-normal text-center">Administradores</h1>
+                <h1 class="h3 mb-3 pt-2 fw-normal text-center"><strong>Administradores</strong></h1>
 
                 <div class="mb-3">
                     <label for="exampleDropdownFormEmail1" class="form-label">Correo electrónico</label>
@@ -87,24 +74,9 @@
                         La contraseña es obligatoria.
                     </span>
                 </div>
-                <!-- <div class="mb-3">
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="dropdownCheck">
-                      <label class="form-check-label" for="dropdownCheck">
-                        Recordar cuenta
-                      </label>
-                    </div>
-                  </div> -->
                 <button role="link" class="btn btn-primary">Acceder</button>
             </form>
-
         </div>
         <p-toast></p-toast>
-        
     </div>
-
-
-
-
-
 </div>

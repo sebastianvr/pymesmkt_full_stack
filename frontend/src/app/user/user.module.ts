@@ -24,6 +24,8 @@ import { MainComponent } from './pages/main/main.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from 'primeng/api';
 import { OfferDetailComponent } from './pages/offer-detail/offer-detail.component';
+import { FilterPublicationComponent } from './components/filter-publication/filter-publication.component';
+import { ModalOfferDetailComponent } from './components/modal-offer-detail/modal-offer-detail.component';
 
 
 const components = [
@@ -43,11 +45,13 @@ const components = [
   PostCardPymeComponent,
   MainComponent,
   OfferDetailComponent,
+  FilterPublicationComponent,
 ]
 
 @NgModule({
   declarations: [
     ...components,
+    ModalOfferDetailComponent
   ],
   imports: [
     CommonModule,

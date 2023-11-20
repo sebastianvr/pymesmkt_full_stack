@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const db = require('../db/connection');
 
-
 const Oferta = db.define(
     'Oferta',
     {
@@ -10,32 +9,37 @@ const Oferta = db.define(
             primaryKey: true,
         },
         mensaje: {
-            type: DataTypes.TEXT
+            type: DataTypes.TEXT,
         },
         precioOferta: {
             type: DataTypes.INTEGER,
         },
-        // ESTADOS DE OFERTA
-        // DISPONIBLE: oferta que no ha sido rechazada ni pagada.
-        // FINALIZADA: oferta pagada.
+        /**
+         * ESTADOS DE OFERTA
+         * DISPONIBLE: oferta que no ha sido rechazada ni pagada.
+         * FINALIZADA: oferta pagada. 
+         * */
         procesoDeOferta: {
             type: DataTypes.ENUM('FINALIZADA', 'DISPONIBLE', 'RECHAZADA'),
-            defaultValue: 'DISPONIBLE' 
+            defaultValue: 'DISPONIBLE',
         },
-        // Eliminacion, SOLO MODIFICO A FALSO, AUN EXISTE!
+        /** 
+         * Para la ELIMINACIÓN, 
+         * SOLO SE MODIFICA A FALSO, AUN EXISTE!
+         * */
         estado: {
             type: DataTypes.BOOLEAN,
-            defaultValue: true
+            defaultValue: true,
         },
         createdAt: {
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
         },
         updatedAt: {
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
         },
     },
     {
-        indexes: [{ unique: true, fields: ['id'] }]
+        indexes: [{ unique: true, fields: ['id'] }],
     });
 
 module.exports = Oferta;

@@ -2,51 +2,61 @@
     <div class="d-flex justify-content-center">
 
         <div class="container">
-            <div class="col-md-12 g-5 pt-4">
+            <div class="col-md-12 pt-2">
                 <form [formGroup]="formularioPublicacion" (ngSubmit)="enviarPublicacion()">
 
-                    <!-- Producto o servicio botones -->
+                    <!-- OPCIONES -->
                     <div class="container">
                         <div class="col-md-12 text-center mb-3">
-                            <h3 class="queDeseas fs-1 text-center d-inline pb-2">¿Qué deseas publicar? </h3>
+                            <h3 class="fs-1 text-center d-inline"><b>¿Qué deseas publicar?</b></h3>
                             <a class="descripcionLabel d-block text-muted">(Selecciona una opción)</a>
                         </div>
 
-                        <div class="row">
-                            <div class="col-6 text-end">
-                                <label class="btn btn-primary fs-4">
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-md-4 text-center my-1">
+                                <label class="btn btn-primary fs-4"
+                                    [ngClass]="{ 'btn-success': selectedOption === 'Producto' }">
                                     <input class="inputRadio" type="radio" value="Producto"
                                         (click)="limpiarFormulario('Producto')" formControlName="productoOServicio">
-                                    Producto
+                                    <div class="d-flex flex-column align-items-center">
+                                        <img src="../../../../assets/icons/new-product.svg" alt="new-product.svg"
+                                            class="icon-buttons-style">
+                                        <b>PRODUCTO</b>
+                                    </div>
                                 </label>
                             </div>
-                            <div class="col-6 text-start">
-                                <label class="btn btn-primary fs-4">
+                            <div class="col-md-4 text-center my-1">
+                                <label class="btn btn-primary fs-4"
+                                    [ngClass]="{ 'btn-success': selectedOption === 'Servicio' }">
                                     <input class="inputRadio" type="radio" value="Servicio"
                                         (click)="limpiarFormulario('Servicio')" formControlName="productoOServicio">
-                                    Servicio
+                                    <div class="d-flex flex-column align-items-center">
+                                        <img src="../../../../assets/icons/new-service.svg" alt="new-service.svg"
+                                            class="icon-buttons-style" style="width: 25px;">
+                                        <b>SERVICIO</b>
+                                    </div>
                                 </label>
                             </div>
-
-                            <hr class="my-3">
                         </div>
+                        <hr>
                     </div>
 
-                    <!-- Formulario para un PRODUCTO -->
-                    <div class="row g-3"
-                        *ngIf="this.formularioPublicacion.get('productoOServicio')?.value == 'Producto'">
+                    <!-- Formulario PRODUCTO -->
+                    <div class="row" *ngIf="this.formularioPublicacion.get('productoOServicio')?.value == 'Producto'">
 
-                        <div class="col-md-12">
-                            <img class="iconPublicacion float-end dmx-auto" src="../../../assets/icons/box-seam.svg"
-                                alt="pen.svg" width="80">
-                            <h3 class="fs-4 d-inline">Publica el producto que necesitas</h3>
+                        <div class="col-md-12 mb-2">
+                            <img class="iconPublicacion float-end" src="../../../assets/icons/new-product.svg"
+                                alt="new-product.svg" width="80">
+                            <h3 class="fs-4 d-inline">Publica el <i><b>producto</b></i> que necesitas:</h3>
                         </div>
 
                         <!-- Titulo -->
-                        <div class="col-sm-12">
-                            <label for="titlePublication" class="form-label">Título <a
-                                    class="descripcionLabel text-muted">(Escribe el nombre del producto que deseas
-                                    buscar)</a></label>
+                        <div class="col-md-12 mb-2">
+                            <label for="titlePublication" class="form-label">Título
+                                <a class="descripcionLabel text-muted">
+                                    (Escribe el nombre del producto que deseas buscar)
+                                </a>
+                            </label>
                             <input pInputText type="text" formControlName="titulo" class="form-control"
                                 id="titlePublication">
                             <span *ngIf="campoInvalido('titulo')" class="form-text text-danger">
@@ -55,7 +65,7 @@
                         </div>
 
                         <!-- Descripción -->
-                        <div class="col-sm-12">
+                        <div class="col-md-12 mb-2">
                             <label for="descriptionPublication" class="form-label">Descripción</label>
                             <textarea pInputTextarea class="form-control" formControlName="descripcion"
                                 id="descriptionPublication"></textarea>
@@ -65,22 +75,24 @@
                         </div>
 
                         <!-- Color -->
-                        <div class="col-md-6">
-                            <label for="colorInput" class="form-label">Color <a
-                                    class="descripcionLabel text-muted">(Opcional)</a></label>
+                        <div class="col-md-6 mb-2">
+                            <label for="colorInput" class="form-label">Color
+                                <a class="descripcionLabel text-muted">(Opcional)</a>
+                            </label>
                             <input pInputText type="text" formControlName="color" class="form-control" id="colorInput">
                         </div>
 
                         <!-- Modelo -->
-                        <div class="col-md-6">
-                            <label for="modeloInput" class="form-label">Modelo <a
-                                    class="descripcionLabel text-muted">(Opcional)</a></label>
+                        <div class="col-md-6 mb-2">
+                            <label for="modeloInput" class="form-label">Modelo
+                                <a class="descripcionLabel text-muted">(Opcional)</a>
+                            </label>
                             <input pInputText type="text" formControlName="modelo" class="form-control"
                                 id="modeloInput">
                         </div>
 
                         <!-- Garantía -->
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-2">
                             <label for="">Garantía</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" [value]="true" formControlName="garantia"
@@ -99,18 +111,18 @@
                         </div>
 
                         <!-- Años de garantia -->
-                        <div class="col-md-6 p-grid p-fluid p-0">
+                        <div class="col-md-6 mb-2">
                             <label for="aniosGarantia" class="form-label">Años de garantía
                                 <a class="descripcionLabel text-muted">
                                     (Opcional)
                                 </a>
                             </label>
-                            <input pInputNumber type="number"
-                                formControlName="aniosGarantia" class="form-control" id="aniosGarantia" min="0">
+                            <input pInputNumber type="number" formControlName="aniosGarantia" class="form-control"
+                                id="aniosGarantia" min="0">
                         </div>
 
                         <!-- Cantidad de productos -->
-                        <div class="col-md-6 col-xs-12">
+                        <div class="col-md-6 mb-2">
                             <label for="horizontal" class="form-label d-block">Cantidad de productos</label>
                             <p-inputNumber (onBlur)="calcularTotal()" formControlName="cantidad" [showButtons]="true"
                                 buttonLayout="horizontal" [min]="1" name="horizontal" inputId="horizontal"
@@ -120,23 +132,25 @@
                         </div>
 
                         <!-- Precio por unidad -->
-                        <div class="col-md-6 col-xs-12">
+                        <div class="col-md-6 mb-2">
                             <label for="precioUnidad" class="form-label d-block">Precio por unidad</label>
                             <div class="p-inputgroup">
                                 <span class="p-inputgroup-addon">$</span>
                                 <p-inputNumber (onBlur)="calcularTotal()" inputId="precioUnidad"
                                     formControlName="precioPorUnidad" mode="decimal" locale="es-CH"
-                                    name="precioPorUnidad"></p-inputNumber>
+                                    name="precioPorUnidad">
+                                </p-inputNumber>
                             </div>
                         </div>
 
                         <!-- Precio total a pagar -->
-                        <div class="col-md-12">
+                        <div class="col-md-12 mb-2">
                             <label for="maximumPrice" class="form-label d-block">Precio total a pagar</label>
                             <div class="p-inputgroup">
                                 <span class="p-inputgroup-addon">$</span>
                                 <p-inputNumber inputId="maximumPrice" name="maximumPrice" formControlName="totalPrecio"
-                                    mode="decimal" locale="es-CH" currency="CLP" name="maximumPrice"></p-inputNumber>
+                                    mode="decimal" locale="es-CH" currency="CLP" name="maximumPrice">
+                                </p-inputNumber>
                             </div>
                             <span *ngIf="campoInvalido('totalPrecio')" class="form-text text-danger">
                                 El precio total es obligatorio.
@@ -144,7 +158,7 @@
                         </div>
 
                         <!-- Subir archivos -->
-                        <div class="mb-3 col-md-12">
+                        <div class="col-md-12 mb-2">
                             <label for="files[]" class="mb-2">Subir archivos</label>
                             <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
                                 [showUploadButton]="false" url="./upload.php" (onUpload)="onUpload($event)"
@@ -158,23 +172,23 @@
                         </div>
 
                         <!-- Boton para enviar -->
-                        <div class="container">
-                            <button 
-                                class="float-end btn btn-primary btn-lg mb-3">Publicar</button>
+                        <div class="row">
+                            <div class="container mb-5">
+                                <button class="float-end btn btn-primary">Publicar</button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Formulario para un SERVICIO -->
-                    <div class="row g-3"
-                        *ngIf="this.formularioPublicacion.get('productoOServicio')?.value == 'Servicio'">
-                        <div class="col-md-12">
-                            <img class="iconPublicacion float-end dmx-auto" src="../../../assets/icons/puzzle.svg"
-                                alt="pen.svg" width="80">
-                            <h3 class="fs-4 d-inline">Publica el servicio que necesitas</h3>
+                    <!-- Formulario SERVICIO -->
+                    <div class="row" *ngIf="this.formularioPublicacion.get('productoOServicio')?.value == 'Servicio'">
+                        <div class="col-md-12 mb-2">
+                            <img class="iconPublicacion float-end" src="../../../../assets/icons/new-service.svg"
+                                alt="new-service.svg" width="80">
+                            <h3 class="fs-4 d-inline">Publica el <i><b>servicio</b></i> que necesitas:</h3>
                         </div>
 
                         <!-- Titulo -->
-                        <div class="col-sm-12">
+                        <div class="col-md-12 mb-2">
                             <label for="titlePublication" class="form-label">Título
                                 <a class="descripcionLabel text-muted">(Escribe el servicio que deseas buscar)</a>
                             </label>
@@ -183,11 +197,10 @@
                             <span *ngIf="campoInvalido('titulo')" class="form-text text-danger">
                                 El titulo es obligatorio.
                             </span>
-
                         </div>
 
                         <!-- Descripcion -->
-                        <div class="col-sm-12">
+                        <div class="col-md-12 mb-2">
                             <label for="descriptionPublication" class="form-label">Descripción</label>
                             <textarea pInputTextarea class="form-control" formControlName="descripcion"
                                 id="descriptionPublication"></textarea>
@@ -197,7 +210,7 @@
                         </div>
 
                         <!-- Garantia -->
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-2">
                             <label for="">Garantía</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" [value]="true" formControlName="garantia"
@@ -216,7 +229,7 @@
                         </div>
 
                         <!-- Años de garantia -->
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-2">
                             <label for="aniosGarantia" class="form-label">Años de garantía
                                 <a class="descripcionLabel text-muted">
                                     (Opcional)
@@ -230,7 +243,7 @@
                         </div>
 
                         <!-- Precio total -->
-                        <div class="col-md-12">
+                        <div class="col-md-12 mb-2">
                             <label for="maximumPrice" class="form-label d-block">Precio total a pagar</label>
                             <div class="p-inputgroup">
                                 <span class="p-inputgroup-addon">$</span>
@@ -244,7 +257,7 @@
                         </div>
 
                         <!-- Fecha inicio -->
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-6 mb-2">
                             <label for="dateTermination" class="form-label d-block">Fecha de inicio del servicio</label>
                             <div class="p-inputgroup">
                                 <p-calendar class="" [showIcon]="true" icon="pi pi-calendar-plus"
@@ -258,7 +271,7 @@
                         </div>
 
                         <!-- Fecha finalizacion -->
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-6 mb-2">
                             <label for="dateTermination" class="form-label d-block">Fecha de finalización del
                                 servicio</label>
                             <div class="p-inputgroup">
@@ -273,7 +286,7 @@
                         </div>
 
                         <!-- Horas a trabajar -->
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-6 mb-2">
                             <label for="horasATrabajar" class="form-label">Cantidad de horas a trabajar
                                 <a class="descripcionLabel text-muted">(Opcional)</a>
                             </label>
@@ -282,7 +295,7 @@
                         </div>
 
                         <!-- Subir archivos -->
-                        <div class="mb-3 col-md-12">
+                        <div class="col-md-12 mb-3">
                             <label for="files[]" class="mb-2">Subir archivos</label>
                             <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
                                 [showUploadButton]="false" url="./upload.php" (onUpload)="onUpload($event)"
@@ -295,10 +308,12 @@
                             </p-fileUpload>
                         </div>
 
-                        <!-- Boton para enviar -->
-                        <div class="container">
-                            <button (click)="this.formularioPublicacion.markAllAsTouched()"
-                                class="float-end btn btn-primary btn-lg mb-3">Publicar</button>
+                        <!-- BOTON ENVIAR-->
+                        <div class="row">
+                            <div class="container mb-5">
+                                <button (click)="this.formularioPublicacion.markAllAsTouched()"
+                                    class="float-end btn btn-primary">Publicar</button>
+                            </div>
                         </div>
                     </div>
                 </form>

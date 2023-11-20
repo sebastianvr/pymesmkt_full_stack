@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, CanLoad, Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { AuthService } from '../services/auth/auth.service';
 
 @Injectable({
@@ -14,10 +14,8 @@ export class AdminGuard implements CanActivate, CanLoad {
   ) { }
 
   canActivate(): Observable<boolean> | boolean {
-
-    console.log(this.authService.usuario)
     return this.authService.validarToken()
-      .pipe(tap(valid => {
+      .pipe(map(valid => {
         if (valid && this.authService.usuario.rol === 'ADMIN-USER') {
           return true;
         } else {
@@ -25,13 +23,12 @@ export class AdminGuard implements CanActivate, CanLoad {
           return false;
         }
       }));
-
   }
 
   canLoad(): Observable<boolean> | boolean {
     console.log(this.authService.usuario)
     return this.authService.validarToken()
-      .pipe(tap(valid => {
+      .pipe(map(valid => {
         if (valid && this.authService.usuario.rol === 'ADMIN-USER') {
           return true;
         } else {
@@ -39,6 +36,5 @@ export class AdminGuard implements CanActivate, CanLoad {
           return false;
         }
       }));
-
   }
 }

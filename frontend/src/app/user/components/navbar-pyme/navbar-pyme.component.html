@@ -1,47 +1,35 @@
-<header class="p-3 mb-3 border-bottom">
+<header class="p-3 border-bottom">
     <div class="container">
         <div class="row">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-
-                <div>
-                    <app-sidebar-user></app-sidebar-user>
+            <div class="col-12 d-flex align-items-center justify-content-between">
+                <!-- Contenido a la izquierda -->
+                <div class="d-flex align-items-center">
+                    <div class="mx-3">
+                        <app-sidebar-user 
+                        nameUser="{{nombreUsuario}}"
+                        ></app-sidebar-user>
+                    </div>
+                    <a routerLink="/user" class="navbar-brand text-dark text-decoration-none hide-on-small-screen">
+                        <img class="mx-2" src="../../../../assets/icons/factory.svg" alt="factory.svg">
+                        <strong class="smaller-text">Pymes Marketplace</strong>
+                    </a>
                 </div>
 
-                <a class="d-flex  mx-4 align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                        class="bi bi-building" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd"
-                            d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022zM6 8.694 1 10.36V15h5V8.694zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5V15z" />
-                        <path
-                            d="M2 11h1v1H2v-1zm2 0h1v1H4v-1zm-2 2h1v1H2v-1zm2 0h1v1H4v-1zm4-4h1v1H8V9zm2 0h1v1h-1V9zm-2 2h1v1H8v-1zm2 0h1v1h-1v-1zm2-2h1v1h-1V9zm0 2h1v1h-1v-1zM8 7h1v1H8V7zm2 0h1v1h-1V7zm2 0h1v1h-1V7zM8 5h1v1H8V5zm2 0h1v1h-1V5zm2 0h1v1h-1V5zm0-2h1v1h-1V3z" />
-                    </svg>
-                    <strong class="mx-2">Pymes Marketplace</strong>
-                </a>
-                
-
-                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                    <!-- <li><a  class="nav-link px-2 link-dark">¿Quiénes somos?</a></li> -->
-                    <!-- <li><a  class="nav-link px-2 link-dark">Contáctanos</a></li> -->
-                </ul>
-
-
-                <div class="dropdown text-end">
-                    <div class="d-inline ">
-                        <h4 class="d-inline fs-5 ml-2">Bienvenido {{nombreUsuario | titlecase }}</h4>
-
-                    </div>
-                    <div class="d-inline mx-3"></div>
+                <!-- Contenido a la derecha -->
+                <div class="dropdown">
                     <a class="d-inline link-dark text-decoration-none dropdown-toggle" id="dropdownUser1"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="../../../../assets/icons/people-circle.svg" alt="Foto usuario" width="32" height="32"
                             class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                        <li><a routerLink="/user/my-profile" class="dropdown-item" >Mi Perfil</a></li>
-                        <li><a class="dropdown-item" >Términos y condiciones</a></li>
+                        <li><a class="dropdown-item">Términos y condiciones</a></li>
+                        <li><a class="dropdown-item">¿Quiénes somos?</a></li>
+                        <li><a class="dropdown-item">Contáctanos</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
+                        <li><a routerLink="/user/my-profile" class="dropdown-item">Mi Perfil</a></li>
                         <li><a class="dropdown-item" (click)="logOut()">Cerrar sesión</a></li>
                     </ul>
                 </div>

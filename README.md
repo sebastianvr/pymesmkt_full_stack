@@ -1,3 +1,29 @@
+# **Ejecución de Docker en modo desarrollo**
+
+Este proyecto utiliza Docker para facilitar la configuración del entorno de desarrollo. A continuación, se describe cómo ejecutar el proyecto en modo desarrollo utilizando Docker Compose.
+
+### Requisitos previos
+
+- Docker y Docker Compose deben estar instalados en tu máquina.
+
+## __Instrucciones__
+
+1. Clona el repositorio en tu máquina local.
+
+```bash
+git clone https://github.com/tu-usuario/tu-repositorio.git
+```
+
+2. Accede al directorio raíz del proyecto.
+
+```bash
+cd tu-repositorio
+```
+3. Ejecuta el siguiente comando para construir y levantar los contenedores.
+
+```bash
+docker-compose up
+```
 
 # **Tools used in this project**
 

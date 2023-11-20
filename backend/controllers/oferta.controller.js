@@ -1,5 +1,7 @@
-const { uid } = require('uid');
+const { validationResult } = require('express-validator');
 const { response, request } = require('express');
+const { uid } = require('uid');
+const { Sequelize } = require('sequelize');
 
 const Usuario = require('../models/usuario');
 const Oferta = require('../models/oferta');
@@ -7,12 +9,10 @@ const Publicacion = require('../models/publicacion');
 const Pyme = require('../models/pyme');
 
 
-// Obtiene una sola oferta usando el id de la oferta
 const ofertaGetById = async (req = request, res = response) => {
-
+    console.log('[ofertas] ofertaGetById()')
     const { IdOferta } = req.params;
 
-    // console.log('IdOferta', IdOferta)
     if (!IdOferta) {
         return res.status(400).json({
             ok: false,
@@ -35,9 +35,8 @@ const ofertaGetById = async (req = request, res = response) => {
                     //     where
                     // }
                 }
-
             ]
-        })
+        });
 
         // console.log(oferta)
         if (!oferta) {
@@ -49,196 +48,234 @@ const ofertaGetById = async (req = request, res = response) => {
 
         res.status(200).json({
             ok: true,
-            oferta
+            oferta,
         });
-
     } catch (error) {
         console.log(error);
-        res.status(400).json({
+        res.status(500).json({
             ok: false,
             error,
             msg: 'Error en ofertaGetById()',
         });
     }
-
-
 }
 
+// Obtiene ofertas recibidas de un usuario, usando su id
 const ofertasRecibidasGetById = async (req = request, res = response) => {
+    console.log('[ofertas] ofertasRecibidasGetById()')
+    const { idUsuario } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const { UsuarioId } = req.params;
-    // console.log('UsuarioId : ', UsuarioId)
-    try {
-        const ofertas = await Publicacion.findAll({
-            where: {
-                UsuarioId,
-                estado: true,
-                procesoDePublicacion: 'INICIADA'
-            },
-            include: [
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
+
+    // aqui esta mal
+    // debo buscar ofertasRecibidasGetById mas bien es get ofertas recibidas a un UsuarioId O ALGO ASI
+    const filter = {
+        UsuarioId: idUsuario,
+        estado: true,
+        procesoDeOferta: 'DISPONIBLE',
+    };
+
+    if (req.query.mensaje) {
+        filter.mensaje = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('mensaje')),
                 {
-                    model: Oferta,
-                    where: {
-                        estado: true,
-                        procesoDeOferta: 'DISPONIBLE'
-                    },
-                    order: [['createdAt', 'DESC']],
-                    include: [{
+                    [Sequelize.Op.like]: `%${req.query.mensaje.toLowerCase()}%`,
+                },
+            ],
+        };
+    };
+
+    if (req.query.fecha) {
+        // Verificamos que la fecha cumpla con el formato "DD-MM-YYYY"
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            // Si la fecha es válida, podemos incluirla en la consulta
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+
+            filter.createdAt = {
+                [Sequelize.Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('createdAt')), year),
+                ]
+            };
+        }
+    }
+
+    console.log({ filter });
+    try {
+        const { count, rows } =
+            await Oferta.findAndCountAll({
+                where: filter,
+                limit: pageSize,
+                offset: (page - 1) * pageSize,
+                include: [
+                    {
                         model: Usuario,
                         where: { estado: 1 },
-
                         include: [{
                             model: Pyme,
                             where: { estado: 1 }
                         }]
-                    }]
-                }
-            ],
-            order: [['createdAt', 'DESC'],]
-
-        })
-
-
-        if (ofertas) {
-            res.status(200).json({
-                ok: true,
-                ofertas,
+                    },
+                    {
+                        model: Publicacion,
+                        where: { estado: 1 },
+                        include: [
+                            {
+                                model: Usuario,
+                                where: { estado: 1 },
+                                include: [{
+                                    model: Pyme,
+                                    where: { estado: 1 }
+                                }]
+                            },
+                        ]
+                    }
+                ]
             });
-        }
-        else res.status(400).json({
-            ok: false,
-            msg: `No existen ofertas con este usuario ${UsuarioId}`
-        })
+
+
+        console.log({ count, rows });
+
+        if (!rows.length) {
+            return res.status(200).json({
+                message: 'No se encontraron coincidencias.',
+                rows: [],
+            });
+        };
+
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            rows,
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            ok: false,
-            msg: error
-        })
+        console.error({ error });
+        return res.status(500).json(
+            { error: 'Error en el servidor' },
+            error,
+        );
     }
 }
 
+// Obtiene ofertas creadas de un usuario, usando su id
 const ofertasCreadasGetById = async (req = request, res = response) => {
+    console.log('[ofertas] ofertasCreadasGetById()');
 
     const { UsuarioId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const { page, size } = req.query;
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const filter = {
+        UsuarioId,
+        estado: true,
+        procesoDeOferta: 'DISPONIBLE'
+    };
 
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
-
-        let size = 10
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
-            size = sizeAsNumber;
-        }
-
-        const ofertas = await Oferta.findAndCountAll({
-            limit: size,
-            offset: page * size,
-            order: [['createdAt', 'DESC'],],
-            where: {
-                UsuarioId,
-                estado: true,
-                procesoDeOferta: 'DISPONIBLE'
-            },
-            include: [
-                {
-                    model: Publicacion,
-                    where: { 
-                        estado: true,
-                        procesoDePublicacion: 'INICIADA'
-                    },
-                    include: [{
-                        model: Usuario,
-                        where: { estado: true },
-                        attributes: ['nombreUsuario'],
+        const { count, rows } =
+            await Oferta.findAndCountAll({
+                where: filter,
+                limit: pageSize,
+                offset: (page - 1) * pageSize,
+                include: [
+                    {
+                        model: Publicacion,
+                        where: {
+                            estado: true,
+                            procesoDePublicacion: 'INICIADA'
+                        },
                         include: [{
-                            model: Pyme,
+                            model: Usuario,
                             where: { estado: true },
-                            attributes: ['nombrePyme'],
+                            attributes: ['nombreUsuario'],
+                            include: [{
+                                model: Pyme,
+                                where: { estado: true },
+                                attributes: ['nombrePyme'],
+                            }]
                         }]
-                    }]
-                }
-            ],
-        })
-
-        console.log('ofertasCreadas()', ofertas)
-        if (ofertas.count === 0) {
-            return res.status(200).json({
-                ok: true,
-                ofertas,
-                msg: 'No existen ofertas de este usuario'
-            })
-        }
-
-        if (ofertas.count > 0) {
-            return res.status(200).json({
-                ok: true,
-                totalPages: Math.ceil(ofertas.count / size),
-                content: ofertas.rows,
+                    }
+                ],
             });
-        } else {
-            return res.status(400).json({
-                ok: false,
-                msg: `No existen ofertas con este usuario ${UsuarioId}`
-            })
-        }
+
+        console.log({ count, rows });
+
+        if (!rows.length) {
+            return res.status(200).json({
+                message: 'No se encontraron coincidencias.',
+                rows: [],
+            });
+        };
+
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            rows,
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            ok: false,
-            msg: error
-        })
+        console.error({ error });
+        return res.status(500).json(
+            { error: 'Error en el servidor' },
+            error,
+        );
     }
 }
 
 const ofertaPost = async (req = request, res = response) => {
-
-    const { mensaje, precioOferta, PublicacionId, UsuarioId } = req.body
-
-    // nuevo id oferta
-    const myId = uid(15);
+    console.log('[ofertas] ofertaPost()');
+    const { mensaje, precioOferta, PublicacionId, UsuarioId } = req.body;
 
     nuevaOferta = {
-        id: myId,
+        id: uid(15),
         mensaje,
         precioOferta,
-
-        // Id de la publicación
-        PublicacionId,
-
-        //Id del usuario dueño de la oferta
-        UsuarioId
-    }
+        PublicacionId, /** Id de la publicación */
+        UsuarioId, /** Id del usuario dueño de la oferta */
+    };
 
     try {
-        await Oferta.create(nuevaOferta);
-
-
+        const createdOferta = await Oferta.create(nuevaOferta);
         res.status(200).json({
             ok: true,
-            msg: 'Oferta creada'
-        })
-    } catch (error) {
-        res.status(400).json({
-            ok: false,
-            msg: error
-        })
-    }
+            msg: 'Oferta creada',
+            oferta: createdOferta,
+        });
 
+    } catch (error) {
+        console.log({ error });
+        res.status(500).json({
+            ok: false,
+            msg: error,
+        });
+    }
 }
 
 // actualiza el estado de compra de una oferta a traves de su id
 const ofertaPagada = async (req = request, res = response) => {
-
-    const { id } = req.params
+    console.log('[oferta] ofertaPagada()');
+    const { id } = req.params;
 
     try {
         const oferta = await Oferta.update({ procesoDeOferta: 'FINALIZADA' }, {
@@ -249,60 +286,62 @@ const ofertaPagada = async (req = request, res = response) => {
             return res.status(400).json({
                 ok: false,
                 msg: 'No existe oferta con este id',
-                id
-            })
+                id,
+            });
         } else {
             return res.status(200).json({
                 ok: true,
                 msg: 'La oferta fue modificada correctamente',
-            })
+            });
         }
 
     } catch (error) {
-        console.log(error)
-        res.status(400).json({
+        console.log({ error });
+        res.status(500).json({
             ok: false,
             msg: 'error en ofertaPagada()',
-            error
-        })
+            error,
+        });
     }
 }
 
 const ofertaPut = (req = request, res = response) => {
-
-    const { id } = req.params
-    console.log(id)
-
+    console.log('[oferta] ofertaPut()');
+    const { id } = req.params;
     res.status(200).json({
         ok: true,
         msg: 'Put Api desde controlador',
-        id
-    })
+        id,
+    });
 }
 
 const ofertaDelete = async (req = request, res = response) => {
-
-    const { id } = req.params
+    console.log('[oferta] ofertaDelete()');
+    const { id } = req.params;
 
     try {
-        const oferta = await Oferta.update({ estado: 0 }, {
-            where: {
-                estado: 1,
-                id
+        const oferta = await Oferta.update(
+            { estado: 0 },
+            {
+                where: {
+                    estado: 1,
+                    id,
+                }
             }
-        });
+        );
 
         res.status(200).json({
             ok: true,
-            msg: 'Oferta eliminada'
-        })
+            msg: 'Oferta eliminada',
+            oferta,
+        });
 
     } catch (error) {
-        console.log(error)
+        console.log({ error });
         res.status(400).json({
             ok: false,
-            error
-        })
+            error,
+        });
     }
 }
 
@@ -313,5 +352,5 @@ module.exports = {
     ofertaPost,
     ofertaPut,
     ofertaDelete,
-    ofertaPagada
+    ofertaPagada,
 };

@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "start:dev": "ng serve --host 0.0.0.0 --port 4200",
     "watch": "ng build --watch --configuration development",
     "test": "jest",
     "test:watch": "jest --watchAll"
@@ -25,6 +26,7 @@
     "bootstrap": "^5.2.0",
     "bootstrap-icons": "^1.9.1",
     "d3": "^7.6.1",
+    "d3-zoom": "^3.0.0",
     "graphology": "^0.24.1",
     "graphology-layout": "^0.6.0",
     "jquery": "^3.6.1",
@@ -63,13 +65,14 @@
     ],
     "reporters": [
       "default",
-      ["jest-html-reporters", {
-        "publicPath": "./html-report",
-        "filename": "report.html",
-        "openReport": true
-      }]
+      [
+        "jest-html-reporters",
+        {
+          "publicPath": "./html-report",
+          "filename": "report.html",
+          "openReport": true
+        }
+      ]
     ]
-
-
   }
 }

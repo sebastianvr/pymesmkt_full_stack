@@ -43,12 +43,8 @@ export class LoginComponent implements OnInit {
       return
     }
 
-    const endpoint = this.esAdmin ? 'admin/login' : 'login';
-
-    this.AuthService.login(this.formularioLogin.value, endpoint).subscribe(ok => {
-      // console.log(ok)
+    this.AuthService.login(this.formularioLogin.value).subscribe(ok => {
       if (ok === true) {
-        
         Swal.fire({
           icon: 'success',
           title: 'Accediendo',
@@ -56,7 +52,11 @@ export class LoginComponent implements OnInit {
           timer: 1000,
         })
         
-        this.router.navigate(['/user'])
+        if(this.esAdmin){
+          this.router.navigate(['/admin'])
+        }else{
+          this.router.navigate(['/user'])
+        }
       
       } else {
        
@@ -77,5 +77,11 @@ export class LoginComponent implements OnInit {
   campoInvalido(campo: string) {
     return this.formularioLogin.controls[campo].errors
       && this.formularioLogin.controls[campo].touched
+  }
+
+  resetForm() {
+    this.formularioLogin.reset();
+    this.formularioLogin.markAsUntouched(); // Establece todos los campos como no tocados.
+
   }
 }

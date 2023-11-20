@@ -5,29 +5,27 @@ const Publicacion = require('../models/publicacion');
 const Usuario = require('../models/usuario');
 const Reclamo = require('../models/reclamo');
 const Pyme = require('../models/pyme');
-const db = require('../db/connection');
 
-
-
-
-// Obtiene todos los reclamos de TODOS los usuarios 
+/**
+ * Obtiene todos los reclamos de TODOS los usuarios.
+ * @param {request} req 
+ * @param {response} res 
+ */
 const reclamosGetAll = async (req = request, res = response) => {
-
     const { page, size } = req.query;
-
     const pageAsNumber = Number.parseInt(page);
     const sizeAsNumber = Number.parseInt(size);
 
     try {
         let page = 0;
         if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
+            page = pageAsNumber;
+        };
 
-        let size = 10
+        let size = 10;
         if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 100) {
             size = sizeAsNumber;
-        }
+        };
 
         let reclamos = await Reclamo.findAndCountAll({
             where: { estado: true },
@@ -71,13 +69,13 @@ const reclamosGetAll = async (req = request, res = response) => {
                                 where: { estado: true },
                                 attributes: ['nombrePyme'],
                             },
-                        }
-                    ]
+                        },
+                    ],
                 },
             ],
         });
 
-        // console.log('reclamos' , reclamos)
+        // console.log({reclamos});
         // if (reclamos.count === 0) {
         //     res.status(200).json({
         //         ok: true,
@@ -91,33 +89,27 @@ const reclamosGetAll = async (req = request, res = response) => {
                 totalPages: Math.ceil(reclamos.count / size),
                 content: reclamos.rows,
             });
-        }
-
+        };
     } catch (error) {
-        console.log(error)
+        // console.log({error})
         res.status(400).json({
             ok: false,
             msj: 'Ocurrio un error en reclamosGetAll()',
-            error
+            error,
         });
-    }
-}
+    };
+};
 
 const reclamoPost = async (req = request, res = response) => {
-    //Id unico de 15 caracteres, para cada nueva publicacion creada
     const myId = uid(15);
-
     const {
         titulo,
         mensaje,
         documento,
         mensajeAdmin,
-
-        // id de la publicacion que referenciará al reclamo
         PublicacionId,
-        // id del usuario que referenciará al reclamo
-        UsuarioId
-    } = req.body
+        UsuarioId,
+    } = req.body;
 
 
     const nuevoReclamo = {
@@ -126,14 +118,9 @@ const reclamoPost = async (req = request, res = response) => {
         mensaje,
         documento,
         mensajeAdmin,
-
-        // id de la publicacion que referenciará al reclamo
         PublicacionId,
-        // id del usuario que RECIBIRÁ referenciará el reclamo
-        UsuarioId
-    }
-
-    // console.log(nuevoReclamo)
+        UsuarioId,
+    };
 
     try {
         const { id } = await Reclamo.create(nuevoReclamo);
@@ -141,33 +128,30 @@ const reclamoPost = async (req = request, res = response) => {
         res.status(200).json({
             ok: true,
             id,
-            msg: 'Nueva reclamo creado'
-        })
+            msg: 'Nueva reclamo creado',
+        });
     } catch (error) {
         res.status(400).json({
             ok: false,
             error,
-            msg: 'Error al crear reclamo.'
-        })
-    }
-
-}
+            msg: 'Error al crear reclamo.',
+        });
+    };
+};
 
 const publicacionPut = (req = request, res = response) => {
-
-    const { id } = req.params
-    console.log(id)
+    const { id } = req.params;
+    // console.log({ id });
 
     res.status(200).json({
         ok: true,
         msg: 'Put Api desde controlador',
-        id
-    })
-}
+        id,
+    });
+};
 
 const reclamoDelete = async (req = request, res = response) => {
-
-    const { id } = req.params
+    const { id } = req.params;
 
     try {
         const reclamo = await Reclamo.update({ estado: 0 }, {
@@ -175,21 +159,21 @@ const reclamoDelete = async (req = request, res = response) => {
         });
 
         res.status(200).json({
-            msg: 'Reclamo eliminado de la bd'
-        })
-
+            msg: 'Reclamo eliminado de la bd',
+            reclamo,
+        });
     } catch (error) {
-        console.log(error)
+        console.log({ error });
         res.status(400).json({
             ok: false,
-            msg: 'Error al eliminar reclamo'
-        })
-    }
-}
+            msg: 'Error al eliminar reclamo',
+        });
+    };
+};
 
 module.exports = {
     reclamosGetAll,
     reclamoPost,
     publicacionPut,
-    reclamoDelete
+    reclamoDelete,
 };

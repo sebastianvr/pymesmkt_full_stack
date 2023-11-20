@@ -1,69 +1,59 @@
-<div class="container-fluid">
-    <app-search-publication></app-search-publication>
-
-    <div class="">
+<div class="container mx-auto">
+    <div class="justify-content-center">
+        <div class="row">
+            <app-search-publication (formSubmitted)="onFormFilter0Submitted($event)">
+            </app-search-publication>
+        </div>
 
         <div class="row">
-            <div class="col-md-1"></div>
-
-            <div class="col-md-3 col-xs-12 pl-5">
-                <div class="container">
-                    <h3 class="mt-3">Filtrar búsqueda</h3>
-                    <h4>Cantidad de Ofertas </h4>
-                    <select class="form-select form-select mb-3" aria-label=".form-select example">
-                        <option selected>0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3 o más</option>
-                    </select>
-
-                    <h4>Monto máximo</h4>
-                    <select class="form-select form-select mb-3" aria-label=".form-select example">
-                        <option selected></option>
-                        <option value="1">100.000 - 500.000</option>
-                        <option value="2">500.000 - 800.000</option>
-                        <option value="3">800.000 - 1.000.000</option>
-                    </select>
-
-                    <h3>Garantía</h3>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                        <label class="form-check-label" for="flexRadioDefault1">
-                            Con garantía
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
-                            checked>
-                        <label class="form-check-label mb-3" for="flexRadioDefault2">
-                            Sin garantía
-                        </label>
-                    </div>
-
-                    <h3>Tipo</h3>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                        <label class="form-check-label" for="flexRadioDefault1">
-                            Producto
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-                        <label class="form-check-label" for="flexRadioDefault2">
-                            Servicio
-                        </label>
-                    </div>
-
-                    <div class="container">
-                        <button class="btn float-end btn-primary" type="button">Buscar</button>
-                    </div>
-                </div>
-                <br class="my-2">
+            <div class="col-md-4 col-xs-12 m-0">
+                <app-filter-publication (formSubmitted)="onFormFilter1Submitted($event)">
+                </app-filter-publication>
             </div>
 
+            <div class="col-md-8 col-sm-12 m-0">
+                <div class="container mt-5 text-center" *ngIf="isLoading; else PublicationsResponse">
+                    <div class="spinner-border text-primary text-center my-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
 
-            <div class="col-md-8 col-sm-12">
-                <app-post-card-visitor></app-post-card-visitor>
+                
+                <ng-template #PublicationsResponse>
+                    <div class="row my-1">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Limpiar búsqueda" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary float-end">
+                                <img src="../../../../assets/icons/magic.svg" alt="magic.svg"> 
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mx-2">
+                        <!-- Botones de paginación -->
+                        <div class="d-flex justify-content-center">
+                            <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
+                                <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                    (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                    [rotate]="true" [boundaryLinks]="true">
+                                </ngb-pagination>
+                            </div>
+                        </div>
+
+
+                        <app-post-card-visitor [publicaciones]="publicaciones" [isLoading]="isLoading">
+                        </app-post-card-visitor>
+
+                        <!-- Botones de paginación -->
+                        <div class="d-flex justify-content-center">
+                            <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
+                                <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                    (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                    [rotate]="true" [boundaryLinks]="true">
+                                </ngb-pagination>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
             </div>
         </div>
     </div>

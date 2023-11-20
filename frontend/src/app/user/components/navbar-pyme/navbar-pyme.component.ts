@@ -9,14 +9,16 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 })
 export class NavbarPymeComponent implements OnInit {
 
-  nombreUsuario = this.authService.usuario.nombreUsuario
+  nombreUsuario: string = this.authService.usuario.nombreUsuario;
 
   constructor(
-    private router : Router,
-    private authService : AuthService
+    private router: Router,
+    private authService: AuthService
   ) { }
 
+
   ngOnInit(): void {
+    console.log(this.nombreUsuario)
   }
 
   logOut() {

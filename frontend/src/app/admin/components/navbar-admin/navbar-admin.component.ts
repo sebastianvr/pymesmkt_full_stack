@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 @Component({
   selector: 'app-navbar-admin',
@@ -7,9 +9,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NavbarAdminComponent implements OnInit {
 
-  constructor() { }
+
+  nombreUsuario = this.authService.usuario.nombreUsuario
+
+  constructor(
+    private router : Router,
+    private authService : AuthService
+  ) { }
 
   ngOnInit(): void {
+  }
+
+  logOut() {
+    this.authService.logOut()
+    this.router.navigate(['visitor'])
   }
 
 }

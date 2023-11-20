@@ -1,50 +1,70 @@
-version: '3'
+version: '3.8'
 
 services:
   db:
+    restart: always
     image: mysql:8
+    env_file:
+      - ./config/db.env
     environment:
-      MYSQL_DATABASE: pydbdev
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-
+      - TZ=America/Santiago
     ports:
       - '8889:3306'
-    networks:
-      - my-network
     volumes:
       - data:/var/lib/mysql
+    networks:
+      - red_privada
+
+  minio:
+    restart: always
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
+    env_file:
+      - ./config/minio.env  
+    volumes:
+      - minio_data:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    networks:
+      - red_privada
 
   api:
-    build: ./backend
-    environment:
-      PORT: 8080
-      CLIENT_KEY: Est03sMyPub1ck3yKlY3nt.!
-      ADMIN_KEY: Est03sMyPub1ck3y@Dmin.!
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-      DB_USER: root
-      DB_PASS: root
-      DB_PORT: 3306
+    restart: always
     depends_on:
-      - db
-    networks:
-      - my-network
+      - db 
+      - minio
+    build: ./backend
+    env_file:
+      - ./config/api.env
     ports:
-      - '8080:8080'
+      - '8081:8080'
+    command: npm run dev
+    volumes:
+      - ./backend:/api
+    networks:
+      - red_privada
+      - red_proxy
 
   web:
-    build: ./frontend
-    ports:
-      - '4200:4200'
+    restart: always
     depends_on:
       - api
+    ports:
+      - '5700:4200'
+    build: ./frontend
+    volumes:
+      - ./frontend:/web
     networks:
-      - my-network
-
-networks:
-  my-network:
+      - red_privada
+      - red_proxy
 
 volumes:
   data:
+  minio_data:
+
+networks:                  # Definir redes
+  red_proxy:               # Nombre de una red
+    external: true         # Indica que es una red externa al docker-compose
+    name: nginx-proxy      # Nombre de la Red de uso publico entre Docker
+  red_privada: 

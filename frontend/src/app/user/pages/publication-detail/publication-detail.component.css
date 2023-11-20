@@ -1,7 +1,28 @@
-.descriptionCard{
+.card {
+    transition: box-shadow 0.3s;
+    /* Transición suave para la sombra */
+}
+
+.card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    /* Sombras al pasar el mouse sobre la tarjeta */
+}
+
+.descriptionCard {
     text-transform: lowercase;
 }
 
 .descriptionCard::first-letter {
     text-transform: uppercase;
+}
+
+.icon-image {
+    height: auto;
+    max-width: 45px;
+}
+
+.icon-buttons-style {
+    filter: invert(100%);
+    width: 16px;
+    height: 16px;
 }

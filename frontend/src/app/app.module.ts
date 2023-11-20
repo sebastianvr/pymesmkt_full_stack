@@ -9,7 +9,8 @@ import { AppComponent } from './app.component';
 // Cambiar el locale de la app
 import localeEsCL from '@angular/common/locales/es-CL';
 import { registerLocaleData } from '@angular/common';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
 registerLocaleData(localeEsCL)
 
 @NgModule({

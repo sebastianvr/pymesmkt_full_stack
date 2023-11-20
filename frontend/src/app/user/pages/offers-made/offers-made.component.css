@@ -1,33 +1,30 @@
-.card-body {
-    /* background-color:  #0d6efd; */
-    border-radius: 3px;
-    /* color: white; */
+.card {
+    transition: box-shadow 0.3s;
 }
 
-
-.containerPublicacion {
-    max-width: 1000px;
-    margin: auto;
+.card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-/* .containerPrecio{
-    border: 1px solid black;
-    
-} */
-
-.descriptionCard{
+.descriptionCard {
     text-transform: lowercase;
 }
 
-.descriptionCard::first-letter {
+.messageCard::first-letter {
     text-transform: uppercase;
 }
 
-/* .btn-pagar {
-    border-radius: 10px;
-} */
+.icon-image {
+    width: 30%;
+    height: auto;
+    max-width: 150px;
+}
 
-.noOfertas{
-    letter-spacing:4px;
+.noOfertas {
+    letter-spacing: 4px;
     font-weight: 800;
+}
+
+.customSelect{
+    max-width: 110px;
 }

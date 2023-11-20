@@ -1,23 +1,16 @@
-# Usar node 16 como imagen base
-FROM node:16
+FROM node:18-alpine 
 
-# Directorio de trabajo en la imagen
+COPY ["package.json", "package-lock.json", "/web/"]
+
 WORKDIR /web
 
-# Copiar el archivo package.json y package-lock.json
-COPY package*.json ./
+COPY [".", "/web"]
 
-# Instalar las dependencias del proyecto
-RUN npm install
+RUN npm install && npm install -g @angular/cli
 
-# Copiar todo el código fuente al directorio de trabajo
-COPY . .
-
-# Compilar la aplicación de Angular
-RUN npm run build --prod
-
-# Exponer el puerto 80 de la imagen
 EXPOSE 4200
 
-# Comando para iniciar la aplicación al ejecutar el contenedor
-CMD ["npm", "start"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
+
+# PROD MODE
+# CMD ["npm", "start"]

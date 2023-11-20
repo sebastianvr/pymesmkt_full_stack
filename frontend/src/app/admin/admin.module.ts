@@ -16,6 +16,7 @@ import { NewReportComponent } from './pages/new-report/new-report.component';
 import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
 import { ViewSuspendedUsersComponent } from './pages/view-suspended-users/view-suspended-users.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -38,6 +39,7 @@ import { ViewSuspendedUsersComponent } from './pages/view-suspended-users/view-s
     AdminRoutingModule,
     PrimeNgModule,
     FormsModule,
+    NgbModule
   ]
 })
 export class AdminModule { }

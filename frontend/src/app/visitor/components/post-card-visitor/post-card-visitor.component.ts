@@ -1,50 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
-
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-post-card-visitor',
   templateUrl: './post-card-visitor.component.html',
-  styleUrls: ['./post-card-visitor.component.css']
+  styleUrls: ['./post-card-visitor.component.css'],
 })
 export class PostCardVisitorComponent implements OnInit {
+  @Input() publicaciones: any;
+  @Input() isLoading: any;
 
-  publicaciones!: any[]
-  empresa!: any
-  idUsuario!: string
-
-
-  // Pagina actual
-  page = 0;
-  // Tamaño de elementos por página
-  size = 2;
-  // Representa a la cantidad total de publicaciones creadas
-  numElement!: number;
-
-  // pipe personalizado
+  // Custom Pipe 
   garantiaMapa = {
     'true': 'Si',
-    'false': 'No'
-  }
+    'false': 'No',
+  };
 
-  constructor(
-    private publicacionService: PublicacionService,
-  ) { }
+  constructor() { }
 
   ngOnInit(): void {
-    this.getPublicaciones();
-  }
-
-  getPublicaciones() {
-    this.publicacionService.getAllPublicaciones(this.page - 1, this.size)
-      .subscribe(({ content, totalPages }) => {
-        
-        this.publicaciones = content;
-        this.numElement = totalPages * this.size;
-      })
-  }
-
-  done() {
-    this.getPublicaciones();
+    // console.log('this.publicaciones', this.publicaciones);
+    // console.log('this.isLoading', this.isLoading);
   }
 }

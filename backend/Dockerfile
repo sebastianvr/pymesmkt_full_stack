@@ -1,17 +1,19 @@
-FROM node:16
+FROM node:16-alpine
 
-# Crea el directorio de trabajo de la aplicación
+# Creation of working directory
 WORKDIR /api
 
-# Copia los archivos de la aplicación a la imagen
+# Copies the application files to the image.
 COPY package*.json ./
-COPY . .
+COPY package-lock.json ./
 
-# Instala las dependencias de la aplicación
+# Install the application dependencies
 RUN npm install
-
-# Expone el puerto de la aplicación
+COPY . .
 EXPOSE 8080
 
-# Inicia la aplicación
-CMD ["npm", "start"]
+# DEV MODE
+# CMD ["npm", "run", "dev"]
+
+# PROD MODE
+# CMD ["npm", "start"]
