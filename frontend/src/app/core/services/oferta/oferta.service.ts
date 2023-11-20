@@ -4,7 +4,6 @@ import { Observable, Subject } from 'rxjs';
 import { environment } from '../../../../environments/environment.prod';
 import { tap } from 'rxjs/operators';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -14,7 +13,7 @@ export class OfertaService {
   private url: string = environment.baseUrl
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
   ) { }
 
   get refresh$() {
@@ -22,11 +21,7 @@ export class OfertaService {
   }
 
   postOferta(oferta: any): Observable<any> {
-    return this.http.post<any>(`${this.url}/api/oferta/`, oferta)
-  }
-
-  getOfertasRecibidas(idUsuario: string): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/oferta/received/${idUsuario}`);
+    return this.http.post<any>(`${this.url}/api/oferta/`, oferta);
   }
 
   getOfertaById(idOferta: string): Observable<any> {
@@ -34,7 +29,7 @@ export class OfertaService {
   }
 
   getOfertasRealizadas(idUsuario: string): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/oferta/created/${idUsuario}`)
+    return this.http.get<any>(`${this.url}/api/oferta/created/${idUsuario}`);
   }
 
   deleteOferta(idOferta: string): Observable<any> {
@@ -48,5 +43,15 @@ export class OfertaService {
 
   aceptaOferta(oferta: any): Observable<any> {
     return this.http.put<any>(`${this.url}/api/oferta/aceptar/${oferta}`, null);
+  }
+
+  getOfertasById(id: string, filters: any): Observable<any> {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+      
+    const urlWithQuery = `${this.url}/api/oferta/received/${id}?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
   }
 }

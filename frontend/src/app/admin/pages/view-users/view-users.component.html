@@ -16,7 +16,6 @@
 
                 <div class="col-12 text-center" *ngIf="isLoading">
                     <div class="container mt-5">
-                        <!-- Mostrar mensaje de carga aquí -->
                         <div class="spinner-border text-primary text-center my-3" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -25,49 +24,66 @@
 
                 <div class="col-12 text-center" *ngIf="isEmptyUsers && !isLoading">
                     <div class="container mt-5">
-                        <!-- Mostrar mensaje cuando no existen usuarios activos -->
-                        <img src="../../../../assets/icons/empty-users.svg" alt="empty-users.svg"
-                            class="icon-image">
+                        <img src="../../../../assets/icons/empty-users.svg" alt="empty-users.svg" class="icon-image">
                         <h3 class="my-3">No existen usuarios activos aún.</h3>
                     </div>
                 </div>
 
-                
-                    <div class="col-md-12 table-responsive pt-1" *ngIf="!isEmptyUsers && !isLoading">
-                        <!-- Mostrar tabla solo cuando hay usuarios activos -->
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nombre usuario</th>
-                                    <th scope="col">Apellidos</th>
-                                    <th scope="col">Email usuario</th>
-                                    <th scope="col">Empresa</th>
-                                    <th scope="col">RUT Empresa</th>
-                                    <th scope="col" colspan="2" class="text-center">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let usuario of allUsuarios | search : searchText; index as i">
-                                    <th scope="row">{{i+1}}</th>
-                                    <td>{{ usuario.nombreUsuario | titlecase }}</td>
-                                    <td>{{ usuario.apellidos }}</td>
-                                    <td>{{ usuario.emailUsuario }}</td>
-                                    <td>{{ usuario.Pyme.nombrePyme }}</td>
-                                    <td>{{ usuario.Pyme.rut }}</td>
-                                    <td>
-                                        <button (click)="suspenderUsuario(usuario.id)" type="button"
-                                            class="btn btn-warning">Suspender</button>
-                                    </td>
-                                    <td>
-                                        <button (click)="eliminarUsuario(usuario.id)" type="button"
-                                            class="btn btn-danger">Eliminar</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="col-md-12 table-responsive pt-1" *ngIf="!isEmptyUsers && !isLoading">
+
+                     <!-- Botones de paginación -->
+                     <div class="d-flex float-start justify-content-center">
+                        <div class="row">
+                            <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3" [rotate]="true"
+                                [boundaryLinks]="true">
+                            </ngb-pagination>
+                        </div>
                     </div>
-                
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Nombre usuario</th>
+                                <th scope="col">Apellidos</th>
+                                <th scope="col">Email usuario</th>
+                                <th scope="col">Empresa</th>
+                                <th scope="col">RUT Empresa</th>
+                                <th scope="col" colspan="2" class="text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let usuario of allUsuarios | search : searchText; index as i">
+                                <th scope="row">{{i+1}}</th>
+                                <td>{{ usuario.nombreUsuario | titlecase }}</td>
+                                <td>{{ usuario.apellidos }}</td>
+                                <td>{{ usuario.emailUsuario }}</td>
+                                <td>{{ usuario.Pyme.nombrePyme }}</td>
+                                <td>{{ usuario.Pyme.rut }}</td>
+                                <td>
+                                    <button (click)="suspenderUsuario(usuario.id)" type="button"
+                                        class="btn btn-warning">Suspender</button>
+                                </td>
+                                <td>
+                                    <button (click)="eliminarUsuario(usuario.id)" type="button"
+                                        class="btn btn-danger">Eliminar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                     <!-- Botones de paginación -->
+                     <div class="d-flex float-start justify-content-center">
+                        <div class="row">
+                            <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3" [rotate]="true"
+                                [boundaryLinks]="true">
+                            </ngb-pagination>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

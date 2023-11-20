@@ -23,12 +23,14 @@
       <img class="d-block mx-auto my-2" src="../../../../assets/icons/building.svg" alt="" width="96" height="76">
 
       <h4 class="text-left">
-        Usuario: {{nameUser}}
+        <button class="btn btn-primary btn-sm"
+          pTooltip="Configuración personal" data-placement="top" routerLink="/user/my-profile"
+        >{{nameUser}}</button>
       </h4>
 
       <hr>
 
-      <p-panelMenu [model]="itemsPanelMenu" ></p-panelMenu>
+      <p-panelMenu [model]="itemsPanelMenu"></p-panelMenu>
     </div>
   </div>
 </div>

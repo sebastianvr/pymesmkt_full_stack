@@ -1,129 +1,66 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import Swal from 'sweetalert2';
-
-import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import { OfertaService } from '../../../core/services/oferta/oferta.service';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalOfferDetailComponent } from '../modal-offer-detail/modal-offer-detail.component';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 @Component({
   selector: 'app-post-card-pyme',
   templateUrl: './post-card-pyme.component.html',
-  styleUrls: ['./post-card-pyme.component.css']
+  styleUrls: ['./post-card-pyme.component.css'],
 })
 export class PostCardPymeComponent implements OnInit {
+  @Input() publicaciones: any;
+  @Input() isLoading: any;
 
-  publicaciones!: any[]
-  empresa!: any
-  idUsuario!: string
-
-  // @ViewChild('closebutton') closebutton! : ElementRef;
-
+  offerForm!: FormGroup;
+  idUser: string = this.authService.usuario.id;
+  closeResult!: string;
+  
   garantiaMapa = {
     'true': 'Si',
-    'false': 'No'
-  }
-
-  // para realizar oferta
-  maxPrice!: number;
-  mensaje!: string;
-
-  // Pagina actual
-  page = 1;
-  // Tamaño de elementos por página
-  size = 5;
-  // Representa a la cantidad total de publicaciones creadas
-  numElement!: number;
-
-  id = this.authService.usuario.id
+    'false': 'No',
+  };
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
+    private modalService: NgbModal,
     private authService: AuthService,
-    private publicacionService: PublicacionService,
-    private ofertaService: OfertaService
-  ) {
-  }
-
-  formularioOferta: FormGroup = this.fb.group({
-    mensaje: [, Validators.required],
-    precioOferta: [, Validators.required],
-  })
+  ) { }
 
   ngOnInit(): void {
-    this.getPublicaciones()
+    console.log('this.publicaciones', this.publicaciones);
   }
 
-  getPublicaciones() {
-    this.publicacionService.getAllPublicaciones(this.page - 1, this.size)
-      .subscribe(({ content, totalPages}) => {
-        this.publicaciones = content;
-        this.numElement = totalPages;
-      });
-  }
-
-  //Encuentra las publicaciones del propio usuario
-  //Deshabilita el botón ofertar
   isIdsIguales(itemId: string): boolean {
-    if (this.id === itemId) {
-      return false
+    if (this.idUser === itemId) {
+      return true;
     }
-    return true
+    return false;
   }
 
-  enviarOferta(publicacionId: string) {
-    if (this.formularioOferta.invalid) {
-      this.formularioOferta.markAllAsTouched()
-      return
-    }
+  public openOffer(idOffer: string) {
+    console.log({ idOffer });
+    const modalRef = this.modalService.open(ModalOfferDetailComponent, { size: 'lg' });
+    modalRef.componentInstance.idOffer = idOffer;
+    modalRef.componentInstance.respondedUserId = this.idUser;
 
-    const nuevaOferta = {
-      mensaje: this.formularioOferta.get('mensaje')?.value,
-      precioOferta: this.formularioOferta.get('precioOferta')?.value,
-      UsuarioId: this.id,
-      PublicacionId: publicacionId
-    }
-
-    console.log(nuevaOferta)
-
-    Swal.fire({
-      position: 'top-end',
-      icon: 'success',
-      title: 'Tu oferta ha sido enviada!',
-      showConfirmButton: false,
-      timer: 2000
-    }).then((result) => {
-      if (result) {
-
-        this.ofertaService.postOferta(nuevaOferta).subscribe();
-        this.formularioOferta.reset();
-        this.router.navigate(['/user/home']);
+    modalRef.result.then(
+      (result) => {
+        this.closeResult = `Closed with: ${result}`;
+      },
+      (reason) => {
+        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
       }
-    })
-    // console.log(this.formularioOferta.value)
+    );
   }
 
-  campoInvalido(campo: string) {
-    return this.formularioOferta.get(campo)?.errors
-      && this.formularioOferta.get(campo)?.touched
-  }
-
-  selectPage(page: number) {
-    if (page >= 1 && page <= this.numElement) {
-      this.page = page;
-      this.getPublicaciones();
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
     }
-  }
-  
-  formatInput(input: any) {
-    let value = +input.value;
-    if (isNaN(value) || value < 1) {
-      value = 1;
-    } else if (value > this.numElement) {
-      value = this.numElement;
-    }
-    input.value = value;
   }
 }

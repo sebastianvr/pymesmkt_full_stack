@@ -195,7 +195,6 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
 }
 
 const usuarioGet = async (req = request, res = response) => {
-
     const { id } = req.params;
     try {
         const usuario = await Usuario.findByPk(id, {
@@ -215,15 +214,26 @@ const usuarioGet = async (req = request, res = response) => {
         }
 
         if (usuario.imagen) {
-            const url = await minioClient.presignedUrl('GET', 'images-bucket', usuario.imagen);
-            console.log({ url })
+            const method = 'GET';
+            const nameBucket = 'images-bucket';
+            const pathImage = usuario.imagen;
+            const expiration = (3600 * 24 * 7);  // (segundos * horas * dias)
+
+            const url = await minioClient.presignedUrl(
+                method,
+                nameBucket,
+                pathImage,
+                expiration
+            );
+
+            console.log({ url });
             usuario.imagen = url;
         }
 
         return res.status(200).json(usuario);
 
     } catch (error) {
-        console.log(error)
+        console.log({error});
     }
 }
 

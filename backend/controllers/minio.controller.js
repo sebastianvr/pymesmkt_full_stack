@@ -9,9 +9,6 @@ const uploadUserImage = async (req = request, res = response) => {
 
         const data = await minioClient.putObject('images-bucket', fileName, file.buffer);
         console.log({data});
-
-        // Get the URL of the uploaded file
-        // const url = await minioClient.presignedUrl('GET', 'files-bucket', fileName);
         res.json({ filePath : fileName });
     } catch (error) {
         console.error(error);
@@ -20,5 +17,5 @@ const uploadUserImage = async (req = request, res = response) => {
 }
 
 module.exports = {
-    uploadUserImage
+    uploadUserImage,
 }

@@ -91,7 +91,7 @@ const publicacionesGetAll = async (req = request, res = response) => {
 const publicacionGet = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionGet()');
     const { id } = req.params;
-    
+
     try {
         const publicacion = await Publicacion.findByPk(id, {
             where: {
@@ -169,61 +169,85 @@ const publicacionesGet = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionesGet()')
 
     const { idUsuario } = req.params;
-    const { page, size } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
+
+    const filter = {
+        UsuarioId: idUsuario,
+        estado: true,
+        procesoDePublicacion: 'INICIADA'
+    };
+
+    if (req.query.titulo) {
+        filter.titulo = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('titulo')),
+                {
+                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                },
+            ],
+        };
+    };
+
+    if (req.query.fecha) {
+        // Verificamos que la fecha cumpla con el formato "DD-MM-YYYY"
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            // Si la fecha es válida, podemos incluirla en la consulta
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+
+            // Ajusta el nombre de los campos de fecha según tu modelo
+            filter.createdAt = {
+                [Sequelize.Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('createdAt')), year),
+                ]
+            };
+        }
+    }
+
+    console.log({ filter });
 
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
+        const { count, rows: publicaciones } =
+            await Publicacion.findAndCountAll({
+                where: filter,
+                limit: pageSize,
+                offset: (page - 1) * pageSize,
+            });
 
-        let size = 10
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
-            size = sizeAsNumber;
-        }
+        if (!publicaciones.length) {
+            return res.status(200).json({
+                message: 'No se encontraron coincidencias.',
+                publicaciones: [],
+            });
+        };
 
-        const publicacion = await Publicacion.findAndCountAll({
-            limit: size,
-            offset: page * size,
-            where: {
-                estado: true,
-                UsuarioId: idUsuario,
-                procesoDePublicacion: 'INICIADA',
-
-            },
-            order: [['createdAt', 'DESC']],
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            publicaciones,
         });
 
-
-        console.log('publicacion :', publicacion)
-        if (publicacion.count === 0) {
-            res.status(200).json({
-                ok: true,
-                publicacion,
-                msg: 'No existen publicaciones de este usuario'
-            })
-        }
-
-        if (publicacion.count > 0) {
-            res.status(200).json({
-                ok: true,
-                totalPages: Math.ceil(publicacion.count / size),
-                content: publicacion.rows,
-            });
-        }
-
-
-
     } catch (error) {
-        res.status(400).json({
-            ok: false,
+        console.error({ error });
+        return res.status(500).json(
+            { error: 'Error en el servidor' },
             error,
-            msg: 'Error al crear publicación.'
-        })
+        );
     }
+
 }
 
 const publicacionPost = async (req = request, res = response) => {
@@ -353,9 +377,7 @@ const publicacionDelete = async (req = request, res = response) => {
 
     try {
         const publicacion = await Publicacion.update({ estado: 0 }, {
-            where: {
-                id,
-            },
+            where: { id },
         });
 
         res.status(200).json({
@@ -531,7 +553,7 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
     } catch (error) {
         console.error({ error });
         return res.status(500).json(
-            { error: 'Error en el servidor' }, 
+            { error: 'Error en el servidor' },
             error,
         );
     }

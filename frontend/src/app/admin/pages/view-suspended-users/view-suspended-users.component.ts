@@ -16,6 +16,10 @@ export class ViewSuspendedUsersComponent implements OnInit, OnDestroy {
 
   pageSize: number = 20;
   page: number = 1;
+  currentPage!: number;
+  total!: number;
+  totalPages!: number;
+
   isLoading: boolean = true;
   isEmptyUsers: boolean = false;
 
@@ -42,8 +46,23 @@ export class ViewSuspendedUsersComponent implements OnInit, OnDestroy {
       if (data.usuarios.length === 0) {
         this.isEmptyUsers = true;
       } else {
+        const {
+          usuarios,
+          total,
+          currentPage,
+          pageSize,
+          totalPages,
+        } = data;
+
+        this.allUsuariosSuspended = usuarios;
+        this.total = total;
+        this.currentPage = currentPage;
+        this.pageSize = pageSize;
+        this.totalPages = totalPages;
+
         this.isEmptyUsers = false;
-        this.allUsuariosSuspended = data.usuarios;
+
+
         console.log(this.allUsuariosSuspended);
       }
     });
@@ -80,6 +99,11 @@ export class ViewSuspendedUsersComponent implements OnInit, OnDestroy {
     });
   }
 
+  onPageChange(newPage: number) {
+    console.log({newPage});
+    this.getAll(this.pageSize, newPage);
+  }
+  
   ngOnDestroy(): void {
     this.suscription.unsubscribe();
   }
