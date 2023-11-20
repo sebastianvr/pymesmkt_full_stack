@@ -1,60 +1,109 @@
 <div class="container-fluid">
-
     <div class="d-flex justify-content-center">
         <div class="container">
 
             <div class="col-md-12 g-5 pt-4 text-center mb-5">
-                <img class="float-end mb-3" src="../../../../assets/icons/arrow-bar-right.svg" alt="pen.svg" width="55">
-                <h2 class="fs-1 mb-1">Ofertas Realizadas</h2>
+                <img class="float-end mb-3" src="../../../../assets/icons/arrow-bar-right.svg" alt="arrow-bar-right.svg"
+                    width="55">
+                <h2 class="fs-1 mb-1"><strong>Ofertas Realizadas</strong></h2>
             </div>
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 input-group input-group-sm mb-3 mx-3 ">
-                        <div class="input-group input-group-md">
-                            <input type="text" class="form-control" aria-label="Sizing example input"
-                                aria-describedby="inputGroup-sizing-lg" id="buscarOferta">
-                            <span class="input-group-text mr-3" id="inputGroup-sizing-lg">Buscar</span>
+            <div class="col-md-12">
+                <div class="input-group mb-3">
+                    <form [formGroup]="filterForm" class="input-group mb-3">
+                        <select class="form-select customSelect text-center" id="searchOptionSelect"
+                            formControlName="searchOption">
+                            <option [value]="'fecha'">Fecha</option>
+                            <option [value]="'mensaje'">Mensaje</option>
+                        </select>
+
+                        <input type="text" class="form-control" formControlName="searchTerm"
+                            aria-label="Término de búsqueda" />
+                        <button class="input-group-text btn btn-primary" id="basic-addon2" (click)="sendForm()">
+                            Buscar
+                        </button>
+
+                        <div class="container">
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('required')"
+                                class="text-danger">Este campo es requerido.</div>
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('invalidDate')"
+                                class="text-danger">La fecha debe ser tipo DD-MM-YYYY.</div>
+                        </div>
+                    </form>
+
+                    <div class="row my-1">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Limpiar búsqueda" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary float-end">
+                                <img src="../../../../assets/icons/magic.svg" alt="magic.svg">
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Debug -->
+                    <!-- <div class="container">
+                        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+                        <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+                    </div> -->
                 </div>
             </div>
 
-            <div class="col-12 text-center" *ngIf="ofertas === undefined; else divOfertas">
+            <div class="col-md-12 mt-5 text-center" *ngIf="isLoading">
+                <div class="spinner-border text-primary text-center my-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div class="col-md-12 text-center" *ngIf="isEmptyOffersReceived && !isLoading">
                 <div class="container mt-5">
+                    <img src="../../../../assets/icons/offer-icon.svg" alt="offer-icon.svg" class="icon-image">
+                    <h3 class="my-3">No tienes ofertas realizadas aún.</h3>
 
-                    <div class="spinner-border text-primary text-center my-3" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <!-- <p class="noOfertas fs-3 m-0">Buscando ofertas.</p> -->
-                    <br>
-                    <!-- <img src="../../../../assets/icons/card-heading.svg" alt="card" width="100px" class="text-center"> -->
+                    <ng-container *ngIf="ofertas">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Ir atrás" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary text-center">
+                                <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg"
+                                    class="icon-button-style">
+                            </button>
+                        </div>
+                    </ng-container>
                 </div>
             </div>
 
-            <ng-template #divOfertas>
-                <div class="containerPublicacion py-4" *ngFor="let oferta of ofertas">
+            <ng-container *ngIf="!isEmptyOffersReceived && !isLoading">
+                <div class="container py-4" *ngFor="let oferta of ofertas">
                     <div class="card">
                         <div class="card-header">
-                            <span class="text-muted float-end fst-italic">{{oferta.createdAt | date : 'dd MMMM
-                                yyyy'}}</span>
-                            <h3 class="fs-5 m-0">Oferta a {{oferta.Publicacion.Usuario.Pyme.nombrePyme | titlecase}}
+                            <span class="text-muted float-end fst-italic" pTooltip="Fecha de creación">
+                                {{oferta.createdAt | date : 'dd MMMM yyyy'}}
+                            </span>
+                            <h3 class="fs-4 m-0">
+                                <span pTooltip="Nombre de la empresa" data-placement="top">
+                                    Oferta ⇒ {{oferta.Publicacion.Usuario.Pyme.nombrePyme | uppercase}}
+                                </span>
                             </h3>
                         </div>
 
-                        <div class="card-body descriptionCard">
-                            <p>{{oferta.mensaje}}</p>
-                            <div class="containerPrecio my-2">
-                                <h4 class="fs-4">Precio : {{oferta.precioOferta | currency : 'CLP'}}</h4>
+                        <div class="card-body">
+                            <p class="messageCard fs-5">{{oferta.mensaje}}</p>
+                            <div class="my-2">
+                                <h4 class="fs-5">
+                                    <strong>
+                                        Precio : {{oferta.precioOferta | currency : 'CLP'}}
+                                    </strong>
+                                </h4>
                             </div>
 
-                            <div class="container col-12 my-3">
+                            <div class="container col-lg-12 my-3">
                                 <div class="col-md-12">
                                     <button (click)="eliminarOferta(oferta.id)"
-                                        class="btn btn-danger float-start">Eliminar oferta</button>
+                                        class="btn btn-danger btn-sm float-start">
+                                        Eliminar
+                                    </button>
                                 </div>
                                 <div class="col-md-12">
-                                    <button class="btn btn-primary float-end">Editar oferta</button>
+                                    <button class="btn btn-primary btn-sm float-end">Editar</button>
                                 </div>
                             </div>
                         </div>
@@ -62,99 +111,78 @@
                             <ngb-accordion #acc="ngbAccordion">
                                 <ngb-panel title="Detalles de la publicación ">
                                     <ng-template ngbPanelContent>
-                                        <div class="container">
-                                            <div class="col-12 text-center my-5" *ngIf="!oferta; else divPublicacion">
-                                                <div class="spinner-border" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                            </div>
+                                        <div class="row col-lg-12 mx-3">
+                                            <h3 class="text-center">
+                                                {{oferta.Publicacion.titulo | uppercase}}
+                                            </h3>
+                                            <p class="descriptionCard">
+                                                {{oferta.Publicacion.descripcion}}
+                                            </p>
 
-                                            <ng-template #divPublicacion>
-                                                <div class="col-md-12 g-5 mt-4">
-                                                    <div class="container d-grid gap-2 text-center">
-                                                        <button [ngClass]="{
-                                                            'alert-primary' : oferta.Publicacion.procesoDePublicacion.includes('INICIADA'), 
-                                                            'alert-warning' : oferta.Publicacion.procesoDePublicacion.includes('EN PROCESO'),
-                                                            'alert-success' : oferta.Publicacion.procesoDePublicacion.includes('FINALIZADA')
-                                                        }" class="alert alert-success alert-lg text-center"
-                                                            type="button">Publicación
-                                                            {{oferta.Publicacion.procesoDePublicacion | lowercase}}
-                                                        </button>
-                                                    </div>
-
-                                                    <div class="container mt-3">
-                                                        <h3 class="text-center">{{oferta.Publicacion.titulo | uppercase
-                                                            }}</h3>
-                                                        <p class="descriptionCard">{{oferta.Publicacion.descripcion}}
-                                                        </p>
-
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>Precio total</td>
-                                                                    <td>{{oferta.Publicacion.precioTotal | currency :
-                                                                        'CLP'}}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>Cantidad</td>
-                                                                    <td>{{this.oferta.Publicacion.cantidadElementos}}
-                                                                    </td>
-                                                                </tr>
-                                                                <tr *ngIf="oferta.Publicacion.precioUnidad">
-                                                                    <td>Precio por unidad</td>
-                                                                    <td>{{oferta.Publicacion.precioUnidad | currency :
-                                                                        'CLP'}}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>Garantía</td>
-                                                                    <td>{{oferta.Publicacion.garantia.toString() |
-                                                                        i18nSelect:oferta.Publicacion}}</td>
-                                                                </tr>
-                                                                <tr *ngIf="oferta.Publicacion.aniosGarantia">
-                                                                    <td>Años de garantía</td>
-                                                                    <td>{{oferta.Publicacion.aniosGarantia}}</td>
-                                                                </tr>
-                                                                <tr *ngIf="oferta.Publicacion.fechaInicioServicio">
-                                                                    <td>Fecha inicio del servicio</td>
-                                                                    <td>{{oferta.Publicacion.fechaInicioServicio | date
-                                                                        : 'dd MMMM
-                                                                        yyyy'}}</td>
-                                                                </tr>
-                                                                <tr *ngIf="oferta.Publicacion.fechaFinServicio">
-                                                                    <td>Fecha finalización del servicio </td>
-                                                                    <td>{{oferta.Publicacion.fechaFinServicio | date :
-                                                                        'dd MMMM yyyy'}}
-                                                                    </td>
-                                                                </tr>
-                                                                <tr *ngIf="oferta.Publicacion.horasATrabajar">
-                                                                    <td>Cantidad de horas a trabajar </td>
-                                                                    <td>{{oferta.Publicacion.horasATrabajar}}</td>
-                                                                </tr>
-                                                                <tr *ngIf="oferta.Publicacion.modelo">
-                                                                    <td>Modelo</td>
-                                                                    <td>{{oferta.Publicacion.modelo}}</td>
-                                                                </tr>
-                                                                <tr *ngIf="oferta.Publicacion.color">
-                                                                    <td>Color</td>
-                                                                    <td>{{oferta.Publicacion.color | titlecase}}</td>
-                                                                </tr>
-
-                                                            </tbody>
-                                                        </table>
-
-                                                    </div>
-                                                </div>
-                                            </ng-template>
+                                            <table class="table table-hover">
+                                                <tbody>
+                                                    <tr>
+                                                        <td><strong>Precio total</strong></td>
+                                                        <td>{{oferta.Publicacion.precioTotal | currency :
+                                                            'CLP'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Cantidad</strong></td>
+                                                        <td>{{oferta.Publicacion.cantidadElementos}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr *ngIf="oferta.Publicacion.precioUnidad">
+                                                        <td><strong>Precio por unidad</strong></td>
+                                                        <td>{{oferta.Publicacion.precioUnidad | currency :
+                                                            'CLP'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Garantía</strong></td>
+                                                        <td>
+                                                            {{oferta.Publicacion.garantia.toString() |
+                                                            i18nSelect:garantiaMapa}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr *ngIf="oferta.Publicacion.aniosGarantia">
+                                                        <td><strong>Años de garantía</strong></td>
+                                                        <td>{{oferta.Publicacion.aniosGarantia}}</td>
+                                                    </tr>
+                                                    <tr *ngIf="oferta.Publicacion.fechaInicioServicio">
+                                                        <td><strong>Fecha inicio del servicio</strong></td>
+                                                        <td>
+                                                            {{oferta.Publicacion.fechaInicioServicio | date:
+                                                            'dd MMMM yyyy'}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr *ngIf="oferta.Publicacion.fechaFinServicio">
+                                                        <td><strong>Fecha finalización del servicio</strong>
+                                                        </td>
+                                                        <td>{{oferta.Publicacion.fechaFinServicio | date :
+                                                            'dd MMMM yyyy'}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr *ngIf="oferta.Publicacion.horasATrabajar">
+                                                        <td><strong>Cantidad de horas a trabajar</strong></td>
+                                                        <td>{{oferta.Publicacion.horasATrabajar}}</td>
+                                                    </tr>
+                                                    <tr *ngIf="oferta.Publicacion.modelo">
+                                                        <td><strong>Modelo</strong></td>
+                                                        <td>{{oferta.Publicacion.modelo}}</td>
+                                                    </tr>
+                                                    <tr *ngIf="oferta.Publicacion.color">
+                                                        <td><strong>Color</strong></td>
+                                                        <td>{{oferta.Publicacion.color | titlecase}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </ng-template>
-
                                 </ngb-panel>
                             </ngb-accordion>
                         </div>
                     </div>
                 </div>
-            </ng-template>
-
+            </ng-container>
         </div>
 
     </div>
