@@ -33,8 +33,8 @@ router.get('/received/:idUsuario',
             withMessage('page debe ser un número entero mayor o igual a 1'),
         query('pageSize').optional().isInt({ min: 1, max: 100 }).
             withMessage('pageSize debe ser un número entero entre 1 y 100'),
-        query('titulo').optional().isString()
-            .withMessage('El campo "titulo" debe ser una cadena (string)'),
+        query('mensaje').optional().isString()
+            .withMessage('El campo "mensaje" debe ser una cadena (string)'),
         query('fecha').optional()
             .custom((value) => {
                 const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
@@ -49,7 +49,36 @@ router.get('/received/:idUsuario',
 );
 
 // Ruta para obtener todas las ofertas creadas 
-router.get('/created/:UsuarioId', ofertasCreadasGetById);
+router.get('/created/:UsuarioId',
+    [
+        param('UsuarioId')
+            .notEmpty().withMessage('El parámetro idUsuario es obligatorio')
+            .custom((value) => {
+                const uuidRegex = /^[0-9a-fA-F]{15}$/;
+                if (!uuidRegex.test(value)) {
+                    throw new Error('El ID no es válido');
+                }
+                return true;
+            })
+            .withMessage('El ID proporcionado no es válido'),
+        query('page').optional().isInt({ min: 1 }).
+            withMessage('page debe ser un número entero mayor o igual a 1'),
+        query('pageSize').optional().isInt({ min: 1, max: 100 }).
+            withMessage('pageSize debe ser un número entero entre 1 y 100'),
+        query('titulo').optional().isString()
+            .withMessage('El campo "titulo" debe ser una cadena (string)'),
+        query('fecha').optional()
+            .custom((value) => {
+                const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+                if (!dateRegex.test(value)) {
+                    throw new Error('La fecha no es válida. Debe estar en formato DD-MM-YYYY');
+                }
+                return true;
+            })
+            .withMessage('La fecha proporcionada no es válida'),
+    ],
+    ofertasCreadasGetById
+);
 
 router.get('/:IdOferta', [
     param('IdOferta', 'El param id es obligatorio').not().isEmpty(),
