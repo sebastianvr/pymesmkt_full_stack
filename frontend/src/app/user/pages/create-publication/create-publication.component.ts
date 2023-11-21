@@ -71,20 +71,20 @@ export class CreatePublicationComponent implements OnInit {
     if (option == 'Producto') {
       this.formularioPublicacion.reset();
 
-      this.formularioPublicacion.patchValue({
-        titulo: 'Adquisicion de articulos de aseo y ornato',
-        descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
-        productoOServicio: 'Producto',
-        cantidad: 1,
-        precioPorUnidad: null,
-        totalPrecio: 15000,
-        modelo: '1rkAKpJl',
-        color: 'azul',
-        garantia: true,
-        aniosGarantia: 1,
-        archivos: 'archivo.zip',
-        UsuarioId: 'cb8bcb308b7ccf1',
-      });
+      // this.formularioPublicacion.patchValue({
+      //   titulo: 'Adquisicion de articulos de aseo y ornato',
+      //   descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
+      //   productoOServicio: 'Producto',
+      //   cantidad: 1,
+      //   precioPorUnidad: null,
+      //   totalPrecio: 15000,
+      //   modelo: '1rkAKpJl',
+      //   color: 'azul',
+      //   garantia: true,
+      //   aniosGarantia: 1,
+      //   archivos: 'archivo.zip',
+      //   UsuarioId: 'cb8bcb308b7ccf1',
+      // });
 
       this.formularioPublicacion.setErrors(null);
 
@@ -113,19 +113,19 @@ export class CreatePublicationComponent implements OnInit {
       this.formularioPublicacion.setErrors(null);
 
       //quitar estas lineas solo test
-      this.formularioPublicacion.patchValue({
-        titulo: 'Adquisicion de articulos de aseo y ornato',
-        descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
-        productoOServicio: 'Servicio',
-        totalPrecio: 15000,
-        fechaInicio: '',
-        fechaTermino: '',
-        horasATrabajar: 1,
-        garantia: false,
-        aniosGarantia: null,
-        archivos: 'archivo.zip',
-        UsuarioId: 'cb8bcb308b7ccf1',
-      });
+      // this.formularioPublicacion.patchValue({
+      //   titulo: 'Adquisicion de articulos de aseo y ornato',
+      //   descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
+      //   productoOServicio: 'Servicio',
+      //   totalPrecio: 15000,
+      //   fechaInicio: '',
+      //   fechaTermino: '',
+      //   horasATrabajar: 1,
+      //   garantia: false,
+      //   aniosGarantia: null,
+      //   archivos: 'archivo.zip',
+      //   UsuarioId: 'cb8bcb308b7ccf1',
+      // });
 
       // Desabilitar atributos que no son para el formulario de servicio
       this.formularioPublicacion.get('cantidad')?.disable();

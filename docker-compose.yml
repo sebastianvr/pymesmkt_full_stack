@@ -39,9 +39,10 @@ services:
       - ./config/api.env
     ports:
       - '8081:8080'
-    command: npm run dev
     volumes:
       - ./backend:/api
+    environment:
+      VIRTUAL_HOST: api.pymesmkt.informatica.uv.cl
     networks:
       - red_privada
       - red_proxy
@@ -51,14 +52,16 @@ services:
     depends_on:
       - api
     ports:
-      - '5700:4200'
+      - 80:4200
     build: ./frontend
     volumes:
       - ./frontend:/web
+    environment:
+      VIRTUAL_HOST: pymesmkt.informatica.uv.cl
     networks:
       - red_privada
       - red_proxy
-
+    
 volumes:
   data:
   minio_data:
