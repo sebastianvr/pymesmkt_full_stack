@@ -16,6 +16,8 @@
   overflow: hidden;
 }
 
-.card-body {
-  height: 500px;
+.icon-image {
+  width: 30%;
+  height: auto;
+  max-width: 150px;
 }
