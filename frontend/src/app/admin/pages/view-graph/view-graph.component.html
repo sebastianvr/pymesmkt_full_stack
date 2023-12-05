@@ -2,11 +2,27 @@
   <div class="d-flex justify-content-center">
     <div class="container">
 
-      <div class="col-md-12 g-5 pt-4 text-center mb-5">
+      <div class="col-lg-12 g-5 pt-4 text-center mb-5">
         <img class="float-end mb-3" src="../../../../assets/icons/share.svg" alt="share.svg" width="50">
         <h2 class="fs-1 mb-1"><strong>Mapa de colaboraciones</strong></h2>
       </div>
 
+      <div class="col-lg-12 text-center" *ngIf="isLoading">
+        <div class="container mt-5">
+          <div class="spinner-border text-primary text-center my-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-12 text-center" *ngIf="isEmptyGraph && !isLoading">
+        <div class="container mt-5">
+          <img src="../../../../assets/icons/empty-users.svg" alt="empty-users.svg" class="icon-image">
+          <h3 class="my-3">No existen usuarios registrados aún.</h3>
+        </div>
+      </div>
+
+      <!-- BUG PARA MOSTRAR USANDO *ngIf="!isEmptyGraph && !isLoading" -->
       <div class="row">
         <div class="col-lg-12">
           <div class="card mb-5">
@@ -14,7 +30,6 @@
               <button class="btn btn-primary ml-2" (click)="zoomOut()">-</button>
               <button class="btn btn-primary mr-2" style="margin-left: 0.5rem;" (click)="zoomIn()">+</button>
               <button class="btn btn-primary float-end" (click)="centerGraph()">Centrar</button>
-
             </div>
             <div class="card-body p-0">
               <div id="divGraph" #graphContainer class="graph-container"></div>

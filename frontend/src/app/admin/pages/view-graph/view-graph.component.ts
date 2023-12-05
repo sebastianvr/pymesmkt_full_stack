@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 import { GraphService } from '../../../core/services/graph/graph.service';
 import { zoom, ZoomBehavior, ZoomTransform } from 'd3-zoom';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-view-graph',
@@ -18,19 +19,41 @@ export class ViewGraphComponent implements OnInit {
   nodes: any[] = [];
   links: any[] = [];
 
+  isEmptyGraph: boolean = false;
+  isLoading: boolean = false;
+
   constructor(private graphService: GraphService) { }
 
   ngOnInit(): void {
-    this.graphService.getDataGraph().subscribe((data) => {
-      const { nodes, links } = data;
-      console.log({ data });
+    this.isLoading = true;
 
-      this.nodes = nodes;
-      this.links = links;
-      // this.showExampleGraph();
-      this.initializeGraph();
+    this.graphService.getDataGraph()
+      .pipe(
+        catchError((error) => {
+          console.log({ error });
+          return error;
+        }))
+      .subscribe((data) => {
+        console.log({ data });
+        this.isLoading = false;
 
-    });
+        const { nodes, links } = data;
+
+        // Verifica si tanto los nodos como los enlaces están vacíos
+        if (nodes.length === 0 && links.length === 0) {
+          console.log('Los nodos y los enlaces están vacíos.');
+          this.isEmptyGraph = true;
+          return;
+        }
+        
+        this.isEmptyGraph = false;
+        this.nodes = nodes;
+        this.links = links;        
+
+        // this.showExampleGraph();
+        this.initializeGraph();
+
+      });
   }
 
   initializeGraph() {
