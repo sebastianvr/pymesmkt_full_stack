@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 
 @Component({
@@ -11,6 +11,8 @@ export class SidebarAdminComponent implements OnInit {
   display!: boolean;
   visibleSidebar: boolean = true;
   itemsPanelMenu: MenuItem[] = [];
+
+  @Input() nameUser!: string
 
   constructor() { }
 
@@ -60,6 +62,4 @@ export class SidebarAdminComponent implements OnInit {
       }
     ]
   }
-
-
 }

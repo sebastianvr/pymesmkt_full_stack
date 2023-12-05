@@ -10,7 +10,7 @@ export class AdminGuard implements CanActivate, CanLoad {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) { }
 
   canActivate(): Observable<boolean> | boolean {
@@ -26,7 +26,6 @@ export class AdminGuard implements CanActivate, CanLoad {
   }
 
   canLoad(): Observable<boolean> | boolean {
-    console.log(this.authService.usuario)
     return this.authService.validarToken()
       .pipe(map(valid => {
         if (valid && this.authService.usuario.rol === 'ADMIN-USER') {

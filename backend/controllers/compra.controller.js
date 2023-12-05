@@ -6,35 +6,17 @@ const Usuario = require('../models/usuario');
 const Publicacion = require('../models/publicacion');
 const Oferta = require('../models/oferta');
 const Pyme = require('../models/pyme');
-const Calificacion = require('../models/calificacion');
-
-
 
 const dataGraphGet = async (req = request, res = response) => {
+    console.log("[compra] dataGraphGet()");
 
     try {
-        const colaboraciones = await Compra.findAll({
-            where: { estado: true },
-            attributes: [
-                'id',
-                // [Compra.fn('COUNT', Compra.col('hats')), 'n_hats']
-            ],
-            include: [
-                {
-                    model: Usuario,
-                    where: { estado: true },
-                    attributes: ['id'],
-                    include: [{
-                        model: Pyme, 
-                        where: { estado: true }, 
-                        attributes: ['id', 'nombrePyme']
-                    }]
-                },
-                {
-                    model: Oferta,
-                    where: { estado: true },
-                    attributes: ['id'],
-                    include: [{
+        const colaboraciones = await
+            Compra.findAll({
+                where: { estado: true },
+                attributes: ['id'],
+                include: [
+                    {
                         model: Usuario,
                         where: { estado: true },
                         attributes: ['id'],
@@ -43,135 +25,85 @@ const dataGraphGet = async (req = request, res = response) => {
                             where: { estado: true },
                             attributes: ['id', 'nombrePyme']
                         }]
-                    }],
-                    order: [['nombrePyme', 'DESC']],
-                }
-            ],
-        })
+                    },
+                    {
+                        model: Oferta,
+                        where: { estado: true },
+                        attributes: ['id'],
+                        include: [{
+                            model: Usuario,
+                            where: { estado: true },
+                            attributes: ['id'],
+                            include: [{
+                                model: Pyme,
+                                where: { estado: true },
+                                attributes: ['id', 'nombrePyme']
+                            }]
+                        }],
+                        order: [['nombrePyme', 'DESC']],
+                    }
+                ],
+            });
 
-        // console.log('colaboraciones', colaboraciones)
-
-        // Obtengo todos los nodos, formateando la data
-        const nodes = getNodes(colaboraciones);
-
-        // Obtengo todos los links, formateando la data
+        const nodes = await getNodes();
         const links = getLinks(colaboraciones);
 
         return res.status(200).json({
             ok: true,
             nodes,
-            links
+            links,
         });
 
     } catch (error) {
-        console.log(error);
+        console.log({ error });
         res.status(500).json({
             ok: false,
             error,
-            msg: 'Error en dataGraphGet()',
         });
     }
 }
 
-
 /**
- * 
- *  Identificar todos los NODOS existentes
-        Formato  
-            nodes : [
-                id : 1,
-                name : EmpresaName
-            ]
+ *  Obtiene links en base a las compras realizadas.
+     Formato de salida  
+        links : [
+            source : 1,
+            target : 4,
+            type : # 
+        ]
+    
+     Donde : 
+        souce :  nodo con id 1
+        target :  nodo con id 4
+        type :  nro de veces que se repite la relación
 
-            Donde : 
-                id :  identificador unico del nodo
-                name :  nombre de la empresa
  * @param {*} compras
  * @returns 
- * Arreglo con todos los nodos ordenados Alfabeticamente descendentemente
+ * Arreglo con todas las colaboraciones como links.
  */
-function getNodes(compras) {
-
-    /**
-        * Añado un tipo de dato diccionario usando Set para guardar 
-        * SOLO ELEMENTOS QUE NO SE REPITEN
-     */
-    let nodes = new Set();
-
-    // Iteracion y obtencion de todos los nodos
-    compras.forEach((compra, index) => {
-        /** 
-         *  DESESTRUCTURACION DEL OBJETO Y RENOMBRE PARA 
-         *      nombrePyme  = comprador
-         *      Pyme        = vendedor
-        */
-        const {
-            Usuario: {
-                Pyme: { nombrePyme: comprador }
-            },
-            Ofertum: {
-                Usuario: { Pyme: { nombrePyme: vendedor } }
-            }
-        } = compra
-
-        // Añado todos los participantes al diccionario nodes
-        nodes.add(comprador.toLowerCase().trim());
-        nodes.add(vendedor.toLowerCase().trim());
-    });
-
-    
-    // console.log('nodes', nodes)
-    nodes = Array.from(nodes)
-    
-    // Transformo el diccionario a arreglo
-    const newNodes = []
-    for (let index = 0; index < nodes.length; index++) {
-        newNodes.push({
-            id: nodes[index]
-        })
-    }
-
-    return newNodes
-}
-
-/**
- *  
- *   Identificar todas las RELACIONES existentes
-           Formato de salida  
-               links : [
-                   source : 1,
-                   target : 4,
-                   type : # 
-               ]
-            
-            Donde : 
-               souce :  nodo con id 1
-               target :  nodo con id 4
-               target :  número de veces que se repite la relación
- * @param {*} compras
- * @returns 
- * Arreglo con todos los links
- */
-function getLinks(compras) { 
-
+const getLinks = (compras) => {
     let links = [];
     let data = [];
 
-    // Limpiar la informacion
-    compras.forEach((compra, index) => {
+    // Mapping and cleaning data
+    compras.forEach((compra) => {
         /** 
-         *  DESESTRUCTURACION DEL OBJETO Y RENOMBRE PARA 
+         *  Desestructuración del objeto y renombre de relaciones: 
          *      nombrePyme  = comprador
          *      Pyme        = vendedor
         */
         const {
             Usuario: {
-                Pyme: { nombrePyme: comprador }
+                Pyme: {
+                    nombrePyme: comprador
+                }
             },
             Ofertum: {
-                Usuario: { Pyme: { nombrePyme: vendedor } }
+                Usuario: {
+                    Pyme: { nombrePyme: vendedor }
+                }
             }
-        } = compra
+        } = compra;
 
         data.push(`${comprador.toLowerCase().trim()}-${vendedor.toLowerCase().trim()}`)
     });
@@ -180,7 +112,7 @@ function getLinks(compras) {
     for (let index = 0; index < data.length; index++) {
 
         if (data[index] === data[index + 1]) {
-            contador++
+            contador++;
         } else {
             links.push({
                 source: data[index].split('-').shift(),
@@ -190,14 +122,66 @@ function getLinks(compras) {
             contador = 1;
         }
     }
-    return links
+    return links;
+}
+
+const getNodes = async () => {
+    const pymesFound = await Usuario.findAll({
+        where: { estado: true },
+        attributes: ['id'],
+        include: {
+            model: Pyme,
+            where: { estado: true },
+            attributes: ['id', 'nombrePyme']
+        },
+    });
+
+    let nodes = new Set();
+
+    pymesFound.forEach((node) => {
+        const {
+            Pyme: {
+                id,
+                nombrePyme,
+            }
+        } = node;
+
+        const titleCaseNombrePyme = toTitleCase(nombrePyme);
+
+        nodes.add({
+            index: id,
+            name: titleCaseNombrePyme.trim(),
+        });
+    });
+
+    nodes = Array.from(nodes);
+
+    // Transforma el diccionario a arreglo
+    const newNodes = [];
+    for (let index = 0; index < nodes.length; index++) {
+        newNodes.push(nodes[index]);
+    }
+
+    return newNodes;
+}
+
+const toTitleCase = (str) => {
+    return str.replace(
+        /\w\S*/g,
+        (txt) => {
+            return txt.length > 1 ?
+                txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase() :
+                txt.toLowerCase();
+        }
+    );
 }
 
 const comprasGetById = async (req = request, res = response) => {
+    console.log('[compra] comprasGetById()');
 
     const { UsuarioId } = req.params;
-
     const { page, size } = req.query;
+
     const pageAsNumber = Number.parseInt(page);
     const sizeAsNumber = Number.parseInt(size);
 
@@ -259,14 +243,12 @@ const comprasGetById = async (req = request, res = response) => {
             ]
         })
 
-        // console.log(compras)
-        // console.log('comprasGetById()', compras)
         if (compras.count === 0) {
             return res.status(200).json({
                 ok: true,
                 compras,
-                msg: 'No existen compras de este usuario'
-            })
+                msg: 'No existen compras de este usuario',
+            });
         }
 
         if (compras.count > 0) {
@@ -278,66 +260,70 @@ const comprasGetById = async (req = request, res = response) => {
         }
 
     } catch (error) {
-        console.log(error)
+        console.log({ error });
         res.status(500).json({
             ok: false,
-            msg: error
-        })
+            msg: error,
+        });
     }
 }
 
 const compraPost = async (req = request, res = response) => {
+    console.log('[compra] compraPost()');
 
-    const { precio, codAutorizacion, PublicacionId, UsuarioId, OfertumId } = req.body
+    const {
+        precio,
+        codAutorizacion,
+        PublicacionId,
+        UsuarioId,
+        OfertumId
+    } = req.body
+
     const myId = uid(15);
 
     nuevaCompra = {
         id: myId,
         precio,
         codAutorizacion,
-        // Id de la publicación
-        PublicacionId,
-        //Id del usuario dueño de la compra
-        UsuarioId,
-        //Id de la oferta pagada
-        OfertumId
+        PublicacionId, /* Id de la publicación */
+        UsuarioId, /* Id del usuario dueño de la compra */
+        OfertumId /* Id de la oferta pagada */
     }
 
     try {
 
         // comprobar si existe una compra para la misma publicacion 
-        const existePublicacion = await Compra.findOne({ where: { PublicacionId } });
-        // console.log(publicacion)
-        if (!existePublicacion) {
-            await Compra.create(nuevaCompra);
+        const existePublicacion = await Compra.
+            findOne({
+                where: { PublicacionId }
+            });
 
-            return res.status(200).json({
-                ok: true,
-                msg: 'Nueva compra creada'
-            })
-        } else {
-
+        if (existePublicacion) {
             return res.status(400).json({
                 ok: false,
-                msg: 'No se puede comprar una publicacion que ya fue pagada anteriormente.',
-            })
+                msg: 'Esta publicación que ya fue pagada.',
+            });
         }
 
+        await Compra.create(nuevaCompra);
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Nueva compra creada',
+        });
 
     } catch (error) {
-        console.log(error)
+        console.log({ error });
         res.status(500).json({
             ok: false,
             msg: 'Error en compraPost()',
-            msg: error
-        })
+            msg: error,
+        });
     }
-
 }
-
 
 module.exports = {
     compraPost,
     dataGraphGet,
-    comprasGetById
+    comprasGetById,
 };
