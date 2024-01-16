@@ -66,18 +66,10 @@ export class OffersMadeComponent implements OnInit {
     });
   }
 
-  // getOfertas() {
-  //   this.ofertaService.getOfertasRealizadas(this.idUser).subscribe((data) => {
-  //     this.ofertas = data.content;
-  //     console.log('getOfertasRealizadas: ', data);
-  //     console.log('this.ofertas: ', this.ofertas);
-  //   });
-  // }
-
   private getOfertasById(filters: any) {
     this.isLoading = true;
     console.log({ filters });
-    this.ofertaService.getOfertasById(this.idUser, filters).subscribe((data) => {
+    this.ofertaService.getOfertasRealizadas(this.idUser, filters).subscribe((data) => {
       console.log({ data });
       this.isLoading = false;
 
@@ -129,6 +121,7 @@ export class OffersMadeComponent implements OnInit {
       if (result.isConfirmed) {
         this.ofertaService.deleteOferta(idOferta).subscribe((data) => {
           console.log(data);
+          this.ofertas = this.ofertas.filter((oferta: any) => oferta.id !== idOferta);
         });
 
         swalWithBootstrapButtons.fire(
@@ -148,9 +141,13 @@ export class OffersMadeComponent implements OnInit {
 
     this.getOfertasById(query);
 
-    // const searchTermControl = this.filterForm.get('searchTerm');
-    // searchTermControl?.setValue(null);
-    // searchTermControl?.reset(); 
+    const searchTermControl = this.filterForm.get('searchTerm');
+    searchTermControl?.setErrors(null); 
+    searchTermControl?.reset(); 
+    
+    const searchOption = this.filterForm.get('searchOption');
+    searchOption?.setErrors(null); 
+      
   }
 
   private validateDate(control: AbstractControl): { [key: string]: boolean } | null {

@@ -57,7 +57,8 @@
             <div class="col-md-12 text-center" *ngIf="isEmptyOffersReceived && !isLoading">
                 <div class="container mt-5">
                     <img src="../../../../assets/icons/offer-icon.svg" alt="offer-icon.svg" class="icon-image">
-                    <h3 class="my-3">No tienes ofertas realizadas aún.</h3>
+                    <h3 *ngIf="!ofertas" class="my-3">No tienes ofertas realizadas aún.</h3>
+                    <h3 *ngIf="ofertas" class="my-3">No se encontraron coincidencias.</h3>
 
                     <ng-container *ngIf="ofertas">
                         <div class="col-lg-12">
@@ -80,7 +81,7 @@
                             </span>
                             <h3 class="fs-4 m-0">
                                 <span pTooltip="Nombre de la empresa" data-placement="top">
-                                    Oferta ⇒ {{oferta.Publicacion.Usuario.Pyme.nombrePyme | uppercase}}
+                                    Empresa ⇒ {{oferta.Publicacion.Usuario.Pyme.nombrePyme | uppercase}}
                                 </span>
                             </h3>
                         </div>
@@ -112,6 +113,12 @@
                                 <ngb-panel title="Detalles de la publicación ">
                                     <ng-template ngbPanelContent>
                                         <div class="row col-lg-12 mx-3">
+                                            <div class="container">
+                                                <h6 class="alert alert-success py-1 float-end"
+                                                    ngbTooltip="ID de la publicación">
+                                                    {{oferta.PublicacionId}}
+                                                </h6>
+                                            </div>
                                             <h3 class="text-center">
                                                 {{oferta.Publicacion.titulo | uppercase}}
                                             </h3>
