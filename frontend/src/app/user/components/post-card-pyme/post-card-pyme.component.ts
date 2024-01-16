@@ -38,11 +38,12 @@ export class PostCardPymeComponent implements OnInit {
     return false;
   }
 
-  public openOffer(idOffer: string) {
-    console.log({ idOffer });
+  public openOffer(offer: any) {
+    console.log({ offer });
     const modalRef = this.modalService.open(ModalOfferDetailComponent, { size: 'lg' });
-    modalRef.componentInstance.idOffer = idOffer;
-    modalRef.componentInstance.respondedUserId = this.idUser;
+    modalRef.componentInstance.idOffer = offer.id;
+    modalRef.componentInstance.senderUserId = this.idUser;
+    modalRef.componentInstance.recipientdUserId = offer.UsuarioId;
 
     modalRef.result.then(
       (result) => {

@@ -25,6 +25,12 @@
     font-weight: 800;
 }
 
-.customSelect{
+.customSelect {
     max-width: 110px;
+}
+
+.icon-button-style {
+    filter: invert(100%);
+    width: 16px;
+    height: 16px;
 }

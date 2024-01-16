@@ -31,6 +31,10 @@ const Oferta = db.define(
             type: DataTypes.BOOLEAN,
             defaultValue: true,
         },
+        usuarioIdReceptor: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         createdAt: {
             type: DataTypes.DATE,
         },

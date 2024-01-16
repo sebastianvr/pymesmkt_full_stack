@@ -103,10 +103,11 @@ router.post('/', [
 
     check('PublicacionId', 'El id de la publicación es obligatorio').not().isEmpty(),
     validarCampos,
-
-    check('UsuarioId', 'El del usuario es obligatorio').not().isEmpty(),
+    check('UsuarioId', 'El id del usuario es obligatorio').not().isEmpty(),
     validarCampos,
 
+    check('usuarioIdReceptor', 'El del usuarioIdReceptor es obligatorio').not().isEmpty(),
+    validarCampos,
 ], ofertaPost);
 
 // Eliminacion de una publicacion

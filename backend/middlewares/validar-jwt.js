@@ -29,9 +29,9 @@ const validarJWT = async (req, res = response, next) => {
         req.rol = rol;
 
     } catch (error) {
-        if (err.name === 'TokenExpiredError') {
+        if (error.name === 'TokenExpiredError') {
             // El token ha expirado, tomar una acción en consecuencia
-            console.log('Token expirado:', err.expiredAt);
+            console.log('Token expirado:', error.expiredAt);
             res.status(401).json({
               ok: false,
               msg: 'Token expirado',
@@ -39,11 +39,11 @@ const validarJWT = async (req, res = response, next) => {
             return;
         }
        
-        console.log(error);    
+        console.log({error});    
         res.status(401).json({
             ok: false,
             msg: 'Token inválido',
-        })
+        });
     }
     next();
 };
