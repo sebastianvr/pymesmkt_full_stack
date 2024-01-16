@@ -39,7 +39,15 @@ router.get('/suspended/',
     usuariosGetAllSuspended
 );
 
-router.get('/deleted/', usuariosGetAllDeleted);
+router.get('/deleted/',
+    [
+        query('page').optional().isInt({ min: 1 }).
+            withMessage('page debe ser un número entero mayor o igual a 1'),
+        query('pageSize').optional().isInt({ min: 1, max: 100 }).
+            withMessage('pageSize debe ser un número entero entre 1 y 100'),
+    ],
+    usuariosGetAllDeleted
+);
 
 router.get('/:id', usuarioGet);
 

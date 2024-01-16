@@ -137,60 +137,61 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
             error,
         );
     }
-
-
-
 }
 
 const usuariosGetAllDeleted = async (req = request, res = response) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const { page, size } = req.query;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
 
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const filter = {};
+
+    if (req.query.nombreUsuario) {
+        filter.titulo = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('nombreUsuario')),
+                {
+                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                },
+            ],
+        };
+    };
+
+    console.log({ filter });
 
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
+        const { count, rows: usuarios } =
+            await DeleteUsuario.findAndCountAll({
+                where: filter,
+                limit: pageSize,
+                offset: (page - 1) * pageSize,
+            });
 
-        let size = 10
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
-            size = sizeAsNumber;
-        }
+        if (!usuarios.length) {
+            return res.status(200).json({
+                message: 'No se encontraron coincidencias.',
+                usuarios: [],
+            });
+        };
 
-        const usuarios = await DeleteUsuario.findAndCountAll({
-            limit: size,
-            offset: page * size,
-
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            usuarios,
         });
 
-
-
-        if (usuarios.count === 0) {
-            res.status(200).json({
-                ok: true,
-                usuarios,
-                msg: 'No existen usuarios eliminados en la base de datos.'
-            })
-        }
-
-        if (usuarios.count > 0) {
-            res.status(200).json({
-                ok: true,
-                totalPages: Math.ceil(usuarios.count / size),
-                content: usuarios.rows,
-            });
-        }
-
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
-            ok: false,
+        console.error({ error });
+        return res.status(500).json(
+            { error: 'Error en el servidor' },
             error,
-            msg: 'Error al obtener usuarios eliminados.'
-        })
+        );
     }
 }
 
@@ -233,7 +234,7 @@ const usuarioGet = async (req = request, res = response) => {
         return res.status(200).json(usuario);
 
     } catch (error) {
-        console.log({error});
+        console.log({ error });
     }
 }
 
