@@ -13,9 +13,10 @@ import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
 export class ModalOfferDetailComponent implements OnInit {
 
   @Input() idOffer!: string;
-  @Input() respondedUserId!: string; /**Id del usuario "ofertante" */
+  @Input() senderUserId!: string; 
+  @Input() recipientdUserId!: string;
+  
   offerForm!: FormGroup;
-
 
   // 2 MB como tamaño máximo de archivo
   private fileSize: number = (2 * 1024 * 1024);
@@ -53,7 +54,8 @@ export class ModalOfferDetailComponent implements OnInit {
     const newOffer = {
       mensaje: this.offerForm.get('mensaje')?.value,
       precioOferta: this.offerForm.get('precioOferta')?.value,
-      UsuarioId: this.respondedUserId,
+      UsuarioId: this.senderUserId,
+      usuarioIdReceptor: this.recipientdUserId,
       PublicacionId: this.idOffer,
     };
 
