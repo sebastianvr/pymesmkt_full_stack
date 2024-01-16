@@ -8,15 +8,43 @@
                 <h2 class="fs-1 mb-1"><strong>Ofertas Recibidas</strong></h2>
             </div>
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 input-group input-group-sm mb-3 mx-3 ">
-                        <div class="input-group input-group-md">
-                            <input type="text" class="form-control" aria-label="Sizing example input"
-                                aria-describedby="inputGroup-sizing-lg" id="buscarOferta">
-                            <span class="input-group-text mr-3" id="inputGroup-sizing-lg">Buscar</span>
+            <div class="col-md-12">
+                <div class="input-group mb-3">
+                    <form [formGroup]="filterForm" class="input-group mb-3">
+                        <select class="form-select customSelect text-center" id="searchOptionSelect"
+                            formControlName="searchOption">
+                            <option [value]="'fecha'">Fecha</option>
+                            <option [value]="'mensaje'">Mensaje</option>
+                        </select>
+
+                        <input type="text" class="form-control" formControlName="searchTerm"
+                            aria-label="Término de búsqueda" />
+                        <button class="input-group-text btn btn-primary" id="basic-addon2" (click)="sendForm()">
+                            Buscar
+                        </button>
+
+                        <div class="container">
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('required')"
+                                class="text-danger">Este campo es requerido.</div>
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('invalidDate')"
+                                class="text-danger">La fecha debe ser tipo DD-MM-YYYY.</div>
+                        </div>
+                    </form>
+
+                    <div class="row my-1">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Limpiar búsqueda" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary float-end">
+                                <img src="../../../../assets/icons/magic.svg" alt="magic.svg">
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Debug -->
+                    <!-- <div class="container">
+                        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+                        <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+                    </div> -->
                 </div>
             </div>
 
@@ -62,7 +90,7 @@
 
                         <div class="card-footer">
                             <span class="py-2">Empresas ofertantes: </span>
-                            <ngb-accordion #acc="ngbAccordion" *ngFor="let oferta of oferta.Oferta">
+                            <ngb-accordion #acc="ngbAccordion" *ngFor="let oferta of ofertas">
                                 <ngb-panel title="{{oferta.Usuario.Pyme.nombrePyme}}">
                                     <ng-template ngbPanelContent>
                                         <div class="row my-1">
