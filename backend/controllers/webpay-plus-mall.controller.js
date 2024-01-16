@@ -35,23 +35,28 @@ exports.create = asyncHandler(async function (request, response, next) {
     // console.log('process.env.WPPM_CC : ', process.env.WPPM_CC)
     // console.log('details : ', details)
 
-    const createResponse = await (new WebpayPlus.MallTransaction()).create(
-        buyOrder,
-        sessionId,
-        returnUrl,
-        details
-    );
-
-    // console.log('createResponse', createResponse)
-
-    let token = createResponse.token;
-    let url = createResponse.url;
-
-    response.status(200).json({
-        ok: true,
-        token,
-        url
-    })
+    try {
+        const createResponse = await (new WebpayPlus.MallTransaction()).create(
+            buyOrder,
+            sessionId,
+            returnUrl,
+            details
+        );
+    
+        // console.log('createResponse', createResponse)
+    
+        let token = createResponse.token;
+        let url = createResponse.url;
+    
+        response.status(200).json({
+            ok: true,
+            token,
+            url
+        })
+        
+    } catch (error) {
+        console.error(error);
+    }
 });
 
 
