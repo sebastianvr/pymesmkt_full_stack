@@ -60,9 +60,10 @@ const ofertaGetById = async (req = request, res = response) => {
     }
 }
 
-// Obtiene ofertas recibidas de un usuario, usando su id
+
 const ofertasRecibidasGetById = async (req = request, res = response) => {
-    console.log('[ofertas] ofertasRecibidasGetById()')
+    console.log('[ofertas] ofertasRecibidasGetById()');
+
     const { idUsuario } = req.params;
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 20;
@@ -70,80 +71,46 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
-    };
-
-    // aqui esta mal
-    // debo buscar ofertasRecibidasGetById mas bien es get ofertas recibidas a un UsuarioId O ALGO ASI
-    const filter = {
-        UsuarioId: idUsuario,
-        estado: true,
-        procesoDeOferta: 'DISPONIBLE',
-    };
-
-    if (req.query.mensaje) {
-        filter.mensaje = {
-            [Sequelize.Op.and]: [
-                Sequelize.fn('LOWER', Sequelize.col('mensaje')),
-                {
-                    [Sequelize.Op.like]: `%${req.query.mensaje.toLowerCase()}%`,
-                },
-            ],
-        };
-    };
-
-    if (req.query.fecha) {
-        // Verificamos que la fecha cumpla con el formato "DD-MM-YYYY"
-        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-        if (dateRegex.test(req.query.fecha)) {
-            // Si la fecha es válida, podemos incluirla en la consulta
-            const fechaParts = req.query.fecha.split('-');
-            const day = parseInt(fechaParts[0], 10);
-            const month = parseInt(fechaParts[1], 10);
-            const year = parseInt(fechaParts[2], 10);
-
-            filter.createdAt = {
-                [Sequelize.Op.and]: [
-                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('createdAt')), day),
-                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('createdAt')), month),
-                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('createdAt')), year),
-                ]
-            };
-        }
     }
 
-    console.log({ filter });
     try {
-        const { count, rows } =
-            await Oferta.findAndCountAll({
-                where: filter,
-                limit: pageSize,
-                offset: (page - 1) * pageSize,
-                include: [
-                    {
+        const filter = {
+            estado: true,
+            procesoDeOferta: 'DISPONIBLE',
+            usuarioIdReceptor: idUsuario,
+        }
+        console.log({ filter });
+        const { count, rows } = await Oferta.findAndCountAll({
+            where: filter,
+            limit: pageSize,
+            offset: (page - 1) * pageSize,
+            include: [
+                {
+                    model: Publicacion,
+                    where: {
+                        estado: true,
+                        procesoDePublicacion: 'INICIADA'
+                    },
+                    include: [{
                         model: Usuario,
-                        where: { estado: 1 },
+                        where: { estado: true },
+                        attributes: ['nombreUsuario'],
                         include: [{
                             model: Pyme,
-                            where: { estado: 1 }
+                            where: { estado: true },
+                            attributes: ['nombrePyme'],
                         }]
-                    },
-                    {
-                        model: Publicacion,
-                        where: { estado: 1 },
-                        include: [
-                            {
-                                model: Usuario,
-                                where: { estado: 1 },
-                                include: [{
-                                    model: Pyme,
-                                    where: { estado: 1 }
-                                }]
-                            },
-                        ]
-                    }
-                ]
-            });
-
+                    }]
+                }, {
+                    model: Usuario,
+                    include: [{
+                        model: Pyme,
+                        where: { estado: true },
+                        attributes: ['nombrePyme'],
+                    }]
+                }
+            ],
+        });
 
         console.log({ count, rows });
 
@@ -152,7 +119,7 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
                 message: 'No se encontraron coincidencias.',
                 rows: [],
             });
-        };
+        }
 
         return res.status(200).json({
             total: count,
@@ -164,10 +131,10 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
 
     } catch (error) {
         console.error({ error });
-        return res.status(500).json(
-            { error: 'Error en el servidor' },
-            error,
-        );
+        return res.status(500).json({
+            msj: 'Error en el servidor',
+            error
+        });
     }
 }
 
@@ -189,6 +156,39 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
         estado: true,
         procesoDeOferta: 'DISPONIBLE'
     };
+
+    if (req.query.fecha) {
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            // Si la fecha es válida, podemos incluirla en la consulta
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+            console.log({ fechaParts });
+
+            filter.createdAt = {
+                [Sequelize.Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('createdAt')), year),
+                ]
+            };
+        }
+    }
+
+    if (req.query.mensaje) {
+        filter.mensaje = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('mensaje')),
+                {
+                    [Sequelize.Op.like]: `%${req.query.mensaje.toLowerCase()}%`,
+                },
+            ],
+        };
+    };
+
+    console.log({ filter });
 
     try {
         const { count, rows } =
@@ -236,23 +236,31 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
 
     } catch (error) {
         console.error({ error });
-        return res.status(500).json(
-            { error: 'Error en el servidor' },
-            error,
-        );
+        return res.status(500).json({
+            msj: 'Error en el servidor',
+            error
+        });
     }
 }
 
 const ofertaPost = async (req = request, res = response) => {
     console.log('[ofertas] ofertaPost()');
-    const { mensaje, precioOferta, PublicacionId, UsuarioId } = req.body;
+
+    const {
+        mensaje,
+        precioOferta,
+        PublicacionId,
+        usuarioIdReceptor,
+        UsuarioId
+    } = req.body;
 
     nuevaOferta = {
         id: uid(15),
         mensaje,
         precioOferta,
         PublicacionId, /** Id de la publicación */
-        UsuarioId, /** Id del usuario dueño de la oferta */
+        usuarioIdReceptor,
+        UsuarioId,
     };
 
     try {
