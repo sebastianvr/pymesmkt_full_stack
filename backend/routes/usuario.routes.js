@@ -63,7 +63,10 @@ router.post('/', [
     validarCampos,
 ], usuarioPost);
 
-router.put('/:id', validarCampos, usuarioPut);
+router.put('/:id', [
+    check('id', 'El param id es obligatorio').not().isEmpty(), 
+    validarCampos,
+], usuarioPut);
 
 router.put('/activate/:id', validarCampos, usuarioActivatePut);
 

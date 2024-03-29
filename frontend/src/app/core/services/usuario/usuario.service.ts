@@ -10,15 +10,14 @@ import { tap } from 'rxjs/operators';
 export class UsuarioService {
 
   private url: string = environment.baseUrl
-  private refreshUsuarios = new Subject<void>()
-
+  private refreshUsuarios = new Subject<void>();
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
   ) { }
 
   get refresh() {
-    return this.refreshUsuarios
+    return this.refreshUsuarios;
   }
 
   getUsuario(id: string): Observable<any> {
@@ -37,6 +36,10 @@ export class UsuarioService {
     return this.http.get<any>(`${this.url}/api/usuario/deleted/?size=${size}&page=${page}`);
   }
 
+  updateUser(id: string, userUpdate: any) {
+    return this.http.put<any>(`${this.url}/api/usuario/${id}`, userUpdate);
+  }
+
   suspenderUsuario(id: any) {
     return this.http.put<any>(`${this.url}/api/usuario/suspend/${id}`, {})
       .pipe(
@@ -48,11 +51,11 @@ export class UsuarioService {
 
   deleteUsuario(id: any) {
     return this.http.delete<any>(`${this.url}/api/usuario/delete/${id}`, {})
-    .pipe(
-      tap(() => {
-        this.refresh.next();
-      }),
-    );
+      .pipe(
+        tap(() => {
+          this.refresh.next();
+        }),
+      );
   }
 
   activarUsuario(usuario: any) {

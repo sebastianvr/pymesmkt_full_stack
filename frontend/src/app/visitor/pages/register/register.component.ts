@@ -52,8 +52,8 @@ export class RegisterComponent implements OnInit {
     private minioFilesService: MinioFilesService,
     private modalService: NgbModal,
   ) {
-    this.regionesEmpresa = this.regionesComunas.getRegiones();
-    this.regionesPropietario = this.regionesComunas.getRegiones();
+    this.regionesEmpresa = this.regionesComunas.getRegions();
+    this.regionesPropietario = this.regionesComunas.getRegions();
     this.formulario = this.buildForm();
 
     /* Debug - set mock of new user */

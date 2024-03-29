@@ -7,6 +7,7 @@ const { validationResult } = require('express-validator');
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
 const DeleteUsuario = require('../models/deletedUsuario');
+const db = require('../db/connection');
 
 
 const usuariosGetAll = async (req = request, res = response) => {
@@ -289,16 +290,94 @@ const usuarioPost = async (req = request, res = response) => {
 
 }
 
-const usuarioPut = (req = request, res = response) => {
+const usuarioPut = async (req = request, res = response) => {
+    console.log('[usuarios] usuarioPut()');
 
-    const { id } = req.params
-    console.log(id)
+    const { id } = req.params;
+    const userData = req.body;
 
-    res.status(200).json({
-        ok: true,
-        msg: 'Put Api desde controlador',
-        id
-    })
+    try {
+        // Inicia una transacción
+        const transaction = await db.transaction();
+
+        // Busca el usuario por su ID
+        const usuario = await Usuario.findByPk(id, {
+            include: [
+                {
+                    model: Pyme,
+                    where: { estado: true }, // Si deseas filtrar las pymes con estado true
+                },
+            ],
+            transaction, // Asocia la transacción a esta consulta
+        });
+
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado',
+            });
+        }
+
+        // Mapea la información del usuario según el modelo
+        const userMapped = filterExistingFields({
+            nombreUsuario: userData.nombre,
+            apellidos: userData.apellidos,
+            run: userData.run,
+            emailUsuario: userData.email,
+            imagen: userData.imagen,
+            region: userData.opRegion,
+            comuna: userData.opCommune,
+            dir1Propietario: userData.direccionPropietario,
+            dir2Propietario: userData.direccionPropietario2,
+            descripcion: userData.descripcion,
+        });
+
+        // Mapea la información de la empresa (Pyme) según el modelo
+        const pymeMapped = filterExistingFields({
+            nombrePyme: userData.nombreEmpresa,
+            rut: userData.rut,
+            tipoEmpresa: userData.tipoEmpresa,
+            rubro: userData.rubro,
+            regionEmpresa: userData.regionEmpresa,
+            comunaEmpresa: userData.communeEmpresa,
+            dirEmpresa: userData.direccionEmpresa,
+            descripcionEmpresa: userData.descripcionEmpresa,
+        });
+        // Actualiza los campos del usuario con la información proporcionada 
+        await usuario.update(userMapped, { transaction });
+
+        // Si existe información de la empresa (Pyme) en la solicitud, y hay campos en pymeMapped, actualiza también esa información
+        if (usuario.Pyme && Object.keys(pymeMapped).length > 0) {
+            await usuario.Pyme.update(pymeMapped, { transaction });
+        }
+
+        // Confirma la transacción
+        await transaction.commit();
+
+        res.status(200).json({
+            ok: true,
+            msg: 'Usuario actualizado correctamente',
+            usuario,
+        });
+    } catch (error) {
+        console.log(error);
+        // Si ocurre un error, revierte la transacción
+        await transaction.rollback();
+        res.status(500).json({
+            ok: false,
+            msg: 'Error al actualizar el usuario',
+        });
+    }
+
+}
+
+function filterExistingFields(obj) {
+    return Object.keys(obj)
+        .filter(key => obj[key] !== undefined && obj[key] !== null)
+        .reduce((filteredObj, key) => {
+            filteredObj[key] = obj[key];
+            return filteredObj;
+        }, {});
 }
 
 /**
