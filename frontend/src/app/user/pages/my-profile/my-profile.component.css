@@ -7,3 +7,17 @@
         margin-top: 3vh;
     }
 }
+
+.custom-file-input {
+    visibility: hidden;
+    width: 0;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
