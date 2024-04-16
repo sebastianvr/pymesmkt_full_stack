@@ -17,8 +17,8 @@ const Reclamo = db.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        documento: {
-            type: DataTypes.BLOB,
+        documentos: {
+            type: DataTypes.TEXT,
         },
         mensajeAdmin: {
             type: DataTypes.STRING,
