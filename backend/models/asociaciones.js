@@ -35,6 +35,10 @@ Reclamo.belongsTo(Usuario);
 Publicacion.hasMany(Reclamo);
 Reclamo.belongsTo(Publicacion)
 
+// Un reclamo PUEDE estar asociado a una compra
+Reclamo.belongsTo(Compra);
+Compra.hasOne(Reclamo);
+
 /* Un usuario CREA muchas compras */
 Usuario.hasMany(Compra);
 Compra.belongsTo(Usuario);
