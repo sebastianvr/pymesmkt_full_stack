@@ -305,10 +305,10 @@ const usuarioPut = async (req = request, res = response) => {
             include: [
                 {
                     model: Pyme,
-                    where: { estado: true }, // Si deseas filtrar las pymes con estado true
+                    where: { estado: true },
                 },
             ],
-            transaction, // Asocia la transacción a esta consulta
+            transaction, // Asocia la transacción a la consulta
         });
 
         if (!usuario) {
