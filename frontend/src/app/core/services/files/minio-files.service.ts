@@ -19,4 +19,12 @@ export class MinioFilesService {
 
     return this.http.post(`${this.url}/api/minio/uploadUserImage`, formData); 
   }
+
+  postNewReportFiles(files: File[]): Observable<any> {
+    const formData = new FormData();
+    for (let file of files) {
+      formData.append('files', file);
+    }
+    return this.http.post(`${this.url}/api/minio/reportFiles`, formData); 
+  }
 }
