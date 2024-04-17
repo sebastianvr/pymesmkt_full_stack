@@ -6,6 +6,7 @@ const Usuario = require('../models/usuario');
 const Publicacion = require('../models/publicacion');
 const Oferta = require('../models/oferta');
 const Pyme = require('../models/pyme');
+const Reclamo = require('../models/reclamo');
 
 const dataGraphGet = async (req = request, res = response) => {
     console.log("[compra] dataGraphGet()");
@@ -45,6 +46,8 @@ const dataGraphGet = async (req = request, res = response) => {
                 ],
             });
 
+        // console.log(colaboraciones[0]);
+
         const nodes = await getNodes();
         const links = getLinks(colaboraciones);
 
@@ -81,51 +84,113 @@ const dataGraphGet = async (req = request, res = response) => {
  * @returns 
  * Arreglo con todas las colaboraciones como links.
  */
+// const getLinks = (compras) => {
+//     console.log('getLinks()');
+//     // console.log(compras.dataValues);
+//     let links = [];
+//     let data = [];
+
+//     // Mapping and cleaning data
+//     compras.forEach((compra) => {
+//         /** 
+//          *  Desestructuración del objeto y renombre de relaciones: 
+//          *      nombrePyme  = comprador
+//          *      Pyme        = vendedor
+//         */
+//         // const {
+//         //     Usuario: {
+
+//         //         Pyme: {
+//         //             nombrePyme: comprador,
+//         //         },
+//         //     },
+//         //     Ofertum: {
+
+//         //         Usuario: {
+//         //             Pyme: { nombrePyme: vendedor },
+//         //         },
+//         //     },
+//         // } = compra;
+
+//         // data.push(`${compra.Usuario.id} ${comprador.toLowerCase().trim()}-${compra.Ofertum.Usuario.id} ${vendedor.toLowerCase().trim()}`);
+//         const compradorId = compra.Usuario.id;
+//         const vendedorId = compra.Ofertum.Usuario.id;
+
+//         const comprador = compra.Usuario.Pyme.nombrePyme.toLowerCase().trim();
+//         const vendedor = compra.Ofertum.Usuario.Pyme.nombrePyme.toLowerCase().trim();
+
+//         data.push(`${compradorId} ${comprador}-${vendedorId} ${vendedor}`);
+//     });
+
+
+//     let contador = 1;
+
+//     for (let index = 0; index < data.length; index++) {
+//         if (data[index] === data[index + 1]) {
+//             contador++;
+//         } else {
+//             const [compradorId, vendedorId] = data[index].split(' ')[0].split('-');
+//             links.push({
+//                 source: {
+//                     index: compradorId,
+//                     name: data[index].split('-').shift()
+//                 },
+//                 target: {
+//                     index: vendedorId,
+//                     name: data[index].split('-').pop(),
+//                 },
+//                 type: contador
+//             });
+//             contador = 1;
+//         }
+//     }
+//     clg
+//     return links;
+// }
 const getLinks = (compras) => {
+    console.log('getLinks()');
     let links = [];
-    let data = [];
+    let relationships = {};
 
     // Mapping and cleaning data
     compras.forEach((compra) => {
-        /** 
-         *  Desestructuración del objeto y renombre de relaciones: 
-         *      nombrePyme  = comprador
-         *      Pyme        = vendedor
-        */
-        const {
-            Usuario: {
-                Pyme: {
-                    nombrePyme: comprador
-                }
-            },
-            Ofertum: {
-                Usuario: {
-                    Pyme: { nombrePyme: vendedor }
-                }
-            }
-        } = compra;
+        const compradorId = compra.Usuario.id;
+        const vendedorId = compra.Ofertum.Usuario.id;
 
-        data.push(`${comprador.toLowerCase().trim()}-${vendedor.toLowerCase().trim()}`)
+        const comprador = compra.Usuario.Pyme.nombrePyme.toLowerCase().trim();
+        const vendedor = compra.Ofertum.Usuario.Pyme.nombrePyme.toLowerCase().trim();
+
+        const key = `${compradorId}-${vendedorId}`;
+        const existingRelation = relationships[key];
+
+        if (existingRelation) {
+            existingRelation.type++;
+        } else {
+            relationships[key] = {
+                source: {
+
+                    name: toTitleCase(comprador),
+                },
+                target: {
+
+                    name: toTitleCase(vendedor),
+                },
+                type: 1,
+            };
+        }
     });
 
-    let contador = 1;
-    for (let index = 0; index < data.length; index++) {
+    // Convert the relationships object to an array of links
+    links = Object.values(relationships);
+    console.log(links[0]);
 
-        if (data[index] === data[index + 1]) {
-            contador++;
-        } else {
-            links.push({
-                source: data[index].split('-').shift(),
-                target: data[index].split('-').pop(),
-                type: contador
-            })
-            contador = 1;
-        }
-    }
+    console.log({ links });
     return links;
-}
+};
+
 
 const getNodes = async () => {
+    console.log('getNodes()');
     const pymesFound = await Usuario.findAll({
         where: { estado: true },
         attributes: ['id'],
@@ -137,7 +202,7 @@ const getNodes = async () => {
     });
 
     let nodes = new Set();
-
+    console.log({ nodes });
     pymesFound.forEach((node) => {
         const {
             Pyme: {
@@ -162,6 +227,7 @@ const getNodes = async () => {
         newNodes.push(nodes[index]);
     }
 
+    console.log({ newNodes });
     return newNodes;
 }
 
@@ -238,8 +304,15 @@ const comprasGetById = async (req = request, res = response) => {
                             where: { estado: true },
                         }]
                     }]
-
                 },
+                {
+                    model: Reclamo, 
+                    where: {
+                        estado: true,
+                    },
+                    attributes: ['id'],
+                    required: false // Hacer que la asociación con Reclamo sea opcional
+                }
             ]
         })
 
@@ -252,6 +325,7 @@ const comprasGetById = async (req = request, res = response) => {
         }
 
         if (compras.count > 0) {
+            console.log('compras.rows', compras.rows);
             return res.status(200).json({
                 ok: true,
                 totalPages: Math.ceil(compras.count / size),
@@ -276,7 +350,7 @@ const compraPost = async (req = request, res = response) => {
         codAutorizacion,
         PublicacionId,
         UsuarioId,
-        OfertumId
+        OfertumId,
     } = req.body
 
     const myId = uid(15);
@@ -287,7 +361,7 @@ const compraPost = async (req = request, res = response) => {
         codAutorizacion,
         PublicacionId, /* Id de la publicación */
         UsuarioId, /* Id del usuario dueño de la compra */
-        OfertumId /* Id de la oferta pagada */
+        OfertumId, /* Id de la oferta pagada */ 
     }
 
     try {
