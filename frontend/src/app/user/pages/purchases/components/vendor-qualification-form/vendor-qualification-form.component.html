@@ -1,0 +1,48 @@
+<form [formGroup]="calificationForm" (ngSubmit)="sendCalification()">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Califica a tu vendedor
+        </h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()">
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="col-12 mb-3">
+            <label for="addresDescription" class="form-label fw-bold">Reseña</label>
+            <textarea class="form-control" placeholder="Escribe una reseña sobre tu vendedor" id="addresDescription"
+                formControlName="reseña"></textarea>
+            <span *ngIf="fieldInvalidFormCalification('reseña')" class="form-text text-danger">
+                La reseña es obligatoria.
+            </span>
+        </div>
+
+        <div class="col-12 mb-3">
+            <div class="container px-0 text-center">
+                <label for="ratio" class="form-label fw-bold mb-0">Calificación final
+                </label>
+            </div>
+            <div class="container px-0 d-flex justify-content-center">
+                <ngb-rating formControlName="calificacion" id="ratio" [max]="5">
+                    <ng-template let-fill="fill" let-index="index">
+                        <i class="bi-star{{fill === 100 ? '-fill' : ''}}" [class.filled]="fill === 100">
+                        </i>
+                    </ng-template>
+                </ngb-rating>
+                <span *ngIf="fieldInvalidFormCalification('calificacion')" class="form-text text-danger">
+                    La calificación es obligatoria.
+                </span>
+            </div>
+        </div>
+
+        <!-- Formulario FORMATO JSON -->
+        <!-- <div class="container">
+            <span>calificationForm.value :</span>
+            <pre>{{calificationForm.value | json}}</pre>
+            <span>calificationForm.errors :</span>
+            <pre>{{calificationForm.errors | json}}</pre>
+        </div> -->
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary float-start" [disabled]="calificationForm.invalid">Enviar</button>
+    </div>
+</form>
