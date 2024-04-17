@@ -105,10 +105,11 @@ const reclamoPost = async (req = request, res = response) => {
     const {
         titulo,
         mensaje,
-        documento,
+        documentos,
         mensajeAdmin,
         PublicacionId,
         UsuarioId,
+        CompraId
     } = req.body;
 
 
@@ -116,10 +117,11 @@ const reclamoPost = async (req = request, res = response) => {
         id: myId,
         titulo,
         mensaje,
-        documento,
+        documentos,
         mensajeAdmin,
         PublicacionId,
         UsuarioId,
+        CompraId
     };
 
     try {
@@ -128,7 +130,7 @@ const reclamoPost = async (req = request, res = response) => {
         res.status(200).json({
             ok: true,
             id,
-            msg: 'Nueva reclamo creado',
+            msg: 'Nuevo reclamo creado',
         });
     } catch (error) {
         res.status(400).json({
@@ -139,7 +141,7 @@ const reclamoPost = async (req = request, res = response) => {
     };
 };
 
-const publicacionPut = (req = request, res = response) => {
+const reclamoPut = (req = request, res = response) => {
     const { id } = req.params;
     // console.log({ id });
 
@@ -174,6 +176,6 @@ const reclamoDelete = async (req = request, res = response) => {
 module.exports = {
     reclamosGetAll,
     reclamoPost,
-    publicacionPut,
+    reclamoPut,
     reclamoDelete,
 };

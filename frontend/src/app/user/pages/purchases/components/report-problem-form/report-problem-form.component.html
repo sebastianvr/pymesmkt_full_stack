@@ -1,0 +1,46 @@
+<form [formGroup]="reportForm" (ngSubmit)="sendReport()">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Escribe tu reclamo</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()">
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="col-12 mb-3">
+            <label for="address2" class="form-label fw-bold">Titulo</label>
+            <input type="text" class="form-control" id="address2" formControlName="titulo">
+            <span *ngIf="fieldInvalidFormReport('titulo')" class="form-text text-danger">
+                El titulo es obligatorio.
+            </span>
+        </div>
+
+        <div class="col-12 mb-3">
+            <label for="addresDescription" class="form-label fw-bold">Descripción</label>
+            <textarea class="form-control" placeholder="Redacta el problema que ha ocurrido." id="addresDescription"
+                formControlName="descripcion"></textarea>
+            <span *ngIf="fieldInvalidFormReport('descripcion')" class="form-text text-danger">
+                La descripcion es obligatoria.
+            </span>
+        </div>
+
+        <div class="container p-0">
+            <div class="mb-3 col-md-12">
+                <label for="files[]" class="mb-2 fw-bold">Adjuntar archivos (máximo 8 archivos, máximo 15 MB)</label>
+                <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false" [showUploadButton]="false"
+                    (onSelect)="onUpload($event)" [multiple]="true" accept=".jpg,.jpeg,.png,.pdf,.zip"
+                    [maxFileSize]="15000000" [fileLimit]="8">
+                </p-fileUpload>
+            </div>
+        </div>
+
+        <!-- Formulario FORMATO JSON -->
+        <div class="container">
+            <span>reportForm.value :</span>
+            <pre>{{reportForm.value | json}}</pre>
+            <span>reportForm.errors :</span>
+            <pre>{{reportForm.errors | json}}</pre>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary float-start" [disabled]="reportForm.invalid">Enviar</button>
+    </div>
+</form>

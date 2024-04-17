@@ -26,6 +26,8 @@ import { MessageService } from 'primeng/api';
 import { OfferDetailComponent } from './pages/offer-detail/offer-detail.component';
 import { FilterPublicationComponent } from './components/filter-publication/filter-publication.component';
 import { ModalOfferDetailComponent } from './components/modal-offer-detail/modal-offer-detail.component';
+import { VendorQualificationFormComponent } from './pages/purchases/components/vendor-qualification-form/vendor-qualification-form.component';
+import { ReportProblemFormComponent } from './pages/purchases/components/report-problem-form/report-problem-form.component';
 
 
 const components = [
@@ -46,12 +48,14 @@ const components = [
   MainComponent,
   OfferDetailComponent,
   FilterPublicationComponent,
+  ModalOfferDetailComponent,
+  VendorQualificationFormComponent,
+  ReportProblemFormComponent
 ]
 
 @NgModule({
   declarations: [
     ...components,
-    ModalOfferDetailComponent
   ],
   imports: [
     CommonModule,
