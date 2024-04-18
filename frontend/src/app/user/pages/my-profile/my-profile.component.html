@@ -55,18 +55,15 @@
                                     <div class="col-md-6">
                                         <label for="myDNI" class="form-label">RUN (DNI)</label>
                                         <input type="text" class="form-control" id="myDNI" formControlName="run">
-                                        <!-- <span *ngIf="campoInvalido('run', 'infoPropietario')" class="form-text text-danger">
-                                        El Run es inválido o ya existe.
-                                    </span> -->
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="email" class="form-label">Correo electrónico</label>
                                         <input type="email" class="form-control" id="email" formControlName="email">
-                                        <span *ngIf="campoInvalido('correoPropietario', 'infoPropietario')"
+                                        <!-- <span *ngIf="campoInvalido('correoPropietario', 'infoPropietario')"
                                             class="form-text text-danger">
                                             El correo es inválido o ya existe.
-                                        </span>
+                                        </span> -->
                                     </div>
                                 </div>
                             </ng-template>
@@ -78,7 +75,7 @@
                                 </button>
                                 <button *ngIf="!loadingInfoPropietario && !this.editMode.infoPropietario"
                                     (click)="updateUser('infoPropietario')"
-                                    [disabled]="userForm.get('infoPropietario')?.invalid && !userForm.get('infoPropietario')?.touched"
+                                    [disabled]="userForm.get('infoPropietario')?.invalid || !userForm.get('infoPropietario')?.touched"
                                     class="btn btn-sm btn-primary float-start my-3 mx-2">
                                     Guardar
                                 </button>
@@ -165,6 +162,10 @@
                                             </ng-container>
                                         </ng-container>
                                     </select>
+                                    <span *ngIf="campoInvalido('opCommune', 'infoLocalidadPropietario')"
+                                        class="form-text text-danger">
+                                        Seleccione una comuna.
+                                    </span>
                                 </div>
                             </div>
 
@@ -173,6 +174,10 @@
                                     <label for="address" class="form-label">Dirección</label>
                                     <input type="text" class="form-control" id="address"
                                         formControlName="direccionPropietario">
+                                    <span *ngIf="campoInvalido('direccionPropietario', 'infoLocalidadPropietario')"
+                                        class="form-text text-danger">
+                                        La dirección es obligatoria.
+                                    </span>
                                 </div>
 
                                 <div class="col-lg-12 mt-2">
@@ -199,7 +204,7 @@
                                 <button
                                     *ngIf="!loadingInfoLocalidadPropietario && !this.editMode.infoLocalidadPropietario"
                                     (click)="updateUser('infoLocalidadPropietario')"
-                                    [disabled]="userForm.get('infoLocalidadPropietario')?.invalid && !userForm.get('infoLocalidadPropietario')?.touched"
+                                    [disabled]="userForm.get('infoLocalidadPropietario')?.invalid || !userForm.get('infoLocalidadPropietario')?.touched"
                                     class="btn btn-sm btn-primary float-start my-3 mx-2">
                                     Guardar
                                 </button>
@@ -212,7 +217,6 @@
                     <!-- Información de la empresa -->
                     <div class="row" formGroupName="infoEmpresa">
                         <h3 class="fs-2">Información de la empresa</h3>
-
 
                         <div *ngIf="this.loadingInfoEmpresa; else templateInfoEmpresa"
                             class="container-fluid mt-5 text-center">
@@ -227,6 +231,10 @@
                                     <label for="nameCompany" class="form-label">Nombre</label>
                                     <input type="text" class="form-control" id="nameCompany"
                                         formControlName="nombreEmpresa">
+                                    <span *ngIf="campoInvalido('nombreEmpresa', 'infoEmpresa')"
+                                        class="form-text text-danger">
+                                        El nombre es obligatorio.
+                                    </span>
                                 </div>
 
                                 <div class="col-md-6">
@@ -255,11 +263,18 @@
                                             </ng-container>
                                         </ng-container>
                                     </select>
+                                    <span *ngIf="campoInvalido('tipoEmpresa', 'infoEmpresa')"
+                                        class="form-text text-danger">
+                                        El tipo de empresa es obligatorio.
+                                    </span>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="lineOfBusiness" class="form-label">Rubro</label>
                                     <input class="form-control" id="lineOfBusiness" formControlName="rubro">
+                                    <span *ngIf="campoInvalido('rubro', 'infoEmpresa')" class="form-text text-danger">
+                                        El rubro es obligatorio.
+                                    </span>
                                 </div>
                             </div>
 
@@ -270,7 +285,7 @@
                                 </button>
                                 <button *ngIf="!loadingInfoEmpresa && !this.editMode.infoEmpresa"
                                     (click)="updateUser('infoEmpresa')"
-                                    [disabled]="userForm.get('infoEmpresa')?.invalid && !userForm.get('infoEmpresa')?.touched"
+                                    [disabled]="userForm.get('infoEmpresa')?.invalid || !userForm.get('infoEmpresa')?.touched"
                                     class="btn btn-sm btn-primary float-start my-3 mx-2">
                                     Guardar
                                 </button>
@@ -319,8 +334,6 @@
 
                                 <div class="col-lg-6">
                                     <label for="communeCompany" class="form-label">Comuna</label>
-                                    <!-- <select class="form-select" id="communeCompany" formControlName="communeEmpresa">
-                                    </select> -->
                                     <select class="form-select" id="country" formControlName="communeEmpresa">
                                         <ng-container *ngIf="!user.Pyme.comunaEmpresa">
                                             <option disabled selected value="null">Seleccione una comuna</option>
@@ -330,13 +343,19 @@
                                         </ng-container>
 
                                         <ng-container *ngIf="user.Pyme.comunaEmpresa">
-                                            <option selected [value]="user.Pyme.comunaEmpresa">{{user.Pyme.comunaEmpresa}}</option>
+                                            <option selected [value]="user.Pyme.comunaEmpresa">
+                                                {{user.Pyme.comunaEmpresa}}</option>
                                             <ng-container *ngFor="let comuna of selectedRegionCommunes">
-                                                <option *ngIf="comuna !== user.Pyme.comunaEmpresa" [value]="comuna">{{ comuna }}
+                                                <option *ngIf="comuna !== user.Pyme.comunaEmpresa" [value]="comuna">{{
+                                                    comuna }}
                                                 </option>
                                             </ng-container>
                                         </ng-container>
                                     </select>
+                                    <span *ngIf="campoInvalido('communeEmpresa', 'infoLocalidadEmpresa')"
+                                        class="form-text text-danger">
+                                        Seleccione una comuna.
+                                    </span>
                                 </div>
                             </div>
 
@@ -345,6 +364,10 @@
                                     <label for="addressCompany" class="form-label">Dirección</label>
                                     <input type="text" class="form-control" id="addressCompany"
                                         formControlName="direccionEmpresa">
+                                    <span *ngIf="campoInvalido('direccionEmpresa', 'infoLocalidadEmpresa')"
+                                        class="form-text text-danger">
+                                        La dirección de la empresa es obligatoria.
+                                    </span>
                                 </div>
 
                                 <div class="col-lg-12 mt-2">
@@ -363,7 +386,7 @@
                                 </button>
                                 <button *ngIf="!loadingInfoLocalidadEmpresa && !this.editMode.infoLocalidadEmpresa"
                                     (click)="updateUser('infoLocalidadEmpresa')"
-                                    [disabled]="userForm.get('infoLocalidadEmpresa')?.invalid && !userForm.get('infoLocalidadEmpresa')?.touched"
+                                    [disabled]="userForm.get('infoLocalidadEmpresa')?.invalid || !userForm.get('infoLocalidadEmpresa')?.touched"
                                     class="btn btn-sm btn-primary float-start my-3 mx-2">
                                     Guardar
                                 </button>
