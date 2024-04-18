@@ -44,9 +44,7 @@ export class MyProfileComponent implements OnInit {
 
   };
 
-  imageUrl!: string;
-
-
+  public imageUrl!: string;
   private emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
 
   constructor(
@@ -54,8 +52,8 @@ export class MyProfileComponent implements OnInit {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private emailValidator: EmailValidatorService,
-    private runValidator: RunValidatorService,
-    private rutValidator: RutValidatorService,
+    // private runValidator: RunValidatorService,
+    // private rutValidator: RutValidatorService,
     private regionesComunas: RegionesComunasService,
     private messageService: MessageService,
     private minioFilesService: MinioFilesService,
@@ -67,7 +65,7 @@ export class MyProfileComponent implements OnInit {
     this.usuarioService.getUsuario(this.currentUserId)
       .subscribe((user) => {
         this.user = user;
-        console.log({ user });
+        // console.log({ user });
 
         // Setea valores del formulario con los datos del usuario
         this.setForm(user);
@@ -75,6 +73,7 @@ export class MyProfileComponent implements OnInit {
   }
 
   private setForm(user: any, formName?: string) {
+    // console.log('setForm()');
     const formMappings: { [key: string]: any } = {
       infoPropietario: {
         nombre: user.nombreUsuario,
@@ -93,7 +92,7 @@ export class MyProfileComponent implements OnInit {
       infoEmpresa: {
         nombreEmpresa: user.Pyme.nombrePyme,
         rut: user.Pyme.rut,
-        tipoEmpresa: user.Pyme.tipoEmpresa, // Aquí asegúrate de que el valor se establezca correctamente
+        tipoEmpresa: user.Pyme.tipoEmpresa,
         rubro: user.Pyme.rubro,
       },
       infoLocalidadEmpresa: {
@@ -105,6 +104,7 @@ export class MyProfileComponent implements OnInit {
     };
 
     const formValues = formName ? { [formName]: formMappings[formName] } : formMappings;
+    // console.log({ formValues });
     this.userForm.patchValue(formValues);
   }
 
@@ -264,7 +264,12 @@ export class MyProfileComponent implements OnInit {
         if (groupControls.hasOwnProperty(controlName)) {
           const control = groupControls[controlName];
           if (this.editMode[groupName]) {
-            control.enable();
+            // Si el control es el run ,rut o el correo electrónico, no habilitarlo nunca
+            if (controlName === 'run' || controlName === 'rut' || controlName === 'email') {
+              control.disable();
+            } else {
+              control.enable();
+            }
           } else {
             control.disable();
 
@@ -305,12 +310,11 @@ export class MyProfileComponent implements OnInit {
 
     // Obtener los datos del formulario específico
     const updateData = this.userForm.get(formName)?.value;
-
-    console.log({ updateData });
+    // console.log({ updateData });
 
     this.usuarioService.updateUser(this.currentUserId, updateData)
       .subscribe((res: any) => {
-        console.log({ res });
+        // console.log({ res });
         switch (formName) {
           case 'infoPropietario':
             // Desactivar el loader específico después de completar la operación
@@ -351,9 +355,9 @@ export class MyProfileComponent implements OnInit {
   public onRegionChange(event: Event, formControlName: string) {
     const selectedRegion = (event.target as HTMLSelectElement).value;
     if (selectedRegion) {
-      const region = this.regionesComunas.getComunas(selectedRegion);
-      if (region) {
-        this.selectedRegionCommunes = region;
+      const communes = this.regionesComunas.getComunas(selectedRegion);
+      if (communes) {
+        this.selectedRegionCommunes = communes;
         this.userForm.get(formControlName)?.setValue(null); // Reiniciar la selección de comuna        
       } else {
         this.selectedRegionCommunes = [];
@@ -371,7 +375,7 @@ export class MyProfileComponent implements OnInit {
     const file: File = inputElement.files[0];
 
     this.minioFilesService.uploadImage(file).subscribe(
-      (response: any) => { // Aquí puedes definir una interfaz para tipar correctamente la respuesta
+      (response: any) => {
         this.imageUrl = response.filePath;
       },
       (error: any) => {
@@ -380,8 +384,8 @@ export class MyProfileComponent implements OnInit {
     );
   }
 
-  public campoInvalido(campo: string, formulario: string) {
-    return this.userForm.get(formulario)?.get(campo)?.errors
-      && this.userForm.get(formulario)?.get(campo)?.touched;
+  public campoInvalido(field: string, arrayForm: string) {
+    return this.userForm.get(arrayForm)?.get(field)?.errors
+      && this.userForm.get(arrayForm)?.get(field)?.touched;
   }
 }
