@@ -8,10 +8,10 @@ const Pyme = require('../models/pyme');
 
 /**
  * Obtiene todos los reclamos de TODOS los usuarios.
- * @param {request} req 
- * @param {response} res 
  */
 const reclamosGetAll = async (req = request, res = response) => {
+    console.log('[reclamos] reclamosGetAll()');
+
     const { page, size } = req.query;
     const pageAsNumber = Number.parseInt(page);
     const sizeAsNumber = Number.parseInt(size);
@@ -57,7 +57,6 @@ const reclamosGetAll = async (req = request, res = response) => {
                 {
                     model: Publicacion,
                     where: { estado: true },
-                    // attributes: ['UsuarioId', 'id'],
                     include: [
                         // usuario creador del reclamo
                         {
@@ -85,22 +84,24 @@ const reclamosGetAll = async (req = request, res = response) => {
         // }
 
         if (reclamos.count > 0) {
-            res.status(200).json({
+            return res.status(200).json({
                 totalPages: Math.ceil(reclamos.count / size),
                 content: reclamos.rows,
             });
         };
     } catch (error) {
-        // console.log({error})
-        res.status(400).json({
+        console.error(error);
+        return res.status(400).json({
             ok: false,
-            msj: 'Ocurrio un error en reclamosGetAll()',
+            msj: 'Error en el servidor, reclamosGetAll()',
             error,
         });
     };
 };
 
 const reclamoPost = async (req = request, res = response) => {
+    console.log('[reclamos] reclamoPost()');
+
     const myId = uid(15);
     const {
         titulo,
@@ -111,7 +112,6 @@ const reclamoPost = async (req = request, res = response) => {
         UsuarioId,
         CompraId
     } = req.body;
-
 
     const nuevoReclamo = {
         id: myId,
@@ -127,48 +127,61 @@ const reclamoPost = async (req = request, res = response) => {
     try {
         const { id } = await Reclamo.create(nuevoReclamo);
 
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
-            id,
             msg: 'Nuevo reclamo creado',
+            id
         });
     } catch (error) {
-        res.status(400).json({
+        return res.status(500).json({
             ok: false,
-            error,
-            msg: 'Error al crear reclamo.',
+            msg: 'Error en el servidor, reclamoPost().',
+            error
         });
     };
 };
 
 const reclamoPut = (req = request, res = response) => {
-    const { id } = req.params;
-    // console.log({ id });
+    console.log('[reclamos] reclamoPut()');
 
-    res.status(200).json({
-        ok: true,
-        msg: 'Put Api desde controlador',
-        id,
-    });
+    try {
+        const { id } = req.params;
+        // console.log({ id });
+
+        return res.status(200).json({
+            ok: true,
+            id,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, reclamoPut()',
+            error
+        });
+    }
 };
 
 const reclamoDelete = async (req = request, res = response) => {
-    const { id } = req.params;
+    console.log('[reclamos] reclamoDelete()');
 
     try {
+        const { id } = req.params;
         const reclamo = await Reclamo.update({ estado: 0 }, {
-            where: { id },
+            where: { id }
         });
 
-        res.status(200).json({
+        return res.status(200).json({
+            ok: true,
             msg: 'Reclamo eliminado de la bd',
             reclamo,
         });
+
     } catch (error) {
-        console.log({ error });
-        res.status(400).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            msg: 'Error al eliminar reclamo',
+            msg: 'Error en el servidor, reclamoDelete()',
         });
     };
 };
