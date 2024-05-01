@@ -1,24 +1,37 @@
-const { uid } = require('uid');
 const { response, request } = require('express');
+const { uid } = require('uid');
 
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
 
 
 const pymesGet = async (req = request, res = response) => {
+    console.log('[pymes] pymesGet()');
+
     try {
-        const pymes = await Pyme.findAll({
-            where: { estado: true },
+        const pymes = await Pyme.findAll(
+            { where: { estado: true } }
+        );
+
+        return res.status(200).json({
+            ok: true,
+            pymes,
         });
-        res.status(200).json(pymes);
+
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, pymesGet()',
+            error
+        });
     };
 };
 
 const pymeGet = async (req = request, res = response) => {
-    const { UsuarioId } = req.params;
+    console.log('[pymes] pymeGet()');
 
+    const { UsuarioId } = req.params;
     // console.log({UsuarioId});
     try {
         const pyme = await Pyme.findOne({
@@ -30,21 +43,30 @@ const pymeGet = async (req = request, res = response) => {
 
         // console.log({pyme});
         if (pyme) {
-            res.status(200).json({
+            return res.status(200).json({
                 ok: true,
                 pyme,
             });
         }
-        else res.status(400).json({
-            ok: false,
-            msg: 'No existe pyme con este id',
-        });
+        else {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No existe pyme con este id',
+            });
+        }
+
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, pymeGet()',
+            error
+        });
     }
 };
 
 const pymePost = async (req = request, res = response) => {
+    console.log('[pymes] pymePost()');
 
     const {
         nombrePyme,
@@ -55,10 +77,10 @@ const pymePost = async (req = request, res = response) => {
         tipoEmpresa
     } = req.body;
 
-    const myId = uid(15);
+    const newId = uid(15);
 
-    nuevaPyyme = {
-        id: myId,
+    newSme = {
+        id: newId,
         nombrePyme,
         rut,
         emailPyme,
@@ -68,33 +90,48 @@ const pymePost = async (req = request, res = response) => {
     };
 
     try {
-        await Pyme.create(nuevaPyyme);
+        await Pyme.create(newSme);
 
-        res.status(200).json({
-            msg: 'nueva pyme creada',
+        return res.status(200).json({
+            ok: true,
+            msg: 'Nueva pyme creada.',
         });
+
     } catch (error) {
-        // console.log({error});
-        res.status(400).json({
-            msg: error,
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, pymePost().',
+            error,
         });
     };
 };
 
 const pymePut = (req = request, res = response) => {
-    const { id } = req.params;
+    console.log('[pymes] pymePost()');
 
-    // console.log({id});
-    res.status(200).json({
-        ok: true,
-        msg: 'Put Api desde controlador',
-        id,
-    });
+    const { id } = req.params;
+    try {
+        // console.log({id});
+        return res.status(200).json({
+            ok: true,
+            msg: 'Put Api desde controlador',
+            id,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, pymePut()',
+            error
+        });
+    }
 };
 
 const pymeDelete = async (req = request, res = response) => {
-    const { id } = req.params;
+    console.log('[pymes] pymeDelete()');
 
+    const { id } = req.params;
     try {
         const usuario = await Usuario.update(
             { estadoUsuario: 0 },
@@ -105,13 +142,19 @@ const pymeDelete = async (req = request, res = response) => {
                 },
             });
 
-        console.log({ usuario });
-        res.status(200).json({
+        // console.log({ usuario });
+        return res.status(200).json({
+            ok: true,
             usuario,
         });
 
     } catch (error) {
-        console.log({ error });
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, pymeDelete()',
+            error
+        });
     };
 };
 
@@ -120,5 +163,5 @@ module.exports = {
     pymeGet,
     pymePost,
     pymePut,
-    pymeDelete
+    pymeDelete,
 };
