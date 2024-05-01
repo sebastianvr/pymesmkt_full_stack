@@ -1,19 +1,14 @@
 const { validationResult } = require('express-validator');
 const { response, request } = require('express');
+const { Sequelize } = require('sequelize');
 const { uid } = require('uid');
 
 const Publicacion = require('../models/publicacion');
 const Pyme = require('../models/pyme');
 const Usuario = require('../models/usuario');
 const Calificacion = require('../models/calificacion');
-const { Sequelize, Op } = require('sequelize');
 
-/**
- * Obtiene todas las publicaciones de TODOS los usuarios.
- * @param {request} req 
- * @param {response} res 
- * @returns 
- */
+
 const publicacionesGetAll = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionesGetAll()');
 
@@ -68,30 +63,25 @@ const publicacionesGetAll = async (req = request, res = response) => {
             ],
         });
 
-        console.log({ publicaciones });
-        res.status(200).json({
+        // console.log({ publicaciones });
+        return res.status(200).json({
             totalPages: Math.ceil(publicaciones.count / size),
             content: publicaciones.rows,
         });
+
     } catch (error) {
-        res.status(400).json({
+        return res.status(500).json({
             ok: false,
-            msj: 'Ocurrio un error en publicacionesGetAll()',
+            msj: 'Error en el servidor, publicacionesGetAll()',
             error
         });
     }
 }
 
-/**
- * Obtiene una sola publicación segun un id.
- * @param {request} req 
- * @param {response} res 
- * @returns 
- */
 const publicacionGet = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionGet()');
-    const { id } = req.params;
 
+    const { id } = req.params;
     try {
         const publicacion = await Publicacion.findByPk(id, {
             where: {
@@ -125,15 +115,15 @@ const publicacionGet = async (req = request, res = response) => {
         })
 
         if (!publicacion.estado) {
-            res.status(400).json({
+            return res.status(400).json({
                 ok: false,
                 msg: `Esta publicación fue eliminada, ${id}`
-            })
+            });
         } else if (!publicacion.UsuarioId) {
-            res.status(400).json({
+            return res.status(400).json({
                 ok: false,
                 msg: `No existe publicación con id: ${id}`
-            })
+            });
         } else {
 
             // calcular promedio total
@@ -146,25 +136,22 @@ const publicacionGet = async (req = request, res = response) => {
 
             publicacion.dataValues.numEstrellas = sumatoria / calificaciones.length
 
-
-            res.status(200).json({
+            return res.status(200).json({
                 ok: true,
                 publicacion
             });
         }
 
-
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor al obtener publicaciones',
+            error
+        });
     }
 }
 
-/**
- * Obtiene todas las publicaciones de UN usuario específico.
- * @param {request} req 
- * @param {response} res 
- * @returns 
- */
 const publicacionesGet = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionesGet()')
 
@@ -215,8 +202,7 @@ const publicacionesGet = async (req = request, res = response) => {
         }
     }
 
-    console.log({ filter });
-
+    // console.log({ filter });
     try {
         const { count, rows: publicaciones } =
             await Publicacion.findAndCountAll({
@@ -241,11 +227,12 @@ const publicacionesGet = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error({ error });
-        return res.status(500).json(
-            { error: 'Error en el servidor' },
-            error,
-        );
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, publicacionesGet().',
+            error
+        });
     }
 
 }
@@ -254,7 +241,6 @@ const publicacionPost = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionPost()');
 
     const myId = uid(15);
-
     const {
         titulo,
         descripcion,
@@ -295,35 +281,31 @@ const publicacionPost = async (req = request, res = response) => {
 
         // id del usuario que referenciará a la publicacion
         UsuarioId
+    };
 
-    }
-
-    console.log(nuevaPublicacion)
-
+    // console.log(nuevaPublicacion);
     try {
-        const { id } = await Publicacion.create(nuevaPublicacion, {
-            // include: [Pyme]
-        });
-        res.status(200).json({
+        const { id } = await Publicacion.create(nuevaPublicacion);
+        return res.status(200).json({
             ok: true,
-            id,
-            msg: 'Nueva publicación creada'
-        })
-    } catch (error) {
-        res.status(400).json({
-            ok: false,
-            error,
-            msg: 'Error al crear publicación.'
-        })
-    }
+            msg: 'Nueva publicación creada',
+            id
+        });
 
+    } catch (error) {
+        console.error(error);
+        return res.status(400).json({
+            ok: false,
+            msg: 'Error en el servidor al crear publicación.',
+            error
+        });
+    }
 }
 
 const publicacionPut = (req = request, res = response) => {
     console.log('[publicaciones] publicacionPut()');
 
     const { id } = req.params;
-
     res.status(200).json({
         ok: true,
         msg: 'Put Api desde controlador',
@@ -331,17 +313,10 @@ const publicacionPut = (req = request, res = response) => {
     })
 }
 
-/**
- * Actualiza el estado de compra de una publicación a través de su id
- * @param {request} req 
- * @param {response} res 
- * @returns 
- */
 const publicacionPagada = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionPagada()');
 
     const { id } = req.params;
-
     try {
         const publicacion = await Publicacion.update({ procesoDePublicacion: 'FINALIZADA' }, {
             where: { id },
@@ -361,10 +336,10 @@ const publicacionPagada = async (req = request, res = response) => {
         }
 
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            msg: 'error en publicacionPagada()',
+            msg: 'Error en el servidor, publicacionPagada()',
             error,
         });
     }
@@ -374,28 +349,27 @@ const publicacionDelete = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionDelete()');
 
     const { id } = req.params;
-
     try {
         const publicacion = await Publicacion.update({ estado: 0 }, {
             where: { id },
         });
 
-        res.status(200).json({
+        return res.status(200).json({
+            ok: true,
             msg: 'Publicación eliminada de la bd',
             publicacion,
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error al eliminar publicación.',
+            error,
+        });
     }
 }
 
-/**
- * Retorna todas las publicaciones compradas por un idUsuario.
- * @param {request} req 
- * @param {response} res 
- * @returns 
- */
 const publicacionesCompradas = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionesCompradas()');
 
@@ -429,7 +403,7 @@ const publicacionesCompradas = async (req = request, res = response) => {
 
 
         if (publicacion.count === 0) {
-            res.status(200).json({
+            return res.status(200).json({
                 ok: true,
                 publicacion,
                 msg: 'No existen publicaciones compradas de este usuario',
@@ -437,21 +411,19 @@ const publicacionesCompradas = async (req = request, res = response) => {
         }
 
         if (publicacion.count > 0) {
-            res.status(200).json({
+            return res.status(200).json({
                 ok: true,
                 totalPages: Math.ceil(publicacion.count / size),
                 content: publicacion.rows,
             });
         }
 
-
-
     } catch (error) {
         console.log(error);
-        res.status(400).json({
+        return res.status(500).json({
             ok: false,
-            error,
-            msg: 'Error al buscar publicaciónes compradas.',
+            msg: 'Error al buscar publicaciones compradas.',
+            error
         });
     }
 }
@@ -508,7 +480,6 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
     };
 
     // console.log({ filter });
-
     try {
         const { count, rows: publicaciones } =
             await Publicacion.findAndCountAll({
@@ -551,11 +522,12 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error({ error });
-        return res.status(500).json(
-            { error: 'Error en el servidor' },
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor al buscar publicación filtrada',
             error,
-        );
+        });
     }
 }
 
