@@ -1,13 +1,13 @@
-const { uid } = require('uid');
-const bcryptjs = require('bcryptjs');
-const { minioClient } = require('../minio/connection');
 const { response, request } = require('express');
 const { validationResult } = require('express-validator');
+const db = require('../db/connection');
+const { minioClient } = require('../minio/connection');
+const { uid } = require('uid');
+const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
 const DeleteUsuario = require('../models/deletedUsuario');
-const db = require('../db/connection');
 
 
 const usuariosGetAll = async (req = request, res = response) => {
@@ -34,8 +34,7 @@ const usuariosGetAll = async (req = request, res = response) => {
         };
     };
 
-    console.log({ filter });
-
+    // console.log({ filter });
     try {
         const { count, rows: usuarios } =
             await Usuario.findAndCountAll({
@@ -100,8 +99,7 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
         };
     };
 
-    console.log({ filter });
-
+    // console.log({ filter });
     try {
         const { count, rows: usuarios } =
             await Usuario.findAndCountAll({
@@ -141,6 +139,8 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
 }
 
 const usuariosGetAllDeleted = async (req = request, res = response) => {
+    console.log('[usuarios] usuariosGetAllDeleted()');
+
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 20;
 
@@ -162,8 +162,7 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
         };
     };
 
-    console.log({ filter });
-
+    // console.log({ filter });
     try {
         const { count, rows: usuarios } =
             await DeleteUsuario.findAndCountAll({
@@ -197,6 +196,8 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
 }
 
 const usuarioGet = async (req = request, res = response) => {
+    console.log('[usuarios] usuarioGet()');
+
     const { id } = req.params;
     try {
         const usuario = await Usuario.findByPk(id, {
@@ -228,7 +229,7 @@ const usuarioGet = async (req = request, res = response) => {
                 expiration
             );
 
-            console.log({ url });
+            // console.log({ url });
             usuario.imagen = url;
         }
 
@@ -240,6 +241,8 @@ const usuarioGet = async (req = request, res = response) => {
 }
 
 const usuarioPost = async (req = request, res = response) => {
+    console.log('[usuarios] usuarioPost()');
+
     //Id unico de 15 caracteres, para cada nuevo usuario creado
     const myId = uid(15);
 
@@ -324,7 +327,7 @@ const usuarioPut = async (req = request, res = response) => {
             apellidos: userData.apellidos,
             run: userData.run,
             emailUsuario: userData.email,
-            imagen: userData.imagen,
+            // imagen: userData.imagen,
             region: userData.opRegion,
             comuna: userData.opCommune,
             dir1Propietario: userData.direccionPropietario,
@@ -380,13 +383,8 @@ function filterExistingFields(obj) {
         }, {});
 }
 
-/**
- *  Elimina el usuario de la tabla usuario, añade usuario eliminado a lista negra
- * @param {request} req 
- * @param {response} res 
- * @returns Usuario eliminado de la bd 
- */
 const usuarioDelete = async (req = request, res = response) => {
+    console.log('[usuarios] usuarioDelete()');
 
     const { id } = req.params
 
@@ -406,8 +404,7 @@ const usuarioDelete = async (req = request, res = response) => {
             where: { id }
         })
 
-        console.log('usuarioEliminado', usuarioEliminado)
-
+        // console.log('usuarioEliminado', usuarioEliminado)
         // copiar datos en una tabla usuariosEliminados
         const myId = uid(10);
 
@@ -447,6 +444,8 @@ const usuarioDelete = async (req = request, res = response) => {
 }
 
 const suspendUser = async (req = request, res = response) => {
+    console.log('[usuarios] suspendUser()');
+
     const { id } = req.params;
 
     try {
@@ -480,6 +479,8 @@ const suspendUser = async (req = request, res = response) => {
 }
 
 const usuarioSuspended = async (req = request, res = response) => {
+    console.log('[usuarios] usuarioSuspended()');
+
     const { id } = req.params;
     try {
         const busqueda = await Usuario.findByPk(id);
@@ -496,7 +497,7 @@ const usuarioSuspended = async (req = request, res = response) => {
             { where: { id } },
         );
 
-        console.log('usuario', usuario);
+        // console.log('usuario', usuario);
         res.status(200).json({
             ok: true,
             msg: 'Usuario suspendido de la bd',
@@ -512,6 +513,8 @@ const usuarioSuspended = async (req = request, res = response) => {
 }
 
 const usuarioActivatePut = async (req = request, res = response) => {
+    console.log('[usuarios] usuarioActivatePut()');
+
     const { id } = req.params;
 
     try {

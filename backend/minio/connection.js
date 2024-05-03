@@ -17,7 +17,8 @@ async function createBucket(bucketName) {
         if (!exists) {
             await minioClient.makeBucket(bucketName);
         }
-        console.log(`Bucket: ${bucketName} creado exitosamente`);
+        console.log(`Bucket name ${bucketName} ha sido creado.`);
+        
     } catch (error) {
         console.error(error);
     }

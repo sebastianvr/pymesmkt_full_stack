@@ -6,10 +6,13 @@ const Usuario = require("../models/usuario");
 
 
 const login = async (req = request, res = response) => {
-    const { emailUsuario, contrasenia } = req.body
+    console.log('[login] login()');
+
+    const { emailUsuario, contrasenia } = req.body;
     try {
-        //verificar si email existe en BD
-        const usuario = await Usuario.findOne({ where: { emailUsuario } });
+        const usuario = await Usuario.findOne(
+            { where: { emailUsuario } }
+        );
 
         if (!usuario) {
             return res.status(400).json({
@@ -38,7 +41,7 @@ const login = async (req = request, res = response) => {
         //gererar JWT
         /* En el payload guardo id - nombre - rol */
         const token = await createJWT(usuario.id, usuario.nombreUsuario, usuario.rol);
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             id: usuario.id,
             nombreUsuario: usuario.nombreUsuario,
@@ -47,16 +50,17 @@ const login = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.log(error)
+        console.error(error);
         return res.status(500).json({
             ok: false,
+            msj: 'Error en el servidor, login().',
             error,
-            msj: "Error hable con el administrador."
-        })
+        });
     }
 }
 
 const revalidarToken = async (req = request, res = response) => {
+    console.log('[login] revalidarToken()');
 
     const { id, nombreUsuario, rol } = req;
     try {
@@ -67,20 +71,20 @@ const revalidarToken = async (req = request, res = response) => {
             nombreUsuario,
             rol,
             token
-        })
+        });
 
     } catch (error) {
-        console.log(error)
-        return res.status(400).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
+            msg: 'Error en el servidor, revalidarToken().',
             error,
-            msg: 'error en revalidarToken()'
-        })
+        });
     }
 
 }
 
 module.exports = {
     login,
-    revalidarToken
+    revalidarToken,
 }

@@ -1,5 +1,5 @@
-const { uid } = require('uid');
 const { response, request } = require('express');
+const { uid } = require('uid');
 
 const Compra = require('../models/compra');
 const Usuario = require('../models/usuario');
@@ -7,6 +7,160 @@ const Publicacion = require('../models/publicacion');
 const Oferta = require('../models/oferta');
 const Pyme = require('../models/pyme');
 const Reclamo = require('../models/reclamo');
+
+const comprasGetById = async (req = request, res = response) => {
+    console.log('[compra] comprasGetById()');
+
+    const { UsuarioId } = req.params;
+    const { page, size } = req.query;
+
+    const pageAsNumber = Number.parseInt(page);
+    const sizeAsNumber = Number.parseInt(size);
+
+    try {
+        let page = 0;
+        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
+            page = pageAsNumber;
+        }
+
+        let size = 10
+        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
+            size = sizeAsNumber;
+        }
+
+        const compras = await Compra.findAndCountAll({
+            limit: size,
+            offset: page * size,
+            order: [['createdAt', 'DESC'],],
+            where: {
+                UsuarioId,
+                estado: true,
+            },
+            include: [
+                {
+                    model: Publicacion,
+                    where: {
+                        estado: true,
+                        procesoDePublicacion: 'FINALIZADA'
+                    }
+                },
+                {
+                    // Usuario dueño de la publicacion
+                    model: Usuario,
+                    where: { estado: true },
+                    // attributes : ['id', 'nombreUsuario'],
+                    include: [{
+                        model: Pyme,
+                        where: { estado: true },
+                    }]
+                },
+                {
+                    model: Oferta,
+                    where: {
+                        estado: true,
+                        procesoDeOferta: 'FINALIZADA'
+                    },
+                    include: [{
+                        // Usuario dueño de la oferta
+                        model: Usuario,
+                        where: { estado: true },
+                        // attributes : ['id', 'nombreUsuario'],
+                        include: [{
+                            model: Pyme,
+                            where: { estado: true },
+                        }]
+                    }]
+                },
+                {
+                    model: Reclamo,
+                    where: {
+                        estado: true,
+                    },
+                    attributes: ['id'],
+                    required: false // Hacer que la asociación con Reclamo sea opcional
+                }
+            ]
+        })
+
+        if (compras.count === 0) {
+            return res.status(200).json({
+                ok: true,
+                msg: 'No existen compras de este usuario',
+                compras
+            });
+        }
+
+        if (compras.count > 0) {
+            // console.log('compras.rows', compras.rows);
+            return res.status(200).json({
+                ok: true,
+                totalPages: Math.ceil(compras.count / size),
+                content: compras.rows
+            });
+        }
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, comprasGetById()',
+            msg: error,
+        });
+    }
+}
+
+const compraPost = async (req = request, res = response) => {
+    console.log('[compra] compraPost()');
+
+    const {
+        precio,
+        codAutorizacion,
+        PublicacionId,
+        UsuarioId,
+        OfertumId,
+    } = req.body;
+
+    const newId = uid(15);
+
+    newPurchase = {
+        id: newId,
+        precio,
+        codAutorizacion,
+        PublicacionId, /* Id de la publicación */
+        UsuarioId, /* Id del usuario dueño de la compra */
+        OfertumId, /* Id de la oferta pagada */
+    }
+
+    try {
+
+        // comprobar si existe una compra para la misma publicacion 
+        const existPublication = await Compra.findOne(
+            { where: { PublicacionId } }
+        );
+
+        if (existPublication) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Esta publicación que ya fue pagada.',
+            });
+        }
+
+        await Compra.create(newPurchase);
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Nueva compra creada',
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, compraPost()',
+            error
+        });
+    }
+}
 
 const dataGraphGet = async (req = request, res = response) => {
     console.log("[compra] dataGraphGet()");
@@ -47,21 +201,21 @@ const dataGraphGet = async (req = request, res = response) => {
             });
 
         // console.log(colaboraciones[0]);
-
         const nodes = await getNodes();
         const links = getLinks(colaboraciones);
 
         return res.status(200).json({
             ok: true,
             nodes,
-            links,
+            links
         });
 
     } catch (error) {
-        console.log({ error });
-        res.status(500).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            error,
+            msg: 'Error en el servidor, dataGraphGet()',
+            error
         });
     }
 }
@@ -147,8 +301,53 @@ const dataGraphGet = async (req = request, res = response) => {
 //     clg
 //     return links;
 // }
+
+const getNodes = async () => {
+    console.log('getNodes()');
+
+    const pymesFound = await Usuario.findAll({
+        where: { estado: true },
+        attributes: ['id'],
+        include: {
+            model: Pyme,
+            where: { estado: true },
+            attributes: ['id', 'nombrePyme']
+        },
+    });
+
+    let nodes = new Set();
+    // console.log({ nodes });
+    pymesFound.forEach((node) => {
+        const {
+            Pyme: {
+                id,
+                nombrePyme,
+            }
+        } = node;
+
+        const titleCaseNombrePyme = toTitleCase(nombrePyme);
+
+        nodes.add({
+            index: id,
+            name: titleCaseNombrePyme.trim(),
+        });
+    });
+
+    nodes = Array.from(nodes);
+
+    // Transforma el diccionario a arreglo
+    const newNodes = [];
+    for (let index = 0; index < nodes.length; index++) {
+        newNodes.push(nodes[index]);
+    }
+
+    // console.log({ newNodes });
+    return newNodes;
+}
+
 const getLinks = (compras) => {
     console.log('getLinks()');
+
     let links = [];
     let relationships = {};
 
@@ -182,54 +381,10 @@ const getLinks = (compras) => {
 
     // Convert the relationships object to an array of links
     links = Object.values(relationships);
-    console.log(links[0]);
-
-    console.log({ links });
+    // console.log(links[0]);
+    // console.log({ links });
     return links;
 };
-
-
-const getNodes = async () => {
-    console.log('getNodes()');
-    const pymesFound = await Usuario.findAll({
-        where: { estado: true },
-        attributes: ['id'],
-        include: {
-            model: Pyme,
-            where: { estado: true },
-            attributes: ['id', 'nombrePyme']
-        },
-    });
-
-    let nodes = new Set();
-    console.log({ nodes });
-    pymesFound.forEach((node) => {
-        const {
-            Pyme: {
-                id,
-                nombrePyme,
-            }
-        } = node;
-
-        const titleCaseNombrePyme = toTitleCase(nombrePyme);
-
-        nodes.add({
-            index: id,
-            name: titleCaseNombrePyme.trim(),
-        });
-    });
-
-    nodes = Array.from(nodes);
-
-    // Transforma el diccionario a arreglo
-    const newNodes = [];
-    for (let index = 0; index < nodes.length; index++) {
-        newNodes.push(nodes[index]);
-    }
-
-    console.log({ newNodes });
-    return newNodes;
-}
 
 const toTitleCase = (str) => {
     return str.replace(
@@ -240,160 +395,6 @@ const toTitleCase = (str) => {
                 txt.toLowerCase();
         }
     );
-}
-
-const comprasGetById = async (req = request, res = response) => {
-    console.log('[compra] comprasGetById()');
-
-    const { UsuarioId } = req.params;
-    const { page, size } = req.query;
-
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
-
-    try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
-
-        let size = 10
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
-            size = sizeAsNumber;
-        }
-
-        const compras = await Compra.findAndCountAll({
-            limit: size,
-            offset: page * size,
-            order: [['createdAt', 'DESC'],],
-            where: {
-                UsuarioId,
-                estado: true,
-            },
-            include: [
-                {
-                    model: Publicacion,
-                    where: {
-                        estado: true,
-                        procesoDePublicacion: 'FINALIZADA'
-                    }
-                },
-                {
-                    // Usuario dueño de la publicacion
-                    model: Usuario,
-                    where: { estado: true },
-                    // attributes : ['id', 'nombreUsuario'],
-                    include: [{
-                        model: Pyme,
-                        where: { estado: true },
-                    }]
-                },
-                {
-                    model: Oferta,
-                    where: {
-                        estado: true,
-                        procesoDeOferta: 'FINALIZADA'
-                    },
-                    include: [{
-                        // Usuario dueño de la oferta
-                        model: Usuario,
-                        where: { estado: true },
-                        // attributes : ['id', 'nombreUsuario'],
-                        include: [{
-                            model: Pyme,
-                            where: { estado: true },
-                        }]
-                    }]
-                },
-                {
-                    model: Reclamo, 
-                    where: {
-                        estado: true,
-                    },
-                    attributes: ['id'],
-                    required: false // Hacer que la asociación con Reclamo sea opcional
-                }
-            ]
-        })
-
-        if (compras.count === 0) {
-            return res.status(200).json({
-                ok: true,
-                compras,
-                msg: 'No existen compras de este usuario',
-            });
-        }
-
-        if (compras.count > 0) {
-            console.log('compras.rows', compras.rows);
-            return res.status(200).json({
-                ok: true,
-                totalPages: Math.ceil(compras.count / size),
-                content: compras.rows,
-            });
-        }
-
-    } catch (error) {
-        console.log({ error });
-        res.status(500).json({
-            ok: false,
-            msg: error,
-        });
-    }
-}
-
-const compraPost = async (req = request, res = response) => {
-    console.log('[compra] compraPost()');
-
-    const {
-        precio,
-        codAutorizacion,
-        PublicacionId,
-        UsuarioId,
-        OfertumId,
-    } = req.body
-
-    const myId = uid(15);
-
-    nuevaCompra = {
-        id: myId,
-        precio,
-        codAutorizacion,
-        PublicacionId, /* Id de la publicación */
-        UsuarioId, /* Id del usuario dueño de la compra */
-        OfertumId, /* Id de la oferta pagada */ 
-    }
-
-    try {
-
-        // comprobar si existe una compra para la misma publicacion 
-        const existePublicacion = await Compra.
-            findOne({
-                where: { PublicacionId }
-            });
-
-        if (existePublicacion) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'Esta publicación que ya fue pagada.',
-            });
-        }
-
-        await Compra.create(nuevaCompra);
-
-        return res.status(200).json({
-            ok: true,
-            msg: 'Nueva compra creada',
-        });
-
-    } catch (error) {
-        console.log({ error });
-        res.status(500).json({
-            ok: false,
-            msg: 'Error en compraPost()',
-            msg: error,
-        });
-    }
 }
 
 module.exports = {

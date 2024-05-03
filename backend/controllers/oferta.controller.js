@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const { response, request } = require('express');
-const { uid } = require('uid');
 const { Sequelize } = require('sequelize');
+const { uid } = require('uid');
 
 const Usuario = require('../models/usuario');
 const Oferta = require('../models/oferta');
@@ -46,16 +46,17 @@ const ofertaGetById = async (req = request, res = response) => {
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             oferta,
         });
+
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
+            msg: 'Error en el servidor,  ofertaGetById()',
             error,
-            msg: 'Error en ofertaGetById()',
         });
     }
 }
@@ -79,7 +80,8 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
             procesoDeOferta: 'DISPONIBLE',
             usuarioIdReceptor: idUsuario,
         }
-        console.log({ filter });
+
+        // console.log({ filter });
         const { count, rows } = await Oferta.findAndCountAll({
             where: filter,
             limit: pageSize,
@@ -112,8 +114,7 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
             ],
         });
 
-        console.log({ count, rows });
-
+        // console.log({ count, rows });
         if (!rows.length) {
             return res.status(200).json({
                 message: 'No se encontraron coincidencias.',
@@ -130,15 +131,15 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error({ error });
+        console.error(error);
         return res.status(500).json({
+            ok: false,
             msj: 'Error en el servidor',
             error
         });
     }
 }
 
-// Obtiene ofertas creadas de un usuario, usando su id
 const ofertasCreadasGetById = async (req = request, res = response) => {
     console.log('[ofertas] ofertasCreadasGetById()');
 
@@ -160,12 +161,12 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
     if (req.query.fecha) {
         const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
         if (dateRegex.test(req.query.fecha)) {
-            // Si la fecha es válida, podemos incluirla en la consulta
+            // Si la fecha es válida, incluirla en la consulta
             const fechaParts = req.query.fecha.split('-');
             const day = parseInt(fechaParts[0], 10);
             const month = parseInt(fechaParts[1], 10);
             const year = parseInt(fechaParts[2], 10);
-            console.log({ fechaParts });
+            // console.log({ fechaParts });
 
             filter.createdAt = {
                 [Sequelize.Op.and]: [
@@ -188,8 +189,7 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
         };
     };
 
-    console.log({ filter });
-
+    //  console.log({ filter });
     try {
         const { count, rows } =
             await Oferta.findAndCountAll({
@@ -217,8 +217,7 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
                 ],
             });
 
-        console.log({ count, rows });
-
+        // console.log({ count, rows });
         if (!rows.length) {
             return res.status(200).json({
                 message: 'No se encontraron coincidencias.',
@@ -235,9 +234,10 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error({ error });
+        console.error(error);
         return res.status(500).json({
-            msj: 'Error en el servidor',
+            ok: false,
+            msj: 'Error en el servidor, ofertasCreadasGetById()',
             error
         });
     }
@@ -265,17 +265,22 @@ const ofertaPost = async (req = request, res = response) => {
 
     try {
         const createdOferta = await Oferta.create(nuevaOferta);
-        res.status(200).json({
+
+        // Incrementar la cantidad de ofertas recibidas en la publicación
+        await Publicacion.increment('cantidadOfertasRecibidas', { where: { id: PublicacionId } });
+
+        return res.status(200).json({
             ok: true,
             msg: 'Oferta creada',
-            oferta: createdOferta,
+            oferta: createdOferta
         });
 
     } catch (error) {
-        console.log({ error });
-        res.status(500).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            msg: error,
+            msg: 'Error en el servidor, ofertaPost()',
+            error
         });
     }
 }
@@ -283,12 +288,13 @@ const ofertaPost = async (req = request, res = response) => {
 // actualiza el estado de compra de una oferta a traves de su id
 const ofertaPagada = async (req = request, res = response) => {
     console.log('[oferta] ofertaPagada()');
-    const { id } = req.params;
 
+    const { id } = req.params;
     try {
-        const oferta = await Oferta.update({ procesoDeOferta: 'FINALIZADA' }, {
-            where: { id },
-        });
+        const oferta = await Oferta.update(
+            { procesoDeOferta: 'FINALIZADA' },
+            { where: { id } }
+        );
 
         if (oferta[0] === 0) {
             return res.status(400).json({
@@ -300,14 +306,15 @@ const ofertaPagada = async (req = request, res = response) => {
             return res.status(200).json({
                 ok: true,
                 msg: 'La oferta fue modificada correctamente',
+                oferta
             });
         }
 
     } catch (error) {
-        console.log({ error });
+        console.error(error);
         res.status(500).json({
             ok: false,
-            msg: 'error en ofertaPagada()',
+            msg: 'Error en el servidor, ofertaPagada()',
             error,
         });
     }
@@ -315,18 +322,29 @@ const ofertaPagada = async (req = request, res = response) => {
 
 const ofertaPut = (req = request, res = response) => {
     console.log('[oferta] ofertaPut()');
+
     const { id } = req.params;
-    res.status(200).json({
-        ok: true,
-        msg: 'Put Api desde controlador',
-        id,
-    });
+    try {
+        return res.status(200).json({
+            ok: true,
+            msg: 'Put Api desde controlador',
+            id,
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, ofertaPut()',
+            error
+        });
+
+    }
 }
 
 const ofertaDelete = async (req = request, res = response) => {
     console.log('[oferta] ofertaDelete()');
-    const { id } = req.params;
 
+    const { id } = req.params;
     try {
         const oferta = await Oferta.update(
             { estado: 0 },
@@ -338,17 +356,18 @@ const ofertaDelete = async (req = request, res = response) => {
             }
         );
 
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             msg: 'Oferta eliminada',
             oferta,
         });
 
     } catch (error) {
-        console.log({ error });
-        res.status(400).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            error,
+            msg: 'Error en el servidor, ofertaDelete()',
+            error
         });
     }
 }

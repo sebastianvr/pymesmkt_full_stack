@@ -1,96 +1,119 @@
-const { uid } = require('uid');
 const { response, request } = require('express');
+const { uid } = require('uid');
 
 const Colaboracion = require('../models/colaboracion');
 
-const colaboracionesGet = async (req = request, res = response) => {
 
-   
+const colaboracionesGet = async (req = request, res = response) => {
+    console.log('[colaboraciones] colaboracionesGet()');
 
     try {
-       
-        const usuarios = await Colaboracion.findAll({});
 
-        res.status(200).json({
-            ok : true,
+        const usuarios = await Colaboracion.findAll();
+        return res.status(200).json({
+            ok: true,
             usuarios
-            
         });
+
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, colaboracionesGet()',
+            error
+        });
     }
 }
 
 const colaboracionPost = async (req = request, res = response) => {
-    //Id unico de 15 caracteres, para cada nuevo usuario creado
-    const myId = uid(15);
+    console.log('[colaboraciones] colaboracionPost()');
 
+    const newId = uid(15);
     const {
         pymeVenderora,
         pymeCompradora,
         cantidadDeCompras
-    } = req.body
+    } = req.body;
 
-    const nuevaColaboracion = {
-        id: myId,
+    const newCollaboration = {
+        id: newId,
         pymeVenderora,
         pymeCompradora,
         cantidadDeCompras
-    }
+    };
 
-    console.log(nuevaColaboracion)
-
+    // console.log(newCollaboration)
     try {
-        await Colaboracion.create(nuevaColaboracion);
+        await Colaboracion.create(newCollaboration);
 
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
-            msg: 'Nueva colaboracion creada'
-        })
+            msg: 'Nueva colaboración creada'
+        });
+
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, colaboracionPost()'
+        });
     }
 
 }
 
 const colaboracionPut = (req = request, res = response) => {
+    console.log('[colaboraciones] colaboracionPut()');
 
-    const { id } = req.params
-    console.log(id)
+    try {
+        const { id } = req.params;
+        // console.log(id);
 
-    res.status(200).json({
-        ok: true,
-        msg: 'Put Api desde controlador',
-        id
-    })
+        return res.status(200).json({
+            ok: true,
+            msg: 'Put Api desde controlador',
+            id
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, colaboracionPut()',
+            error
+        });
+    }
 }
 
 const colaboracionDelete = async (req = request, res = response) => {
-
-    const { id } = req.params
+    console.log('[colaboraciones] colaboracionDelete()');
 
     try {
-        const usuario = await Usuario.update({ estado: 0 }, {
-            where: {
-                id: id
-            },
-        });
+        const { id } = req.params;
+        const usuario = await Usuario.update(
+            { estado: 0 },
+            { where: { id } }
+        );
 
         // console.log(usuario)
-        res.status(200).json({
-            msg: 'Usuario eliminado de la bd'
-        })
-
-
+        return res.status(200).json({
+            ok: true,
+            msg: 'Usuario eliminado de la bd',
+            usuario
+        });
 
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, colaboracionDelete()',
+            error
+        });
     }
 }
 
 module.exports = {
-   colaboracionesGet,
-   colaboracionPost,
-   colaboracionPut,
-   colaboracionDelete
-};
+    colaboracionesGet,
+    colaboracionPost,
+    colaboracionPut,
+    colaboracionDelete,
+}
