@@ -66,4 +66,11 @@ export class SearchPublicationComponent implements OnInit {
     }
     return null;
   }
+  
+  clearForm() {
+    this.filterForm.reset({
+      searchTerm: null,
+      searchOption: 'titulo'
+    });
+  }
 }
