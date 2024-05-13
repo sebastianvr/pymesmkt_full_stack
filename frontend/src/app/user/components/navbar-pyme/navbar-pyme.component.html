@@ -5,9 +5,7 @@
                 <!-- Contenido a la izquierda -->
                 <div class="d-flex align-items-center">
                     <div class="mx-3">
-                        <app-sidebar-user 
-                        nameUser="{{nombreUsuario}}"
-                        ></app-sidebar-user>
+                        <app-sidebar-user nameUser="{{userName}}"></app-sidebar-user>
                     </div>
                     <a routerLink="/user" class="navbar-brand text-dark text-decoration-none hide-on-small-screen">
                         <img class="mx-2" src="../../../../assets/icons/factory.svg" alt="factory.svg">
@@ -23,12 +21,12 @@
                             class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                        <li><a class="dropdown-item">Términos y condiciones</a></li>
+                        <!-- <li><a class="dropdown-item">Términos y condiciones</a></li>
                         <li><a class="dropdown-item">¿Quiénes somos?</a></li>
                         <li><a class="dropdown-item">Contáctanos</a></li>
-                        <li>
+                         <li>
                             <hr class="dropdown-divider">
-                        </li>
+                        </li> -->
                         <li><a routerLink="/user/my-profile" class="dropdown-item">Mi Perfil</a></li>
                         <li><a class="dropdown-item" (click)="logOut()">Cerrar sesión</a></li>
                     </ul>
