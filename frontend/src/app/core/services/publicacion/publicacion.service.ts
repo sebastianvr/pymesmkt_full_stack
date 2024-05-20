@@ -22,13 +22,6 @@ export class PublicacionService {
     return this.http.get<any>(`${this.url}/api/publicacion/${id}`);
   }
 
-  /**
-   * Mostrar la sección de MIS COMPRAS, compras de un usuario en especifico.
-   * @param id 
-   * @param page 
-   * @param size 
-   * @returns 
-   */
   getPublicacionesPagadasById(id: string, page: number = 0, size: number = 0): Observable<any> {
     return this.http.get<any>(`${this.url}/api/publicacion/usuario/paid/${id}?size=${size}&page=${page}`);
   }
@@ -38,8 +31,12 @@ export class PublicacionService {
   }
 
   getAllPublicacionById(id: string, filters: any): Observable<any> {
-    // return this.http.get<any>(`${this.url}/api/publicacion/usuario/${id}`);
     const queryParams = { ...filters };
+
+    if (!queryParams) {
+      return this.http.get<any>(`${this.url}/api/publicacion/usuario/${id}`);
+    }
+
     const queryString = Object.keys(queryParams)
       .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
       .join('&');
@@ -48,7 +45,7 @@ export class PublicacionService {
     return this.http.get<any>(urlWithQuery);
   }
 
-  deletePublicacion(id: any): Observable<any> {
+  deletePublication(id: any): Observable<any> {
     return this.http.delete<any>(`${this.url}/api/publicacion/${id}`);
   }
 
