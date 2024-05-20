@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
+import { SearchPublicationComponent } from '../../components/search-publication/search-publication.component';
 
 @Component({
   selector: 'app-home',
@@ -7,19 +8,18 @@ import { PublicacionService } from 'src/app/core/services/publicacion/publicacio
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-
   publicaciones: any;
   currentPage!: number;
 
-  // Paginación
   page: number = 1;
-  pageSize: number = 20;
+  pageSize: number = 10;
   total!: number;
   totalPages!: number;
 
   isLoading: boolean = true;
 
   currentFilter: any;
+  @ViewChild(SearchPublicationComponent) searchPublicationComponent!: SearchPublicationComponent;
 
   constructor(
     private publicacionService: PublicacionService,
@@ -39,7 +39,6 @@ export class HomeComponent implements OnInit {
     this.publicacionService.getQueryPublications(filters)
       .subscribe(data => {
         // console.log({ data });
-
         const {
           publicaciones,
           total,
@@ -69,8 +68,6 @@ export class HomeComponent implements OnInit {
     // console.log('onFormFilter0Submitted()');
     // console.log({ filters });
     this.currentFilter = filters;
-
-
     this.getQueryPublications(filters);
   }
 
@@ -78,7 +75,6 @@ export class HomeComponent implements OnInit {
     // console.log('onFormFilter1Submitted()');
     // console.log({ filters });
     this.currentFilter = filters;
-
     this.getQueryPublications(filters);
   }
 
@@ -103,10 +99,11 @@ export class HomeComponent implements OnInit {
   }
 
   clearFilter() {
+    this.searchPublicationComponent.clearForm();
     this.currentFilter = null;
     const query = {
       page: 1,
-      pageSize: 20,
+      pageSize: this.pageSize,
     };
     this.getQueryPublications(query);
   }
