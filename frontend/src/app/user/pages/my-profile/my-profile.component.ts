@@ -80,7 +80,7 @@ export class MyProfileComponent implements OnInit {
         apellidos: user.apellidos,
         run: user.run,
         email: user.emailUsuario,
-        imagen: user.imagen,
+        imagen: user.imagen, //Solucionar imagen
       },
       infoLocalidadPropietario: {
         opRegion: user.region,

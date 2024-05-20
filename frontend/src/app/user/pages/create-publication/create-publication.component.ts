@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MessageService, PrimeNGConfig } from 'primeng/api';
 import Swal from 'sweetalert2';
 import moment from 'moment';
-import { MessageService, PrimeNGConfig } from 'primeng/api';
 
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
@@ -29,7 +29,7 @@ export class CreatePublicationComponent implements OnInit {
 
   ngOnInit() {
     this.primengConfig.ripple = true;
-    console.log(this.authService.usuario.id);
+    // console.log(this.authService.usuario.id);
   }
 
   formularioPublicacion: FormGroup = this.fb.group({
@@ -52,7 +52,7 @@ export class CreatePublicationComponent implements OnInit {
   });
 
   onUpload(event: any) {
-    console.log('this.uploadedFiles', this.uploadedFiles);
+    // console.log('this.uploadedFiles', this.uploadedFiles);
     for (let file of event.files) {
       this.uploadedFiles.push(file);
     }
@@ -71,20 +71,20 @@ export class CreatePublicationComponent implements OnInit {
     if (option == 'Producto') {
       this.formularioPublicacion.reset();
 
-      this.formularioPublicacion.patchValue({
-        titulo: 'Adquisicion de articulos de aseo y ornato',
-        descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
-        productoOServicio: 'Producto',
-        cantidad: 1,
-        precioPorUnidad: null,
-        totalPrecio: 15000,
-        modelo: '1rkAKpJl',
-        color: 'azul',
-        garantia: true,
-        aniosGarantia: 1,
-        archivos: 'archivo.zip',
-        UsuarioId: 'cb8bcb308b7ccf1',
-      });
+      // this.formularioPublicacion.patchValue({
+      //   titulo: 'Adquisicion de articulos de aseo y ornato',
+      //   descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
+      //   productoOServicio: 'Producto',
+      //   cantidad: 1,
+      //   precioPorUnidad: null,
+      //   totalPrecio: 15000,
+      //   modelo: '1rkAKpJl',
+      //   color: 'azul',
+      //   garantia: true,
+      //   aniosGarantia: 1,
+      //   archivos: 'archivo.zip',
+      //   UsuarioId: 'cb8bcb308b7ccf1',
+      // });
 
       this.formularioPublicacion.setErrors(null);
 
@@ -113,19 +113,19 @@ export class CreatePublicationComponent implements OnInit {
       this.formularioPublicacion.setErrors(null);
 
       //quitar estas lineas solo test
-      this.formularioPublicacion.patchValue({
-        titulo: 'Adquisicion de articulos de aseo y ornato',
-        descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
-        productoOServicio: 'Servicio',
-        totalPrecio: 15000,
-        fechaInicio: '',
-        fechaTermino: '',
-        horasATrabajar: 1,
-        garantia: false,
-        aniosGarantia: null,
-        archivos: 'archivo.zip',
-        UsuarioId: 'cb8bcb308b7ccf1',
-      });
+      // this.formularioPublicacion.patchValue({
+      //   titulo: 'Adquisicion de articulos de aseo y ornato',
+      //   descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
+      //   productoOServicio: 'Servicio',
+      //   totalPrecio: 15000,
+      //   fechaInicio: '',
+      //   fechaTermino: '',
+      //   horasATrabajar: 1,
+      //   garantia: false,
+      //   aniosGarantia: null,
+      //   archivos: 'archivo.zip',
+      //   UsuarioId: 'cb8bcb308b7ccf1',
+      // });
 
       // Desabilitar atributos que no son para el formulario de servicio
       this.formularioPublicacion.get('cantidad')?.disable();

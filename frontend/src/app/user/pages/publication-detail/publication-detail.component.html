@@ -10,7 +10,7 @@
 
             <hr>
 
-            <div class="col-12 text-center my-3" *ngIf="!publicacion; else divPublicacion">
+            <div class="col-12 text-center my-3" *ngIf="!publication; else divPublicacion">
                 <div class="spinner-border  text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
@@ -20,55 +20,55 @@
                 <div class="col-md-12 mt-3">
                     <div class="row">
                         <button class="float-end alert alert-primary py-1 mb-0">
-                            <strong>Compra {{publicacion.procesoDePublicacion | lowercase}}</strong>
+                            <strong>Compra {{publication.procesoDePublicacion | lowercase}}</strong>
                         </button>
                     </div>
 
                     <div class="container mt-3">
-                        <h3 class="text-center">{{publicacion.titulo | uppercase }}</h3>
-                        <p class="descriptionCard">{{publicacion.descripcion}}</p>
+                        <h3 class="text-center">{{publication.titulo | uppercase }}</h3>
+                        <p class="descriptionCard">{{publication.descripcion}}</p>
 
                         <table class="table table-hover">
                             <tbody>
                                 <tr>
                                     <td><strong>Precio total</strong></td>
-                                    <td>{{publicacion.precioTotal | currency : 'CLP'}}</td>
+                                    <td>{{publication.precioTotal | currency : 'CLP'}}</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Cantidad</strong></td>
-                                    <td>{{publicacion.cantidadElementos}}</td>
+                                    <td>{{publication.cantidadElementos}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.precioUnidad">
+                                <tr *ngIf="publication.precioUnidad">
                                     <td><strong>Precio por unidad</strong></td>
-                                    <td>{{publicacion.precioUnidad | currency : 'CLP'}}</td>
+                                    <td>{{publication.precioUnidad | currency : 'CLP'}}</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Garantía</strong></td>
-                                    <td>{{publicacion.garantia.toString() | i18nSelect:garantiaMapa}}</td>
+                                    <td>{{publication.garantia.toString() | i18nSelect:garantiaMapa}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.aniosGarantia">
+                                <tr *ngIf="publication.aniosGarantia">
                                     <td><strong>Años de garantía</strong></td>
-                                    <td>{{publicacion.aniosGarantia}}</td>
+                                    <td>{{publication.aniosGarantia}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.fechaInicioServicio">
+                                <tr *ngIf="publication.fechaInicioServicio">
                                     <td><strong>Fecha inicio del servicio</strong></td>
-                                    <td>{{publicacion.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
+                                    <td>{{publication.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.fechaFinServicio">
+                                <tr *ngIf="publication.fechaFinServicio">
                                     <td><strong>Fecha finalización del servicio</strong></td>
-                                    <td>{{publicacion.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
+                                    <td>{{publication.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.horasATrabajar">
+                                <tr *ngIf="publication.horasATrabajar">
                                     <td><strong>Cantidad de horas a trabajar</strong></td>
-                                    <td>{{publicacion.horasATrabajar}}</td>
+                                    <td>{{publication.horasATrabajar}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.modelo">
+                                <tr *ngIf="publication.modelo">
                                     <td><strong>Modelo</strong></td>
-                                    <td>{{publicacion.modelo}}</td>
+                                    <td>{{publication.modelo}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.color">
+                                <tr *ngIf="publication.color">
                                     <td><strong>Color</strong></td>
-                                    <td>{{publicacion.color | titlecase}}</td>
+                                    <td>{{publication.color | titlecase}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -191,7 +191,7 @@
 
                     <div class="row my-4">
                         <div class="col-md-6 text-center my-1">
-                            <button (click)="eliminarPublicacion()" class="btn btn-danger">
+                            <button (click)="deletePublication()" class="btn btn-danger">
                                 Eliminar
                                 <img src="../../../../assets/icons/trash.svg" class="icon-buttons-style"
                                     alt="trash.svg">

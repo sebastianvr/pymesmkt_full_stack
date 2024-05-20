@@ -1,8 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
 
 @Component({
@@ -13,20 +12,18 @@ import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
 export class ModalOfferDetailComponent implements OnInit {
 
   @Input() idOffer!: string;
-  @Input() senderUserId!: string; 
+  @Input() senderUserId!: string;
   @Input() recipientdUserId!: string;
-  
+
   offerForm!: FormGroup;
 
   // 2 MB como tamaño máximo de archivo
   private fileSize: number = (2 * 1024 * 1024);
   public selectedFile: File | null = null;
-  private allowedFilesExtention: string[] = ['jpg', 'jpeg', 'png', 'svg'];
+  private allowedFilesExtention: string[] = ['jpg', 'jpeg', 'png', 'pdf', 'csv'];
 
   constructor(
-    private router: Router,
     private formBuilder: FormBuilder,
-    private modalService: NgbModal,
     public activeModal: NgbActiveModal,
     private ofertaService: OfertaService,
   ) {
@@ -34,7 +31,7 @@ export class ModalOfferDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.buildForm();
-    console.log(this.idOffer);
+    // console.log(this.idOffer);
   }
 
   private buildForm() {
@@ -59,7 +56,7 @@ export class ModalOfferDetailComponent implements OnInit {
       PublicacionId: this.idOffer,
     };
 
-    console.log({ newOffer });
+    // console.log({ newOffer });
 
     Swal.fire({
       position: 'top-end',
@@ -74,12 +71,12 @@ export class ModalOfferDetailComponent implements OnInit {
         this.activeModal.close(true);
       }
     })
-    console.log(this.offerForm.value);
+    // console.log(this.offerForm.value);
   }
 
-  public campoInvalido(campo: string) {
-    return this.offerForm.get(campo)?.errors
-      && this.offerForm.get(campo)?.touched;
+  public invalidFormFile(nameField: string) {
+    return this.offerForm.get(nameField)?.errors
+      && this.offerForm.get(nameField)?.touched;
   }
 
   public onFileInputChange(event: Event) {

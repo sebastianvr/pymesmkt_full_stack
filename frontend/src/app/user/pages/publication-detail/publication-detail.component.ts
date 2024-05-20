@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs';
 import Swal from 'sweetalert2'
-import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
+
+import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
+
 
 @Component({
   selector: 'app-publication-detail',
@@ -10,20 +12,20 @@ import { PublicacionService } from '../../../core/services/publicacion/publicaci
   styleUrls: ['./publication-detail.component.css']
 })
 export class PublicationDetailComponent implements OnInit {
-  publicacion!: any
+  publication!: any;
 
   garantiaMapa = {
     'true': 'Si',
     'false': 'No'
-  }
+  };
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private publicacionService: PublicacionService
+    private publicacionService: PublicacionService,
   ) { }
 
-  ngOnInit(): void {
+  public ngOnInit() {
     this.activatedRoute.params
       .pipe(
         switchMap(({ id }) =>
@@ -31,12 +33,12 @@ export class PublicationDetailComponent implements OnInit {
         )
       )
       .subscribe(({ publicacion }) => {
-        this.publicacion = publicacion
-        console.log(this.publicacion)
-      })
+        this.publication = publicacion;
+        // console.log(this.publication);
+      });
   }
 
-  eliminarPublicacion() {
+  public deletePublication() {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: 'btn btn-success mx-3',
@@ -60,15 +62,12 @@ export class PublicationDetailComponent implements OnInit {
           'Eliminado!',
           'Tu publicación ha sido eliminada.',
           'success'
-        )
-        this.publicacionService.deletePublicacion(this.publicacion.id).subscribe()
-        this.router.navigate(['/user/see-publications'])
+        );
 
-
+        this.publicacionService.deletePublication(this.publication.id).subscribe();
+        this.router.navigate(['/user/see-publications']);
       }
-    })
+    });
   }
-
-
 
 }

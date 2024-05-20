@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { check } = require('express-validator');
+const { check, query } = require('express-validator');
 
 const { validarCampos } = require('../middlewares/validar-campos');
 
@@ -16,8 +16,15 @@ router.get('/graph/', dataGraphGet);
 
 // Ruta para buscar todas las compras por id del usuario
 router.get('/usuario/:UsuarioId', [
+    query('page').optional().isInt({ min: 1 }).
+        withMessage('page debe ser un número entero mayor o igual a 1'),
+    query('pageSize').optional().isInt({ min: 1, max: 100 }).
+        withMessage('pageSize debe ser un número entero entre 1 y 100'),
     check('UsuarioId', 'El id del usuario es obligatorio').not().isEmpty(),
     validarCampos,
+    
+    query('empresa').optional().isString()
+    .withMessage('El campo "empresa" debe ser una cadena (string)'),
 ], comprasGetById);
 
 // Creacion de una nueva compra

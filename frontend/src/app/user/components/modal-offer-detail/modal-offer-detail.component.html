@@ -18,7 +18,7 @@
                     <label for="descriptionPublication" class="form-label">Mensaje</label>
                     <textarea pInputTextarea class="form-control" formControlName="mensaje"
                         id="descriptionPublication"></textarea>
-                    <span *ngIf="campoInvalido('mensaje')" class="form-text text-danger">
+                    <span *ngIf="invalidFormFile('mensaje')" class="form-text text-danger">
                         El mensaje es obligatorio.
                     </span>
                 </div>
@@ -51,7 +51,7 @@
                             formControlName="precioOferta">
                         </p-inputNumber>
                     </div>
-                    <span *ngIf="campoInvalido('precioOferta')" class="form-text d-block text-danger">
+                    <span *ngIf="invalidFormFile('precioOferta')" class="form-text d-block text-danger">
                         El precio es obligatorio.
                     </span>
                 </div>

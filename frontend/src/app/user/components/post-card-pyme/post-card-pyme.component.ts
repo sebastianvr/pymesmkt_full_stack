@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalOfferDetailComponent } from '../modal-offer-detail/modal-offer-detail.component';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 
@@ -16,7 +16,7 @@ export class PostCardPymeComponent implements OnInit {
   offerForm!: FormGroup;
   idUser: string = this.authService.usuario.id;
   closeResult!: string;
-  
+
   garantiaMapa = {
     'true': 'Si',
     'false': 'No',
@@ -28,7 +28,7 @@ export class PostCardPymeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('this.publicaciones', this.publicaciones);
+    // console.log('this.publicaciones', this.publicaciones);
   }
 
   isIdsIguales(itemId: string): boolean {
@@ -38,30 +38,17 @@ export class PostCardPymeComponent implements OnInit {
     return false;
   }
 
-  public openOffer(offer: any) {
-    console.log({ offer });
+  public async openOffer(offer: any) {
+    // console.log({ offer });
     const modalRef = this.modalService.open(ModalOfferDetailComponent, { size: 'lg' });
     modalRef.componentInstance.idOffer = offer.id;
     modalRef.componentInstance.senderUserId = this.idUser;
     modalRef.componentInstance.recipientdUserId = offer.UsuarioId;
 
-    modalRef.result.then(
-      (result) => {
-        this.closeResult = `Closed with: ${result}`;
-      },
-      (reason) => {
-        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-      }
-    );
-  }
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
+    const result = await modalRef.result;
+    if (result) {
+      // console.log({ result });
+      this.closeResult = `Closed with: ${result}`;
     }
   }
 }

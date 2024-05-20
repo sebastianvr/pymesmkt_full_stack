@@ -85,19 +85,21 @@
                         <div class="col-lg-4">
                             <div class="text-center">
                                 <div class="container">
+                                    <!-- TODO: Arreglar error de minio para servir imagen -->
                                     <ng-container *ngIf="user.imagen; else defaultImage">
-                                        <img src="{{ user.imagen }}" class="imgProfile img-fluid" alt="camera.jpg"
-                                            style="max-height: 130px;">
+                                        <!-- <img src="{{ user.imagen }}" class="imgProfile img-fluid" alt="camera.jpg"
+                                            style="max-height: 130px;"> -->
+                                        <img src="../../../assets/icons/people-circle.svg" class="imgProfile img-fluid"
+                                            alt="people-circle.svg">
                                     </ng-container>
                                     <ng-template #defaultImage>
                                         <img src="../../../assets/icons/people-circle.svg" class="imgProfile img-fluid"
-                                            alt="people-circle.svg" style="max-height: 130px;">
+                                            alt="people-circle.svg">
                                     </ng-template>
                                 </div>
                                 <div class="mt-2">
-                                    <label class="custom-file-label custom-file-upload" for="formFile">Subir imagen
-                                        <input class="custom-file-input" type="file" id="formFile"
-                                            formControlName="imagen" (change)="onFileSelected($event)">
+                                    <label class="custom-file-label custom-file-upload" for="formFile">Subir
+                                        imagen<input class="custom-file-input" type="file" id="formFile" (change)="onFileSelected($event)">
                                     </label>
                                 </div>
                             </div>
@@ -397,10 +399,10 @@
                 </form>
 
                 <!-- Debug Mode -->
-                <div class="container">
+                <!-- <div class="container">
                     <pre><b>formulario.value: </b> {{userForm.value | json }}</pre>
                     <pre><b>formulario.errors: </b> {{userForm.errors | json }}</pre>
-                </div>
+                </div> -->
 
             </ng-template>
         </div>

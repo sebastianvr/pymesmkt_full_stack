@@ -30,7 +30,7 @@
                     </div>
                     <div class="row mx-2">
                         <!-- Botones de paginación -->
-                        <div class="d-flex justify-content-center">
+                        <div *ngIf="totalPages > 1" class="d-flex justify-content-center">
                             <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
                                 <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
                                     (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
@@ -44,7 +44,7 @@
                         </app-post-card-pyme>
 
                         <!-- Botones de paginación -->
-                        <div class="d-flex justify-content-center">
+                        <div *ngIf="totalPages > 1" class="d-flex justify-content-center">
                             <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
                                 <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
                                     (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"

@@ -164,14 +164,16 @@ const publicacionesGet = async (req = request, res = response) => {
         return res.status(400).json({ errors: errors.array() });
     };
 
-    const filter = {
+    const baseFilter = {
         UsuarioId: idUsuario,
         estado: true,
         procesoDePublicacion: 'INICIADA'
     };
 
+    const additionalFilters = {};
+
     if (req.query.titulo) {
-        filter.titulo = {
+        additionalFilters.titulo = {
             [Sequelize.Op.and]: [
                 Sequelize.fn('LOWER', Sequelize.col('titulo')),
                 {
@@ -192,7 +194,7 @@ const publicacionesGet = async (req = request, res = response) => {
             const year = parseInt(fechaParts[2], 10);
 
             // Ajusta el nombre de los campos de fecha según tu modelo
-            filter.createdAt = {
+            additionalFilters.createdAt = {
                 [Sequelize.Op.and]: [
                     Sequelize.where(Sequelize.fn('DAY', Sequelize.col('createdAt')), day),
                     Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('createdAt')), month),
@@ -201,6 +203,11 @@ const publicacionesGet = async (req = request, res = response) => {
             };
         }
     }
+
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters
+    };
 
     // console.log({ filter });
     try {
@@ -212,10 +219,18 @@ const publicacionesGet = async (req = request, res = response) => {
             });
 
         if (!publicaciones.length) {
-            return res.status(200).json({
-                message: 'No se encontraron coincidencias.',
-                publicaciones: [],
-            });
+            if (Object.keys(additionalFilters).length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    publicaciones: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron publicaciones.',
+                    publicaciones: [],
+                });
+            }
         };
 
         return res.status(200).json({
@@ -439,13 +454,15 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
         return res.status(400).json({ errors: errors.array() });
     };
 
-    const filter = {
+    const baseFilter = {
         estado: true,
         procesoDePublicacion: "INICIADA",
     };
 
+    const additionalFilters = {};
+
     if (req.query.titulo) {
-        filter.titulo = {
+        additionalFilters.titulo = {
             [Sequelize.Op.and]: [
                 Sequelize.fn('LOWER', Sequelize.col('titulo')),
                 {
@@ -456,27 +473,32 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
     };
 
     if (req.query.id) {
-        filter.id = req.query.id;
+        additionalFilters.id = req.query.id;
     };
 
     if (req.query.cantidadOfertasRecibidas) {
-        filter.cantidadOfertasRecibidas = {
+        additionalFilters.cantidadOfertasRecibidas = {
             [Sequelize.Op.lte]: parseInt(req.query.cantidadOfertasRecibidas),
         };
     };
 
     if (req.query.precioTotal) {
-        filter.precioTotal = {
+        additionalFilters.precioTotal = {
             [Sequelize.Op.lte]: parseInt(req.query.precioTotal),
         };
     };
 
     if (req.query.garantia) {
-        filter.garantia = (req.query.garantia === "true");
+        additionalFilters.garantia = (req.query.garantia === "true");
     };
 
     if (req.query.productoOServicio) {
-        filter.productoOServicio = req.query.productoOServicio;
+        additionalFilters.productoOServicio = req.query.productoOServicio;
+    };
+
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters
     };
 
     // console.log({ filter });

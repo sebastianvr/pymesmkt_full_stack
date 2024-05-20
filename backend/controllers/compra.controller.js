@@ -1,4 +1,6 @@
 const { response, request } = require('express');
+const { validationResult } = require('express-validator');
+const { Sequelize } = require('sequelize');
 const { uid } = require('uid');
 
 const Compra = require('../models/compra');
@@ -12,30 +14,58 @@ const comprasGetById = async (req = request, res = response) => {
     console.log('[compra] comprasGetById()');
 
     const { UsuarioId } = req.params;
-    const { page, size } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
 
+    const baseFilter = {
+        UsuarioId,
+        estado: true
+    };
+
+    const additionalFilters = {};
+
+    // Condición para filtrar por el nombre de la empresa vendedora
+    if (req.query.empresa) {
+        additionalFilters['$Ofertum.Usuario.Pyme.nombrePyme$'] = {
+            [Sequelize.Op.like]: `%${req.query.empresa.toLowerCase()}%`,
+        };
+    }
+
+    if (req.query.fecha) {
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+
+            additionalFilters.createdAt = {
+                [Sequelize.Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('Compra.createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('Compra.createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('Compra.createdAt')), year),
+                ]
+            };
+        }
+    }
+
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters
+    };
+
+    // console.log({ filter });
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber;
-        }
-
-        let size = 10
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
-            size = sizeAsNumber;
-        }
-
         const compras = await Compra.findAndCountAll({
-            limit: size,
-            offset: page * size,
+            where: filter,
+            limit: pageSize,
+            offset: (page - 1) * pageSize,
             order: [['createdAt', 'DESC'],],
-            where: {
-                UsuarioId,
-                estado: true,
-            },
             include: [
                 {
                     model: Publicacion,
@@ -48,7 +78,6 @@ const comprasGetById = async (req = request, res = response) => {
                     // Usuario dueño de la publicacion
                     model: Usuario,
                     where: { estado: true },
-                    // attributes : ['id', 'nombreUsuario'],
                     include: [{
                         model: Pyme,
                         where: { estado: true },
@@ -64,7 +93,6 @@ const comprasGetById = async (req = request, res = response) => {
                         // Usuario dueño de la oferta
                         model: Usuario,
                         where: { estado: true },
-                        // attributes : ['id', 'nombreUsuario'],
                         include: [{
                             model: Pyme,
                             where: { estado: true },
@@ -80,31 +108,39 @@ const comprasGetById = async (req = request, res = response) => {
                     required: false // Hacer que la asociación con Reclamo sea opcional
                 }
             ]
-        })
+        });
 
-        if (compras.count === 0) {
-            return res.status(200).json({
-                ok: true,
-                msg: 'No existen compras de este usuario',
-                compras
-            });
-        }
+        // console.log('compras.rows', compras.rows);
+        if (!compras.rows.length) {
+            if (Object.keys(additionalFilters).length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    compras: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron compras.',
+                    compras: [],
+                });
+            }
+        };
 
-        if (compras.count > 0) {
-            // console.log('compras.rows', compras.rows);
-            return res.status(200).json({
-                ok: true,
-                totalPages: Math.ceil(compras.count / size),
-                content: compras.rows
-            });
-        }
+        return res.status(200).json({
+            ok: true,
+            total: compras.count,
+            totalPages: Math.ceil(compras.count / pageSize),
+            currentPage: page,
+            pageSize,
+            compras: compras.rows,
+        });
 
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             ok: false,
             msg: 'Error en el servidor, comprasGetById()',
-            msg: error,
+            msg: error
         });
     }
 }
