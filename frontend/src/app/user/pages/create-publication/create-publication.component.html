@@ -32,7 +32,7 @@
                                         (click)="limpiarFormulario('Servicio')" formControlName="productoOServicio">
                                     <div class="d-flex flex-column align-items-center">
                                         <img src="../../../../assets/icons/new-service.svg" alt="new-service.svg"
-                                            class="icon-buttons-style" style="width: 25px;">
+                                            class="icon-buttons-style">
                                         <b>SERVICIO</b>
                                     </div>
                                 </label>
@@ -111,7 +111,7 @@
                         </div>
 
                         <!-- Años de garantia -->
-                        <div class="col-md-6 mb-2">
+                        <div *ngIf="tieneGarantia()" class="col-md-6 mb-2">
                             <label for="aniosGarantia" class="form-label">Años de garantía
                                 <a class="descripcionLabel text-muted">
                                     (Opcional)
@@ -229,7 +229,7 @@
                         </div>
 
                         <!-- Años de garantia -->
-                        <div class="col-md-6 mb-2">
+                        <div *ngIf="tieneGarantia()"  class="col-md-6 mb-2">
                             <label for="aniosGarantia" class="form-label">Años de garantía
                                 <a class="descripcionLabel text-muted">
                                     (Opcional)
