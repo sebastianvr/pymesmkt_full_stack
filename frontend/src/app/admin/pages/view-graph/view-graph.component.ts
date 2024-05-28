@@ -23,45 +23,54 @@ export class ViewGraphComponent implements OnInit {
   constructor(private graphService: GraphService) { }
 
   ngOnInit(): void {
-
     if (this.showExample) {
-      this.showExampleGraph();
-      this.initializeGraph();
+      // console.log('first');
+      // this.showExampleGraph();
+      // this.isEmptyGraph = false;
+      // this.initializeGraph();
       return;
     }
 
+    this.loadDataGraph();
+  }
+
+  private loadDataGraph(): void {
     this.isLoading = true;
     this.graphService.getDataGraph()
       .pipe(
         catchError((error) => {
           console.error(error);
+          this.isLoading = false;
           return error;
-        }))
+        })
+      )
       .subscribe((data) => {
-        // console.log({ data });
-        const { nodes, links } = data;
-        // Verifica si tanto los nodos como los enlaces están vacíos
-        if (nodes.length === 0 && links.length === 0) {
-          console.log('Los nodos y los enlaces están vacíos.');
-          this.isEmptyGraph = true;
-          return;
-        }
-
-        this.isEmptyGraph = false;
+        this.handleGraphData(data);
         this.isLoading = false;
-        this.links = links;
-        this.nodes = nodes;
-        // console.log('this.nodes', this.nodes);
-        // console.log('this.links', this.links);
-        this.initializeGraph();
       });
   }
 
-  initializeGraph() {
+  private handleGraphData(data: any): void {
+    const { nodes, links } = data;
+
+    if (nodes.length === 0 && links.length === 0) {
+      // console.log('Los nodos y los enlaces están vacíos.');
+      this.isEmptyGraph = true;
+      return;
+    }
+
+    this.isEmptyGraph = false;
+    this.links = links;
+    this.nodes = nodes;
+    this.initializeGraph();
+  }
+
+  private initializeGraph() {
     // console.log('initializeGraph()');
     const width: number = screen.width;
     const height: number = screen.height;
 
+    console.log(this.nodes);
     const simulation = d3.forceSimulation(this.nodes)
       .force('link', d3.forceLink(this.links).id((d: any) => d.id))
       .force('charge', d3.forceManyBody().strength(-400))
@@ -193,31 +202,32 @@ export class ViewGraphComponent implements OnInit {
   }
 
   public zoomIn() {
-    // Aumenta la escala del zoom en 1.0 veces
-    this.zoom.scaleBy(this.svg, 1.0);
+    // Aumenta la escala del zoom en 1.2 veces
+    this.zoom.scaleBy(this.svg.transition().duration(200), 1.2);
   }
 
   public zoomOut() {
-    // Reduce la escala del zoom en 1.0 veces
-    this.zoom.scaleBy(this.svg, 1.0);
+    // Reduce la escala del zoom en 1.2 veces
+    this.zoom.scaleBy(this.svg.transition().duration(200), 0.8);
   }
 
   public centerGraph() {
     const svgElement = this.svg.node();
-    const svgWidth = +svgElement.getAttribute("width");
-    const svgHeight = +svgElement.getAttribute("height");
 
-    // Calcula el centro del gráfico
-    const centerX = svgWidth / 2;
-    const centerY = svgHeight / 2;
+    if (!svgElement) return;
 
-    // Realiza la transición para centrar el gráfico
+    // Obteniendo tamaño del contenedor del SVG
+    const bbox = svgElement.getBBox();
+    const centerX = -bbox.x - bbox.width / 2;
+    const centerY = -bbox.y - bbox.height / 2;
+
+    // Transición para centrar el gráfico
     this.svg
       .transition()
       .duration(750) // Duración de la transición en milisegundos
       .call(
         this.zoom.transform,
-        d3.zoomIdentity.translate(centerX, centerY)
+        d3.zoomIdentity.translate(centerX, centerY).scale(1)
       );
   }
 
@@ -233,5 +243,16 @@ export class ViewGraphComponent implements OnInit {
       { source: this.nodes[0].id, target: this.nodes[1].id, type: 1 },
       { source: this.nodes[0].id, target: this.nodes[2].id, type: 3 },
     ];
+  }
+
+  public refresh() {
+    // Eliminar antiguo svg
+    d3.select('#divGraph svg').remove();
+    this.loadDataGraph();
+  }
+
+  public showDemo() {
+    this.showExample = true;
+    this.ngOnInit();
   }
 }
