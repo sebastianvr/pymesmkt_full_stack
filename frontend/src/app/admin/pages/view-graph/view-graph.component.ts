@@ -70,7 +70,6 @@ export class ViewGraphComponent implements OnInit {
     const width: number = screen.width;
     const height: number = screen.height;
 
-    console.log(this.nodes);
     const simulation = d3.forceSimulation(this.nodes)
       .force('link', d3.forceLink(this.links).id((d: any) => d.id))
       .force('charge', d3.forceManyBody().strength(-400))
