@@ -236,7 +236,6 @@ const dataGraphGet = async (req = request, res = response) => {
                 ],
             });
 
-        // console.log(colaboraciones[0]);
         const nodes = await getNodes();
         const links = getLinks(colaboraciones);
 
@@ -245,7 +244,6 @@ const dataGraphGet = async (req = request, res = response) => {
             nodes,
             links
         });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({
@@ -256,93 +254,10 @@ const dataGraphGet = async (req = request, res = response) => {
     }
 }
 
-/**
- *  Obtiene links en base a las compras realizadas.
-     Formato de salida  
-        links : [
-            source : 1,
-            target : 4,
-            type : # 
-        ]
-    
-     Donde : 
-        souce :  nodo con id 1
-        target :  nodo con id 4
-        type :  nro de veces que se repite la relación
-
- * @param {*} compras
- * @returns 
- * Arreglo con todas las colaboraciones como links.
- */
-// const getLinks = (compras) => {
-//     console.log('getLinks()');
-//     // console.log(compras.dataValues);
-//     let links = [];
-//     let data = [];
-
-//     // Mapping and cleaning data
-//     compras.forEach((compra) => {
-//         /** 
-//          *  Desestructuración del objeto y renombre de relaciones: 
-//          *      nombrePyme  = comprador
-//          *      Pyme        = vendedor
-//         */
-//         // const {
-//         //     Usuario: {
-
-//         //         Pyme: {
-//         //             nombrePyme: comprador,
-//         //         },
-//         //     },
-//         //     Ofertum: {
-
-//         //         Usuario: {
-//         //             Pyme: { nombrePyme: vendedor },
-//         //         },
-//         //     },
-//         // } = compra;
-
-//         // data.push(`${compra.Usuario.id} ${comprador.toLowerCase().trim()}-${compra.Ofertum.Usuario.id} ${vendedor.toLowerCase().trim()}`);
-//         const compradorId = compra.Usuario.id;
-//         const vendedorId = compra.Ofertum.Usuario.id;
-
-//         const comprador = compra.Usuario.Pyme.nombrePyme.toLowerCase().trim();
-//         const vendedor = compra.Ofertum.Usuario.Pyme.nombrePyme.toLowerCase().trim();
-
-//         data.push(`${compradorId} ${comprador}-${vendedorId} ${vendedor}`);
-//     });
-
-
-//     let contador = 1;
-
-//     for (let index = 0; index < data.length; index++) {
-//         if (data[index] === data[index + 1]) {
-//             contador++;
-//         } else {
-//             const [compradorId, vendedorId] = data[index].split(' ')[0].split('-');
-//             links.push({
-//                 source: {
-//                     index: compradorId,
-//                     name: data[index].split('-').shift()
-//                 },
-//                 target: {
-//                     index: vendedorId,
-//                     name: data[index].split('-').pop(),
-//                 },
-//                 type: contador
-//             });
-//             contador = 1;
-//         }
-//     }
-//     clg
-//     return links;
-// }
-
 const getNodes = async () => {
-    console.log('getNodes()');
-
+    // console.log('getNodes()');
     const pymesFound = await Usuario.findAll({
-        where: { estado: true },
+        where: { estado: true, rol: 'CLIENT-USER' },
         attributes: ['id'],
         include: {
             model: Pyme,
@@ -355,8 +270,8 @@ const getNodes = async () => {
     // console.log({ nodes });
     pymesFound.forEach((node) => {
         const {
+            id,
             Pyme: {
-                id,
                 nombrePyme,
             }
         } = node;
@@ -364,7 +279,7 @@ const getNodes = async () => {
         const titleCaseNombrePyme = toTitleCase(nombrePyme);
 
         nodes.add({
-            index: id,
+            id,
             name: titleCaseNombrePyme.trim(),
         });
     });
@@ -382,43 +297,35 @@ const getNodes = async () => {
 }
 
 const getLinks = (compras) => {
-    console.log('getLinks()');
-
+    // console.log('getLinks()');
     let links = [];
-    let relationships = {};
+    let linkMap = new Map();
 
     // Mapping and cleaning data
     compras.forEach((compra) => {
         const compradorId = compra.Usuario.id;
         const vendedorId = compra.Ofertum.Usuario.id;
 
-        const comprador = compra.Usuario.Pyme.nombrePyme.toLowerCase().trim();
-        const vendedor = compra.Ofertum.Usuario.Pyme.nombrePyme.toLowerCase().trim();
+        // console.log({ compradorId, vendedorId });
 
-        const key = `${compradorId}-${vendedorId}`;
-        const existingRelation = relationships[key];
+        // Create a unique key for the pair of users
+        const linkKey = `${compradorId}-${vendedorId}`;
 
-        if (existingRelation) {
-            existingRelation.type++;
+        if (linkMap.has(linkKey)) {
+            // If the link already exists, increment the type value
+            linkMap.get(linkKey).type += 1;
         } else {
-            relationships[key] = {
-                source: {
-
-                    name: toTitleCase(comprador),
-                },
-                target: {
-
-                    name: toTitleCase(vendedor),
-                },
-                type: 1,
+            // If the link does not exist, create a new entry with type 1
+            const link = {
+                source: vendedorId,
+                target: compradorId,
+                type: 1
             };
+            linkMap.set(linkKey, link);
+            links.push(link);
         }
     });
 
-    // Convert the relationships object to an array of links
-    links = Object.values(relationships);
-    // console.log(links[0]);
-    // console.log({ links });
     return links;
 };
 
