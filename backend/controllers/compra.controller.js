@@ -257,7 +257,7 @@ const dataGraphGet = async (req = request, res = response) => {
 const getNodes = async () => {
     // console.log('getNodes()');
     const pymesFound = await Usuario.findAll({
-        where: { estado: true },
+        where: { estado: true, rol: 'CLIENT-USER' },
         attributes: ['id'],
         include: {
             model: Pyme,
