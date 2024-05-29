@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { check, param, query } = require('express-validator');
-
+const { validarCampos } = require('../middlewares/validar-campos');
 const { ofertaDelete,
     ofertaPost,
     ofertaPut,
@@ -9,15 +9,14 @@ const { ofertaDelete,
     ofertaGetById,
     ofertaPagada,
 } = require('../controllers/oferta.controller');
-
-
-const { validarCampos } = require('../middlewares/validar-campos');
+const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
 
-// Ruta para obtener todas las ofertas recibidas
+// Obtener todas las ofertas recibidas
 router.get('/received/:idUsuario',
     [
+        validarJWT,
         param('idUsuario')
             .notEmpty().withMessage('El parámetro idUsuario es obligatorio')
             .custom((value) => {
@@ -48,9 +47,10 @@ router.get('/received/:idUsuario',
     ofertasRecibidasGetById
 );
 
-// Ruta para obtener todas las ofertas creadas 
+// Obtener todas las ofertas creadas 
 router.get('/created/:UsuarioId',
     [
+        validarJWT,
         param('UsuarioId')
             .notEmpty().withMessage('El parámetro idUsuario es obligatorio')
             .custom((value) => {
@@ -81,45 +81,36 @@ router.get('/created/:UsuarioId',
 );
 
 router.get('/:IdOferta', [
+    validarJWT,
     param('IdOferta', 'El param id es obligatorio').not().isEmpty(),
     validarCampos
 ], ofertaGetById);
 
-
-// Ruta para buscar una publicacion por id 
-// router.get('/:id', ofertaGet);
-
-// Ruta para obtener todas las publicaciones de un usuario en especifico
-// router.get('/usuario/:idUsuario', publicacionesGet);
-
-
-// Creacion de una nueva publicacion
+// Crear una nueva oferta
 router.post('/', [
+    validarJWT,
     check('mensaje', 'El mensaje es obligatorio').not().isEmpty(),
     validarCampos,
-
     check('precioOferta', 'El precio de oferta es obligatorio').not().isEmpty(),
     validarCampos,
-
     check('PublicacionId', 'El id de la publicación es obligatorio').not().isEmpty(),
     validarCampos,
     check('UsuarioId', 'El id del usuario es obligatorio').not().isEmpty(),
     validarCampos,
-
     check('usuarioIdReceptor', 'El del usuarioIdReceptor es obligatorio').not().isEmpty(),
     validarCampos,
 ], ofertaPost);
 
-// Eliminacion de una publicacion
+// Eliminar una oferta
 router.delete('/:id', [
+    validarJWT,
     param('id', 'El param id es obligatorio').not().isEmpty(),
-
-    // validarJWT, 
     validarCampos
 ], ofertaDelete);
 
-// cambia el estado de la publicacion a procesoDePublicacion :  FINALIZADA
+//  Actualiza el estado de la oferta -> procesoDePublicacion :  FINALIZADA
 router.put('/aceptar/:id', [
+    validarJWT,
     param('id', 'El param id es obligatorio').not().isEmpty(),
     validarCampos
 ], ofertaPagada);

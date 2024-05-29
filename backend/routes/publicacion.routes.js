@@ -13,6 +13,7 @@ const {
     publicacionesFilterQuery
 } = require('../controllers/publicacion.controller');
 const { uid } = require('uid');
+const { validarJWT } = require('../middlewares/validar-jwt');
 
 
 const router = Router();
@@ -85,10 +86,11 @@ router.get('/usuario/:idUsuario',
     publicacionesGet
 );
 
-// Ruta para obtener todas las publicaciones de un usuario en especifico
+// Obtener todas las publicaciones de un usuario en especifico
 router.get('/usuario/paid/:idUsuario', publicacionesCompradas);
 
 router.post('/', [
+    validarJWT,
     check('titulo', 'El titulo es obligatorio').not().isEmpty(),
     validarCampos,
     check('descripcion', 'La descripcion es obligatoria').not().isEmpty(),
@@ -96,18 +98,16 @@ router.post('/', [
 ], publicacionPost);
 
 router.delete('/:id', [
+    validarJWT,
     param('id', 'El param id es obligatorio').not().isEmpty(),
-    // validarJWT, 
     validarCampos
 ], publicacionDelete);
 
-// cambia el estado de la publicacion a procesoDePublicacion :  FINALIZADA
+// Cambia el estado de la publicación -> procesoDePublicacion :  FINALIZADA
 router.put('/aceptar/:id', [
+    validarJWT,
     param('id', 'El param id es obligatorio').not().isEmpty(),
     validarCampos
 ], publicacionPagada);
-
-
-
 
 module.exports = router;
