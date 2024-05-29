@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import localeEsCL from '@angular/common/locales/es-CL';
 import { registerLocaleData } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AuthInterceptor } from './core/services/auth/auth.interceptor';
 
 registerLocaleData(localeEsCL)
 
@@ -25,7 +26,13 @@ registerLocaleData(localeEsCL)
     NgbModule,
   ],
   providers: [
-    {provide : LOCALE_ID, useValue : 'es-CL'}
+    { provide: LOCALE_ID, useValue: 'es-CL' },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+
   ],
   bootstrap: [AppComponent]
 })
