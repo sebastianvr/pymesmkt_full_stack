@@ -1,16 +1,12 @@
 const { Router } = require('express');
-const multer = require('multer');
 const { validarCampos } = require('../middlewares/validar-campos');
-
 const {
     signInPost,
     existeCorreo,
     existeRun,
-    existeRut,
 } = require('../controllers/sign-in.controller');
 
-const { check, param, body } = require('express-validator');
-const { validarJWT } = require('../middlewares/validar-jwt');
+const { check, param } = require('express-validator');
 
 const router = Router();
 
