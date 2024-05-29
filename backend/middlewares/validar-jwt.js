@@ -3,11 +3,21 @@ const jwt = require('jsonwebtoken');
 
 
 const validarJWT = async (req, res = response, next) => {
-    const token = req.header('token');
-    if (!token) {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
         return res.status(401).json({
             ok: false,
             msg: 'No se encuentra el token',
+        });
+    }
+
+    // Separa el prefijo 'Bearer' del token
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({
+            ok: false,
+            msg: 'Token no proporcionado',
         });
     }
 
@@ -22,16 +32,12 @@ const validarJWT = async (req, res = response, next) => {
     }
 
     try {
-        /* verificar parametros: token del ciente, clave de la firma, retorna el payload */
         const { myId, nombreUsuario, rol } = jwt.verify(token, secretKey);
         req.id = myId;
         req.nombreUsuario = nombreUsuario;
         req.rol = rol;
-
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
-            // El token ha expirado, tomar una acción en consecuencia
-            console.log('Token expirado:', error.expiredAt);
             return res.status(401).json({
                 ok: false,
                 msg: 'Token expirado',
@@ -44,7 +50,7 @@ const validarJWT = async (req, res = response, next) => {
             msg: 'Token inválido',
         });
     }
-    
+
     next();
 };
 
