@@ -20,9 +20,12 @@ describe('UsuarioService', () => {
   });
 
   test('PIO8.1 - Debe buscar todos los usuarios registrados', (done) => {
-    
+    const filter = {
+      pageSize: 10,
+      page: 1,
+    };
 
-    service.getAllUsuarios().subscribe((data) => {
+    service.getAllUsersById(filter).subscribe((data) => {
       expect('totalPages' in data && 'content' in data).toBeTruthy();
       expect(typeof data.totalPages).toBe('number')
       expect(Array.isArray(data.content)).toBe(true)
