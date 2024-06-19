@@ -24,6 +24,10 @@ router.get('/',
             withMessage('page debe ser un número entero mayor o igual a 1'),
         query('pageSize').optional().isInt({ min: 1, max: 100 }).
             withMessage('pageSize debe ser un número entero entre 1 y 100'),
+        query('nombre').optional().isString()
+            .withMessage('El campo "titulo" debe ser una cadena (string)'),
+        query('email').optional().isString()
+        .withMessage('El campo "email" debe ser una cadena (string)'),
     ],
     usuariosGetAll
 );

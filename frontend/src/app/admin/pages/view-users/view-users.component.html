@@ -7,83 +7,168 @@
                 <h2 class="fs-1"><strong>Usuarios Activos</strong></h2>
             </div>
 
-            <div class="row">
+            <div class="col-md-12">
                 <div class="input-group mb-3">
-                    <input [(ngModel)]="searchText" type="text" class="form-control" placeholder="Buscar usuario"
-                        aria-label="Recipient's username" aria-describedby="button-addon">
-                    <button class="btn btn-primary" type="button" id="button-addon">Buscar</button>
-                </div>
+                    <form [formGroup]="filterForm" class="input-group mb-3">
+                        <select class="form-select customSelect text-center" id="searchOptionSelect"
+                            formControlName="searchOption">
+                            <option [value]="'nombre'">Nombre</option>
+                            <option [value]="'email'">Correo</option>
+                        </select>
 
-                <div class="col-12 text-center" *ngIf="isLoading">
-                    <div class="container mt-5">
+                        <input type="text" class="form-control" formControlName="searchTerm"
+                            aria-label="Término de búsqueda" />
+                        <button style="border-top-right-radius: .375rem; border-bottom-right-radius: .375rem;"
+                            class="input-group-text btn btn-primary" id="basic-addon2"
+                            [disabled]="isEmptyUsers && !isLoading && !noSearchMatch" (click)="sendForm()">
+                            Buscar
+                        </button>
+
+                        <div class="container">
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('required')"
+                                class="text-danger">Este campo es requerido.</div>
+                        </div>
+                    </form>
+
+                    <div class="row my-1">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Limpiar búsqueda" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary float-end">
+                                <img src="../../../../assets/icons/magic.svg" alt="magic.svg">
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Debug -->
+                    <!-- <div class="container">
+                        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+                        <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+                    </div> -->
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="col-md-12 mt-5 text-center" *ngIf="isLoading">
                         <div class="spinner-border text-primary text-center my-3" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-12 text-center" *ngIf="isEmptyUsers && !isLoading">
-                    <div class="container mt-5">
-                        <img src="../../../../assets/icons/empty-users.svg" alt="empty-users.svg" class="icon-image">
-                        <h3 class="my-3">No existen usuarios activos aún.</h3>
-                    </div>
-                </div>
+                    <!-- Mostrar esta sección si no hay coincidencias en la búsqueda -->
+                    <ng-container *ngIf="noSearchMatch && !isLoading">
+                        <div class="col-md-12 text-center">
+                            <div class="container mt-5">
+                                <!-- <img src="../../../../assets/icons/empty.svg" alt="empty-users.svg" class="icon-image"> -->
+                                <img src="../../../../assets/icons/empty-users.svg" alt="empty-users.svg"
+                                    class="icon-image">
+                                <h3 class="my-3">No existen coincidencias de búsqueda. </h3>
 
-                <div class="col-md-12 table-responsive pt-1" *ngIf="!isEmptyUsers && !isLoading">
-
-                     <!-- Botones de paginación -->
-                     <div class="d-flex float-start justify-content-center">
-                        <div class="row">
-                            <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
-                                (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3" [rotate]="true"
-                                [boundaryLinks]="true">
-                            </ngb-pagination>
+                                <div class="col-lg-12">
+                                    <button ngbTooltip="Ir atrás" (click)="clearFilter()"
+                                        class="btn btn-sm btn-primary text-center">
+                                        <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg"
+                                            class="icon-button-style">
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </ng-container>
 
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Nombre usuario</th>
-                                <th scope="col">Apellidos</th>
-                                <th scope="col">Email usuario</th>
-                                <th scope="col">Empresa</th>
-                                <th scope="col">RUT Empresa</th>
-                                <th scope="col" colspan="2" class="text-center">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let usuario of allUsuarios | search : searchText; index as i">
-                                <th scope="row">{{i+1}}</th>
-                                <td>{{ usuario.nombreUsuario | titlecase }}</td>
-                                <td>{{ usuario.apellidos }}</td>
-                                <td>{{ usuario.emailUsuario }}</td>
-                                <td>{{ usuario.Pyme.nombrePyme }}</td>
-                                <td>{{ usuario.Pyme.rut }}</td>
-                                <td>
-                                    <button (click)="suspenderUsuario(usuario.id)" type="button"
-                                        class="btn btn-warning">Suspender</button>
-                                </td>
-                                <td>
-                                    <button (click)="eliminarUsuario(usuario.id)" type="button"
-                                        class="btn btn-danger">Eliminar</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <!-- Mostrar esta sección si no hay usuarios -->
+                    <ng-container *ngIf="isEmptyUsers && !isLoading && !noSearchMatch">
+                        <div class="col-md-12 text-center">
+                            <div class="container mt-5">
+                                <img src="../../../../assets/icons/empty.svg" alt="empty-users.svg" class="icon-image">
+                                <h3 class="my-3">No has creado publicaciones aún. </h3>
 
-                     <!-- Botones de paginación -->
-                     <div class="d-flex float-start justify-content-center">
-                        <div class="row">
-                            <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
-                                (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3" [rotate]="true"
-                                [boundaryLinks]="true">
-                            </ngb-pagination>
+                                <div class="col-lg-12">
+                                    <button routerLink="/user/create-publication" ngbTooltip="Crear publicación"
+                                        class="btn btn-sm btn-primary text-center">
+                                        <img src="../../../../assets/icons/plus.svg" alt="plus.svg"
+                                            class="icon-button-style">
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </ng-container>
 
+                    <ng-container *ngIf="!isEmptyUsers && !isLoading  && !noSearchMatch">
+                        <div class="row container px-4">
+                            <!-- Botones de paginación -->
+                            <div *ngIf="totalPages > 1" class="row">
+                                <div class="d-flex float-start justify-content-center">
+                                    <div class="row">
+                                        <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                            (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                            [rotate]="true" [boundaryLinks]="true">
+                                        </ngb-pagination>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nombre usuario</th>
+                                        <th scope="col">Apellidos</th>
+                                        <th scope="col">Email usuario</th>
+                                        <th scope="col">Empresa</th>
+                                        <th scope="col">RUT Empresa</th>
+                                        <th scope="col" colspan="2" class="text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let usuario of usuarios; index as i">
+                                        <td>{{ usuario.nombreUsuario | titlecase }}</td>
+                                        <td>{{ usuario.apellidos }}</td>
+                                        <td>{{ usuario.emailUsuario }}</td>
+                                        <td>{{ usuario.Pyme.nombrePyme }}</td>
+                                        <td>{{ usuario.Pyme.rut }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button (click)="suspendUser(usuario.id)" type="button"
+                                                    class="btn btn-sm btn-warning d-flex align-items-center">
+                                                    Suspender
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-archive ms-2 align-middle"
+                                                        viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5" />
+                                                    </svg>
+                                                </button>
+                                                <button (click)="deleteUser(usuario.id)" type="button"
+                                                    class="btn btn-sm btn-danger d-flex align-items-center">
+                                                    Eliminar
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-person-x ms-2 align-middle"
+                                                        viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m.256 7a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z" />
+                                                        <path
+                                                            d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m-.646-4.854.646.647.646-.647a.5.5 0 0 1 .708.708l-.647.646.647.646a.5.5 0 0 1-.708.708l-.646-.647-.646.647a.5.5 0 0 1-.708-.708l.647-.646-.647-.646a.5.5 0 0 1 .708-.708" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Botones de paginación -->
+                            <div *ngIf="totalPages > 1" class="row">
+                                <div class="d-flex float-start justify-content-center">
+                                    <div class="row">
+                                        <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                            (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                            [rotate]="true" [boundaryLinks]="true">
+                                        </ngb-pagination>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
             </div>
         </div>
     </div>

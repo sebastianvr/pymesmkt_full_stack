@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 
 import { SearchPipe } from '../core/pipes/search.pipe';
@@ -36,10 +36,11 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   ],
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     AdminRoutingModule,
     PrimeNgModule,
-    FormsModule,
-    NgbModule
+    NgbModule,
   ]
 })
 export class AdminModule { }

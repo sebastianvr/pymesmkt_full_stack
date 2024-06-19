@@ -24,8 +24,14 @@ export class UsuarioService {
     return this.http.get<any>(`${this.url}/api/usuario/${id}`);
   }
 
-  getAllUsuarios(page: number = 0, size: number = 0): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/usuario/?pageSize=${size}&page=${page}`);
+  getAllUsersById(filters: any): Observable<any> {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/usuario?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
   }
 
   getAllUsuariosSuspended(page: number = 0, size: number = 0) {

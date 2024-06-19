@@ -1,5 +1,6 @@
 const { response, request } = require('express');
 const { validationResult } = require('express-validator');
+const { Sequelize } = require('sequelize');
 const db = require('../db/connection');
 const { minioClient } = require('../minio/connection');
 const { uid } = require('uid');
@@ -11,7 +12,7 @@ const DeleteUsuario = require('../models/deletedUsuario');
 
 
 const usuariosGetAll = async (req = request, res = response) => {
-    console.log('[usuarios] usuariosGetAll()');
+    console.log('[usuarios] usuariosGetAll()')
 
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 20;
@@ -21,20 +22,41 @@ const usuariosGetAll = async (req = request, res = response) => {
         return res.status(400).json({ errors: errors.array() });
     };
 
-    const filter = { estado: true };
+    const baseFilter = {
+        estado: true,
+        rol: 'CLIENT-USER',
+    };
+
+    const additionalFilters = {};
 
     if (req.query.nombre) {
-        filter.titulo = {
+        additionalFilters.nombreUsuario = {
             [Sequelize.Op.and]: [
                 Sequelize.fn('LOWER', Sequelize.col('nombreUsuario')),
                 {
-                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                    [Sequelize.Op.like]: `%${req.query.nombre.toLowerCase()}%`,
                 },
             ],
         };
     };
 
-    // console.log({ filter });
+    if (req.query.email) {
+        additionalFilters.emailUsuario = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('emailUsuario')),
+                {
+                    [Sequelize.Op.like]: `%${req.query.email.toLowerCase()}%`,
+                },
+            ],
+        };
+    }
+
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters
+    };
+
+    console.log({ filter });
     try {
         const { count, rows: usuarios } =
             await Usuario.findAndCountAll({
@@ -50,10 +72,18 @@ const usuariosGetAll = async (req = request, res = response) => {
             });
 
         if (!usuarios.length) {
-            return res.status(200).json({
-                message: 'No se encontraron coincidencias.',
-                usuarios: [],
-            });
+            if (Object.keys(additionalFilters).length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    usuarios: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron usuarios.',
+                    usuarios: [],
+                });
+            }
         };
 
         return res.status(200).json({
@@ -65,12 +95,14 @@ const usuariosGetAll = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error({ error });
-        return res.status(500).json(
-            { error: 'Error en el servidor' },
-            error,
-        );
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, usuariosGetAll().',
+            error
+        });
     }
+
 }
 
 const usuariosGetAllSuspended = async (req = request, res = response) => {
@@ -130,11 +162,12 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error({ error });
-        return res.status(500).json(
-            { error: 'Error en el servidor' },
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, usuariosGetAllSuspended()',
             error,
-        );
+        });
     }
 }
 
@@ -187,11 +220,12 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error({ error });
-        return res.status(500).json(
-            { error: 'Error en el servidor' },
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, usuariosGetAllDeleted()',
             error,
-        );
+        });
     }
 }
 
@@ -236,7 +270,12 @@ const usuarioGet = async (req = request, res = response) => {
         return res.status(200).json(usuario);
 
     } catch (error) {
-        console.log({ error });
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, usuarioGet()',
+            error,
+        });
     }
 }
 
@@ -284,11 +323,17 @@ const usuarioPost = async (req = request, res = response) => {
             // include: [Pyme]
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             msg: 'nuevo usuario creado'
-        })
+        });
+
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, usuarioPost()',
+            error,
+        });
     }
 
 }
@@ -357,18 +402,20 @@ const usuarioPut = async (req = request, res = response) => {
         // Confirma la transacción
         await transaction.commit();
 
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             msg: 'Usuario actualizado correctamente',
             usuario,
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         // Si ocurre un error, revierte la transacción
         await transaction.rollback();
-        res.status(500).json({
+
+        return res.status(500).json({
             ok: false,
-            msg: 'Error al actualizar el usuario',
+            msg: 'Error en el servidor, usuarioPut()',
+            error,
         });
     }
 
@@ -416,30 +463,30 @@ const usuarioDelete = async (req = request, res = response) => {
             run: usuario.run,
             comuna: usuario.comuna,
             region: usuario.region,
-        }
+        };
 
         try {
-            await DeleteUsuario.create(deleteUsuario, {});
-
+            await DeleteUsuario.create(deleteUsuario);
         } catch (error) {
             console.log(error)
             return res.status(400).json({
                 ok: false,
                 msg: 'Error al añadir usuario a lista de eliminados'
-            })
+            });
         }
 
         return res.status(200).json({
             ok: true,
             msg: 'Usuario eliminado de la bd'
-        })
+        });
 
     } catch (error) {
-        console.log(error)
+        console.error(error);
         return res.status(500).json({
             ok: false,
-            msg: 'Error al eliminar usuario'
-        })
+            msg: 'Error en el servidor, usuarioDelete()',
+            error,
+        });
     }
 }
 
@@ -447,7 +494,6 @@ const suspendUser = async (req = request, res = response) => {
     console.log('[usuarios] suspendUser()');
 
     const { id } = req.params;
-
     try {
         const usuario = await Usuario.findByPk(id);
 
@@ -470,10 +516,11 @@ const suspendUser = async (req = request, res = response) => {
         })
 
     } catch (error) {
-        console.log(error);
-        return res.status(400).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            msg: 'Error al suspender usuario',
+            msg: 'Error en el servidor, suspendUser()',
+            error,
         });
     }
 }
@@ -498,16 +545,17 @@ const usuarioSuspended = async (req = request, res = response) => {
         );
 
         // console.log('usuario', usuario);
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             msg: 'Usuario suspendido de la bd',
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            msg: 'Error al suspender usuario',
+            msg: 'Error en el servidor, usuarioSuspended()',
+            error,
         });
     }
 }
@@ -516,23 +564,23 @@ const usuarioActivatePut = async (req = request, res = response) => {
     console.log('[usuarios] usuarioActivatePut()');
 
     const { id } = req.params;
-
     try {
         const usuario = await Usuario.update({ estado: 1 }, {
             where: { id },
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             msg: 'Usuario activado',
             usuario
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            msg: 'Error al activar usuario',
+            msg: 'Error en el servidor, usuarioActivatePut()',
+            error,
         });
     }
 }
