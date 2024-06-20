@@ -1,49 +1,72 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/core/services/usuario/usuario.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-view-deleted-users',
   templateUrl: './view-deleted-users.component.html',
   styleUrls: ['./view-deleted-users.component.css']
 })
-export class ViewDeletedUsersComponent implements OnInit, OnDestroy {
-
-  searchText: string = '';
-  allUsuariosDeleted: any;
-  suscription!: Subscription;
-
-  pageSize: number = 20;
+export class ViewDeletedUsersComponent implements OnInit {
+  pageSize: number = 10;
   page: number = 1;
+
+  initQuery = {
+    pageSize: this.pageSize,
+    page: this.page
+  };
+
   currentPage!: number;
   total!: number;
   totalPages!: number;
 
-  isLoading: boolean = true;
-  isEmptyUsers: boolean = false;
+  isLoading: boolean = false;
+  filterForm!: FormGroup;
+  noSearchMatch!: boolean;
+  isEmptyUsers!: boolean;
+  usuarios: any;
 
   constructor(
+    private formBuilder: FormBuilder,
     private usuarioService: UsuarioService,
   ) { }
 
   ngOnInit(): void {
-    console.log('ngOnInit()');
-    this.getAll(this.pageSize, this.page);
-
-    this.suscription = this.usuarioService.refresh.subscribe((data) => {
-      console.log({ data });
-      this.getAll(this.pageSize, this.page);
-    });
+    this.buildForm();
+    this.getUsersByFilters(this.initQuery);
   }
 
-  getAll(pageSize: number, page: number) {
-    this.isLoading = true;
+  private buildForm() {
+    this.filterForm = this.formBuilder.group({
+      searchTerm: [null, [Validators.required]],
+      searchOption: ['nombre', Validators.required],
+    });
 
-    this.usuarioService.getAllUsuariosDeleted(page, pageSize).subscribe((data) => {
+    this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
+      const searchTermControl = this.filterForm.get('searchTerm');
+
+      searchTermControl?.clearValidators();
+
+      if (option === 'email') {
+        searchTermControl?.setValidators(Validators.required);
+      } else if (option === 'nombre') {
+        searchTermControl?.setValidators(Validators.required);
+      }
+
+      searchTermControl?.reset();
+      searchTermControl?.updateValueAndValidity();
+    });
+  }
+  
+  private getUsersByFilters(filters: any) {
+    this.isLoading = true;
+    // console.log({ filters });
+    this.usuarioService.getAllUsuariosDeleted(filters).subscribe(res => {
+      // console.log({ res });
       this.isLoading = false;
-      console.log({ data });
-      if (data.usuarios.length === 0) {
+
+      if (res.noSearchMatch) {
+        this.noSearchMatch = true;
         this.isEmptyUsers = true;
       } else {
         const {
@@ -52,29 +75,56 @@ export class ViewDeletedUsersComponent implements OnInit, OnDestroy {
           currentPage,
           pageSize,
           totalPages,
-        } = data;
+        } = res;
 
-        this.allUsuariosDeleted = usuarios;
-        this.total = total;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.totalPages = totalPages;
-
-        this.isEmptyUsers = false;
-
-
-        console.log(this.allUsuariosDeleted);
+        if (usuarios.length === 0) {
+          this.isEmptyUsers = true;
+        } else {
+          this.isEmptyUsers = false;
+          this.total = total;
+          this.currentPage = currentPage;
+          this.pageSize = pageSize;
+          this.totalPages = totalPages;
+          this.usuarios = usuarios;
+          this.noSearchMatch = false;
+        }
       }
+
+      this.isLoading = false;
     });
   }
+  
+  public onPageChange(newPage: number) {
+    const query = {
+      page: newPage,
+      pageSize: this.pageSize,
+    };
 
-  onPageChange(newPage: number) {
-    console.log({newPage});
-    this.getAll(this.pageSize, newPage);
+    this.getUsersByFilters(query);
   }
 
-  ngOnDestroy(): void {
-    this.suscription.unsubscribe();
-    console.log('observable cerrado')
+  public sendForm() {
+    // console.log('sendForm()');
+    if (this.filterForm.invalid) {
+      this.filterForm.markAllAsTouched();
+      return;
+    }
+
+    const formValues = this.filterForm.value;
+    const query = {
+      [formValues.searchOption]: formValues.searchTerm,
+      ...this.initQuery
+    };
+
+    // console.log({ query });
+    this.getUsersByFilters(query);
+  }
+
+  public clearFilter() {
+    this.getUsersByFilters(this.initQuery);
+
+    const searchTermControl = this.filterForm.get('searchTerm');
+    searchTermControl?.setValue(null);
+    searchTermControl?.reset();
   }
 }
