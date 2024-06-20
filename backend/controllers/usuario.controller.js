@@ -198,7 +198,6 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
 
 const usuariosGetAllDeleted = async (req = request, res = response) => {
     console.log('[usuarios] usuariosGetAllDeleted()');
-
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 20;
 
@@ -208,17 +207,27 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
     };
 
     const filter = {};
-
-    if (req.query.nombreUsuario) {
-        filter.titulo = {
+    if (req.query.nombre) {
+        filter.nombreUsuario = {
             [Sequelize.Op.and]: [
                 Sequelize.fn('LOWER', Sequelize.col('nombreUsuario')),
                 {
-                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                    [Sequelize.Op.like]: `%${req.query.nombre.toLowerCase()}%`,
                 },
             ],
         };
     };
+
+    if (req.query.email) {
+        filter.emailUsuario = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('emailUsuario')),
+                {
+                    [Sequelize.Op.like]: `%${req.query.email.toLowerCase()}%`,
+                },
+            ],
+        };
+    }
 
     // console.log({ filter });
     try {
@@ -230,10 +239,18 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
             });
 
         if (!usuarios.length) {
-            return res.status(200).json({
-                message: 'No se encontraron coincidencias.',
-                usuarios: [],
-            });
+            if (Object.keys(filter).length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    usuarios: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron usuarios.',
+                    usuarios: [],
+                });
+            }
         };
 
         return res.status(200).json({

@@ -44,8 +44,14 @@ export class UsuarioService {
     return this.http.get<any>(urlWithQuery);
   }
 
-  getAllUsuariosDeleted(page: number = 0, size: number = 0) {
-    return this.http.get<any>(`${this.url}/api/usuario/deleted/?size=${size}&page=${page}`);
+  getAllUsuariosDeleted(filters: any) {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/usuario/deleted/?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
   }
 
   updateUser(id: string, userUpdate: any) {
