@@ -55,8 +55,8 @@ const usuariosGetAll = async (req = request, res = response) => {
         ...baseFilter,
         ...additionalFilters
     };
+    // console.log({ filter });
 
-    console.log({ filter });
     try {
         const { count, rows: usuarios } =
             await Usuario.findAndCountAll({
@@ -102,7 +102,6 @@ const usuariosGetAll = async (req = request, res = response) => {
             error
         });
     }
-
 }
 
 const usuariosGetAllSuspended = async (req = request, res = response) => {
@@ -116,22 +115,40 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
         return res.status(400).json({ errors: errors.array() });
     };
 
-    const filter = {
+    const baseFilter = {
         estado: false,
+        rol: 'CLIENT-USER',
     };
 
-    if (req.query.nombreUsuario) {
-        filter.titulo = {
+    const additionalFilters = {};
+    if (req.query.nombre) {
+        additionalFilters.nombreUsuario = {
             [Sequelize.Op.and]: [
                 Sequelize.fn('LOWER', Sequelize.col('nombreUsuario')),
                 {
-                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+                    [Sequelize.Op.like]: `%${req.query.nombre.toLowerCase()}%`,
                 },
             ],
         };
     };
 
+    if (req.query.email) {
+        additionalFilters.emailUsuario = {
+            [Sequelize.Op.and]: [
+                Sequelize.fn('LOWER', Sequelize.col('emailUsuario')),
+                {
+                    [Sequelize.Op.like]: `%${req.query.email.toLowerCase()}%`,
+                },
+            ],
+        };
+    }
+
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters
+    };
     // console.log({ filter });
+
     try {
         const { count, rows: usuarios } =
             await Usuario.findAndCountAll({
@@ -147,10 +164,18 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
             });
 
         if (!usuarios.length) {
-            return res.status(200).json({
-                message: 'No se encontraron coincidencias.',
-                usuarios: [],
-            });
+            if (Object.keys(additionalFilters).length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    usuarios: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron usuarios.',
+                    usuarios: [],
+                });
+            }
         };
 
         return res.status(200).json({

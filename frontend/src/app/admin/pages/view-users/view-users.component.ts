@@ -28,8 +28,8 @@ export class ViewUsersComponent implements OnInit {
   usuarios: any;
 
   constructor(
-    private usuarioService: UsuarioService,
     private formBuilder: FormBuilder,
+    private usuarioService: UsuarioService,
   ) { }
 
   public ngOnInit(): void {
@@ -61,9 +61,9 @@ export class ViewUsersComponent implements OnInit {
 
   private getUsersByFilters(filters: any) {
     this.isLoading = true;
-    console.log({ filters });
+    // console.log({ filters });
     this.usuarioService.getAllUsersById(filters).subscribe(res => {
-      console.log({ res });
+      // console.log({ res });
       this.isLoading = false;
 
       if (res.noSearchMatch) {
@@ -119,7 +119,10 @@ export class ViewUsersComponent implements OnInit {
           'Usuario añadido a la sección de usuarios suspendidos.',
           'success',
         );
-        this.usuarioService.suspenderUsuario(idUsuario).subscribe();
+        this.usuarioService.suspenderUsuario(idUsuario).subscribe(()=>{
+           // Actualizar la lista de usuarios quitando el usuario suspendido
+           this.usuarios = this.usuarios.filter((usuario : any) => usuario.id !== idUsuario);
+        });
       }
     })
   }
@@ -142,7 +145,10 @@ export class ViewUsersComponent implements OnInit {
       cancelButtonText: 'Cancelar',
       reverseButtons: true,
     }).then((result) => {
-      this.usuarioService.deleteUsuario(idUsuario).subscribe();
+      this.usuarioService.deleteUsuario(idUsuario).subscribe(()=>{
+        // Actualizar la lista de usuarios quitando el usuario eliminado
+        this.usuarios = this.usuarios.filter((usuario : any) => usuario.id !== idUsuario);
+      });
 
       if (result.isConfirmed) {
         swalWithBootstrapButtons.fire(
