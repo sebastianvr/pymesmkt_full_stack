@@ -34,8 +34,14 @@ export class UsuarioService {
     return this.http.get<any>(urlWithQuery);
   }
 
-  getAllUsuariosSuspended(page: number = 0, size: number = 0) {
-    return this.http.get<any>(`${this.url}/api/usuario/suspended/?pageSize=${size}&page=${page}`);
+  getAllUsuariosSuspended(filters: any) {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/usuario/suspended/?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
   }
 
   getAllUsuariosDeleted(page: number = 0, size: number = 0) {
@@ -64,8 +70,8 @@ export class UsuarioService {
       );
   }
 
-  activarUsuario(usuario: any) {
-    return this.http.put<any>(`${this.url}/api/usuario/activate/${usuario.id}`, usuario)
+  activarUsuario(id: string) {
+    return this.http.put<any>(`${this.url}/api/usuario/activate/${id}`, id)
       .pipe(
         tap(() => {
           this.refresh.next();
