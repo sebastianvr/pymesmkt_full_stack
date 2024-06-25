@@ -11,7 +11,7 @@ const crearPyme = require('./create-pyme');
 const crearOferta = require('./create-offer');
 const comprarOferta = require('./create-purchase');
 
-const createUsersSeed = async (req = request, res = response) => {
+const createMockDataBase = async (req = request, res = response) => {
   console.log('[seed] initSeed()');
   const nroUsuarios = 10;
   const nroPublications = 20;
@@ -113,5 +113,5 @@ const hacerOfertas = async (nroOfertas, usuarios) => {
 
 
 module.exports = {
-  createUsersSeed,
+  createMockDataBase,
 };
