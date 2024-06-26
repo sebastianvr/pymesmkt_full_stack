@@ -17,6 +17,7 @@ import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-delet
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
 import { ViewSuspendedUsersComponent } from './pages/view-suspended-users/view-suspended-users.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ModalHelpGraphComponent } from './components/modal-help-graph/modal-help-graph.component';
 
 
 
@@ -33,6 +34,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     ViewDeletedUsersComponent,
     ViewUsersComponent,
     ViewSuspendedUsersComponent,
+    ModalHelpGraphComponent,
   ],
   imports: [
     CommonModule,
