@@ -62,6 +62,7 @@ export class ViewGraphComponent implements OnInit {
     this.isEmptyGraph = false;
     this.links = links;
     this.nodes = nodes;
+    console.log({ data })
     this.initializeGraph();
   }
 
@@ -95,7 +96,7 @@ export class ViewGraphComponent implements OnInit {
     svg.append("svg:defs").selectAll("marker")
       .data(['arrow'])
       .enter().append("svg:marker")
-      .attr("id", String)
+      .attr("id", (d: string) => d)
       .attr("viewBox", "0 -5 10 10")
       .attr("refX", 10)
       .attr("refY", -0.5)
@@ -114,7 +115,8 @@ export class ViewGraphComponent implements OnInit {
       .join("path")
       .attr("id", (d: any) => `${d.source.name}x${d.target.name}`)
       .attr("stroke", "black")
-      .attr("marker-end", "url(#arrow)")
+      .attr("marker-end", "url(#arrow)") // Asegura que el marcador se aplique inicialmente
+
 
     const linkLabel = svg
       .selectAll(".link-label")
@@ -144,6 +146,8 @@ export class ViewGraphComponent implements OnInit {
       .attr("r", 4)
       .style('fill', "#0d6efd")
       .style('cursor', 'pointer')
+      .on('mouseover', (e, d) => handleMouseOver(d))
+      .on('mouseout', (e, d) => handleMouseOut(d))
       .call(
         d3.drag<SVGCircleElement, any>()
           .on('start', (e, d) => dragstarted(e, d))
@@ -184,6 +188,56 @@ export class ViewGraphComponent implements OnInit {
       }
       d.fx = null;
       d.fy = null;
+    };
+
+    const handleMouseOver = (d: any) => {
+      // Reducir la opacidad de todos los elementos
+      d3.selectAll('circle, path, text').style('opacity', 0.1);
+    
+      // Crear un conjunto para almacenar los IDs de los nodos y enlaces relacionados
+      const relatedNodeIds = new Set();
+      const relatedLinkIds = new Set();
+    
+      // Agregar el nodo actual y sus conexiones
+      relatedNodeIds.add(d.id);
+    
+      this.links.forEach(link => {
+        if (link.source && link.target) { // Verificar que source y target estén definidos
+          if (link.source.id === d.id) {
+            relatedNodeIds.add(link.target.id);
+            relatedLinkIds.add(`${link.source.id}-${link.target.id}`);
+          } else if (link.target.id === d.id) {
+            relatedNodeIds.add(link.source.id);
+            relatedLinkIds.add(`${link.source.id}-${link.target.id}`);
+          }
+        }
+      });
+    
+      // Ajustar la opacidad y propiedades de los elementos relacionados
+      d3.selectAll('circle, text')
+        .filter((node: any) => relatedNodeIds.has(node.id))
+        .style('opacity', 1);
+    
+      d3.selectAll('path')
+        .filter((link: any) => {
+          if (link.source && link.target) { // Verificar que source y target estén definidos
+            const linkId = `${link.source.id}-${link.target.id}`;
+            return relatedLinkIds.has(linkId);
+          } else {
+            return false; // Si no están definidos, no incluir el enlace
+          }
+        })
+        .style('opacity', 1)
+        .attr('stroke', (link: any) => link.source.id === d.id ? 'blue' : 'green') // Colorear los enlaces
+        .attr('marker-end', (link: any) => {
+          return link.source.id === d.id ? 'url(#arrow-out)' : 'url(#arrow-in)';
+        });
+    };
+    
+    const handleMouseOut = (d: any) => {
+      d3.selectAll('circle').style('opacity', 1);
+      d3.selectAll('path').style('opacity', 1).attr('stroke', 'black').attr('marker-end', 'url(#arrow)');
+      d3.selectAll('text').style('opacity', 1);
     };
   }
 
