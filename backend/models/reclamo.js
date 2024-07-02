@@ -10,11 +10,11 @@ const Reclamo = db.define(
             primaryKey: true,
         },
         titulo: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         mensaje: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         documentos: {
