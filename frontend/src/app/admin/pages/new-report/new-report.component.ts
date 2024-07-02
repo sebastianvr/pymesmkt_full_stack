@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ReclamoService } from '../../../core/services/reclamo/reclamo.service';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ReclamoService } from 'src/app/core/services/reclamo/reclamo.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -9,45 +10,141 @@ import Swal from 'sweetalert2';
   styleUrls: ['./new-report.component.css']
 })
 export class NewReportComponent implements OnInit {
+  pageSize: number = 10;
+  page: number = 1;
 
-  allReclamos: any;
-  searchText: string = '';
-  closeResult = '';
+  initQuery = {
+    pageSize: this.pageSize,
+    page: this.page
+  };
+
+  currentPage!: number;
+  total!: number;
+  totalPages!: number;
+
+  isLoading: boolean = false;
+  filterForm!: FormGroup;
+  noSearchMatch!: boolean;
+  isEmptyReports!: boolean;
+  reports: any;
 
   constructor(
+    private formBuilder: FormBuilder,
     private reclamoService: ReclamoService,
     private modalService: NgbModal
   ) { }
 
-  ngOnInit(): void {
-    this.reclamoService.getAllReclamos(0, 10).subscribe((data) => {
-      this.allReclamos = data.content
-      console.log('data', data)
-      console.log('this.allReclamos', this.allReclamos)
-    })
+  public ngOnInit(): void {
+    this.buildForm();
+    this.getReportsByFilters(this.initQuery);
   }
 
-  open(content: any) {
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title', centered: true }).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  private buildForm() {
+    this.filterForm = this.formBuilder.group({
+      searchTerm: [null, [Validators.required]],
+      searchOption: ['nombre', Validators.required],
+    });
+
+    this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
+      const searchTermControl = this.filterForm.get('searchTerm');
+
+      searchTermControl?.clearValidators();
+
+      if (option === 'fecha') {
+        searchTermControl?.setValidators([Validators.required, this.validateDate]);
+      } else if (option === 'nombre') {
+        searchTermControl?.setValidators(Validators.required);
+      }
+
+      searchTermControl?.reset();
+      searchTermControl?.updateValueAndValidity();
     });
   }
 
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
+  private getReportsByFilters(filters: any) {
+    this.isLoading = true;
+    console.log({ filters });
+    this.reclamoService.getAllReclamos(filters).subscribe(res => {
+      console.log({ res });
+      this.isLoading = false;
+
+      if (res.noSearchMatch) {
+        this.noSearchMatch = true;
+        this.isEmptyReports = false;
+      } else {
+        const {
+          reclamos,
+          total,
+          currentPage,
+          pageSize,
+          totalPages,
+        } = res;
+
+        if (reclamos.length === 0) {
+          this.isEmptyReports = true;
+          this.noSearchMatch = false;
+        } else {
+          this.isEmptyReports = false;
+          this.total = total;
+          this.currentPage = currentPage;
+          this.pageSize = pageSize;
+          this.totalPages = totalPages;
+          this.reports = reclamos;
+          this.noSearchMatch = false;
+        }
+      }
+
+      this.isLoading = false;
+    });
   }
 
+  public onPageChange(newPage: number) {
+    const query = {
+      page: newPage,
+      pageSize: this.pageSize,
+    };
 
+    this.getReportsByFilters(query);
+  }
 
-  finalizarReclamo(id: string) {
+  public sendForm() {
+    // console.log('sendForm()');
+    if (this.filterForm.invalid) {
+      this.filterForm.markAllAsTouched();
+      return;
+    }
+
+    const formValues = this.filterForm.value;
+    const query = {
+      [formValues.searchOption]: formValues.searchTerm,
+      ...this.initQuery
+    };
+
+    // console.log({ query });
+    this.getReportsByFilters(query);
+  }
+
+  public clearFilter() {
+    this.getReportsByFilters(this.initQuery);
+
+    const searchTermControl = this.filterForm.get('searchTerm');
+    searchTermControl?.setValue(null);
+    searchTermControl?.reset();
+  }
+
+  public openModal(content: any) {
+    this.modalService.open(content, {
+      size: 'lg',
+      ariaLabelledBy: 'modal-basic-title',
+      centered: true
+    }).result.then((result) => {
+      console.log(result);
+    }, (reason) => {
+      console.log(reason);
+    });
+  }
+
+  public endReport(id: string) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: 'btn btn-primary mx-3',
@@ -85,4 +182,41 @@ export class NewReportComponent implements OnInit {
       }
     })
   }
+
+  private validateDate(control: AbstractControl): { [key: string]: boolean } | null {
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+
+    if (dateRegex.test(control.value)) {
+      const parts = control.value.split('-');
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+
+      // Verificar si el día, mes y año son válidos
+      if (
+        day >= 1 &&
+        day <= 31 &&
+        month >= 1 &&
+        month <= 12 &&
+        year >= 1900 && // Ajusta el rango de años según tus necesidades
+        year <= 2099 // Ajusta el rango de años según tus necesidades
+      ) {
+        return null; // Fecha válida
+      }
+    }
+
+    return { invalidDate: true };
+  }
+
+  public getPlaceholder(): string {
+    const selectedOption = this.filterForm.get('searchOption')?.value;
+
+    if (selectedOption === 'nombre') {
+        return 'Nombre de empresa';
+    } else if (selectedOption === 'fecha') {
+        return 'Ej: 01-05-2022';
+    } else {
+        return '';
+    }
+}
 }

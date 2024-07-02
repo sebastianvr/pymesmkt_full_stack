@@ -1,70 +1,98 @@
-const { uid } = require('uid');
 const { response, request } = require('express');
+const { validationResult } = require('express-validator');
+const { Sequelize, Op } = require('sequelize');
+const { uid } = require('uid');
 
 const Publicacion = require('../models/publicacion');
 const Usuario = require('../models/usuario');
 const Reclamo = require('../models/reclamo');
 const Pyme = require('../models/pyme');
 
-/**
- * Obtiene todos los reclamos de TODOS los usuarios.
- */
+
 const reclamosGetAll = async (req = request, res = response) => {
     console.log('[reclamos] reclamosGetAll()');
 
-    const { page, size } = req.query;
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const baseFilter = {
+        estado: true,
+    };
+
+    const additionalFilters = [];
+
+    if (req.query.nombre) {
+        additionalFilters.push({
+            [Op.or]: [
+                { '$Usuario.Pyme.nombrePyme$': { [Op.like]: `%${req.query.nombre.toLowerCase()}%` } },
+                { '$Publicacion.Usuario.Pyme.nombrePyme$': { [Op.like]: `%${req.query.nombre.toLowerCase()}%` } }
+            ]
+        });
+    }
+
+    if (req.query.fecha) {
+        console.log(req.query.fecha);
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+            // console.log('Parsed Date:', { day, month, year });
+
+            additionalFilters.push({
+                [Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('Reclamo.createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('Reclamo.createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('Reclamo.createdAt')), year),
+                ],
+            });
+        }
+    }
+
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters.length > 0 ? { [Op.and]: additionalFilters } : {},
+    };
+    // console.log({ filter });
 
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber;
-        };
-
-        let size = 10;
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 100) {
-            size = sizeAsNumber;
-        };
-
-        let reclamos = await Reclamo.findAndCountAll({
-            where: { estado: true },
-            limit: size,
-            offset: page * size,
+        const { count, rows: reclamos } = await Reclamo.findAndCountAll({
+            where: filter,
+            limit: pageSize,
+            offset: (page - 1) * pageSize,
             order: [['createdAt', 'DESC']],
             include: [
-                // usuario que recibe el reclamo
                 {
                     model: Usuario,
+                    as: 'Usuario',
                     where: { estado: true },
                     include: [
                         {
                             model: Pyme,
+                            as: 'Pyme',
                             where: { estado: true },
-                            // attributes: ['nombrePyme'],
                         },
-                        // {
-                        //     model: Reclamo,
-                        //     where: { estado: true },
-
-                        //     // attributes: [db.fn('COUNT', db.col('Usuario.Reclamos.id')), 'Usuario.Reclamos.id'],
-                        //     group: ['id']
-                        //     // attributes: ['id', [db.fn('COUNT', 0), 'cantidad']],
-                        // },
-                    ]
-                    // attributes: ['nombreUsuario','promedio',[db.fn('COUNT', db.col('puntaje')), 'promedio']],
+                    ],
                 },
                 {
                     model: Publicacion,
+                    as: 'Publicacion',
                     where: { estado: true },
                     include: [
-                        // usuario creador del reclamo
                         {
                             model: Usuario,
+                            as: 'Usuario',
                             where: { estado: true },
                             attributes: ['nombreUsuario'],
                             include: {
                                 model: Pyme,
+                                as: 'Pyme',
                                 where: { estado: true },
                                 attributes: ['nombrePyme'],
                             },
@@ -74,30 +102,39 @@ const reclamosGetAll = async (req = request, res = response) => {
             ],
         });
 
-        // console.log({reclamos});
-        // if (reclamos.count === 0) {
-        //     res.status(200).json({
-        //         ok: true,
-        //         reclamos,
-        //         msg: 'No existen reclamos hacia este usuario'
-        //     })
-        // }
+        if (!reclamos.length) {
+            if (additionalFilters.length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    reclamos: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron reclamos.',
+                    reclamos: [],
+                });
+            }
+        }
 
-        if (reclamos.count > 0) {
-            return res.status(200).json({
-                totalPages: Math.ceil(reclamos.count / size),
-                content: reclamos.rows,
-            });
-        };
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            reclamos,
+        });
+
     } catch (error) {
         console.error(error);
-        return res.status(400).json({
+        return res.status(500).json({
             ok: false,
-            msj: 'Error en el servidor, reclamosGetAll()',
-            error,
+            msg: 'Error en el servidor, reclamosGetAll().',
+            error
         });
-    };
+    }
 };
+
 
 const reclamoPost = async (req = request, res = response) => {
     console.log('[reclamos] reclamoPost()');

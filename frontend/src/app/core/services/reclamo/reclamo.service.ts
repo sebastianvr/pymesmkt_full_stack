@@ -13,13 +13,21 @@ export class ReclamoService {
   constructor(
     private http: HttpClient
   ) { }
-  
+
   postReclamo(nuevoReclamo: any): Observable<any> {
     return this.http.post(`${this.url}/api/reclamo`, nuevoReclamo)
   }
 
-  getAllReclamos(page: number = 0, size: number = 0) {
-    return this.http.get<any>(`${this.url}/api/reclamo/?size=${size}&page=${page}`)
+  getAllReclamos(filters: any) {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/reclamo/?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
+
+
   }
 
   deleteReclamo(id: any) {
