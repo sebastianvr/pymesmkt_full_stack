@@ -14,7 +14,7 @@ export class MessageService {
       icon: type,
       title: message,
       showConfirmButton: false,
-      timer: 1500
+      timer: 1500,
     });
   }
 
@@ -24,5 +24,9 @@ export class MessageService {
 
   public showWarningMessage(message: string) {
     this.showMessage('warning', message);
+  }
+  
+  public showErrorMessage(message: string) {
+    this.showMessage('error', message);
   }
 }
