@@ -13,16 +13,16 @@ const crearOferta = require('./create-offer');
 const comprarOferta = require('./create-purchase');
 const crearAdmin = require('./create-admin.js');
 const crearReclamo = require('./create-claim.js');
+const dropDatabase = require('./delete-db.js');
 
 /**
  * Crea una base de datos ficticia con usuarios, publicaciones, ofertas, compras y reclamos.
- * 
- * @param {Object} req.body - El cuerpo de la solicitud.
+ *
  * @param {number} req.body.nroUsuarios - Número de usuarios a crear. Por defecto, 40.
  * @param {number} req.body.nroPublications - Número de publicaciones por usuario. Por defecto, 10.
  * @param {number} req.body.nroOfertas - Número de ofertas por usuario. Por defecto, 10.
- * @param {number} req.body.nroCompras - Número de compras por usuario. Por defecto, 5.
- * @param {number} req.body.nroReclamos - Número de reclamos por usuario. Por defecto, 2.
+ * @param {number} req.body.nroCompras - Número de compras por usuario. Por defecto, 6.
+ * @param {number} req.body.nroReclamos - Número de reclamos por usuario. Por defecto, 3.
  * @param {number} req.body.nroAdmins - Número de administradores a crear. Por defecto, 0.
  * 
  * @returns {Promise<response>} La respuesta de la solicitud con el estado de la operación.
@@ -37,15 +37,18 @@ const createMockDataBase = async (req = request, res = response) => {
   console.log('[seed] initSeed()');
 
   const {
-    nroUsuarios = 40,
-    nroPublications = 10,
-    nroOfertas = 10,
-    nroCompras = 5,
-    nroReclamos = 2,
+    nroUsuarios = 10,
+    nroPublications = 0,
+    nroOfertas = 0,
+    nroCompras = 0,
+    nroReclamos =0,
     nroAdmins = 0,
   } = req.body;
 
   try {
+    // Eliminar toda la información de la base de datos
+    await dropDatabase();
+
     const credencialesUsuarios = {
       admins: [],
       clients: []
@@ -65,13 +68,9 @@ const createMockDataBase = async (req = request, res = response) => {
       }
     }
 
-    // Crear admins
-    for (let index = 0; index < nroAdmins; index++) {
-      const { usuario: adminUsuario, contrasenia: adminContrasenia } = await crearAdmin();
-      credencialesUsuarios.admins.push({
-        email: adminUsuario.emailUsuario,
-        contrasenia: adminContrasenia
-      });
+    // Crear admins si se proporciona nroAdmins
+    if (nroAdmins > 0) {
+      await hacerAdmins(nroAdmins, credencialesUsuarios);
     }
 
     // Obtener todos los usuarios creados
@@ -105,6 +104,16 @@ const createMockDataBase = async (req = request, res = response) => {
     return res.status(500).json({
       ok: false,
       error: error,
+    });
+  }
+};
+
+const hacerAdmins = async (nroAdmins, credencialesUsuarios) => {
+  for (let index = 0; index < nroAdmins; index++) {
+    const { usuario: adminUsuario, contrasenia: adminContrasenia } = await crearAdmin();
+    credencialesUsuarios.admins.push({
+      email: adminUsuario.emailUsuario,
+      contrasenia: adminContrasenia
     });
   }
 };
