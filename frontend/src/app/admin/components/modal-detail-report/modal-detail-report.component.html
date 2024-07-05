@@ -11,11 +11,21 @@
             <div class="row justify-content-center">
                 <div class="col-md-4 col-sm-12 text-center">
                     <h3 class="fs-6 mb-3">Archivos Adjuntos</h3>
-                    <img class="d-block mx-auto mb-2" width="50" src="../../../../assets/icons/file-zip.svg" alt="file-zip.svg">
+                    <img class="d-block mx-auto mb-2" width="50" src="../../../../assets/icons/file-zip.svg"
+                        alt="file-zip.svg">
                     <button class="btn btn-success btn-sm my-2" type="button">Descargar</button>
                 </div>
             </div>
         </div>
+
+        <ng-container *ngIf="detailReport.mensajeAdmin">
+            <hr>
+            <h3 class="fs-6 mb-3">Mensaje del administrador:</h3>
+            <div class="container">
+                <p class="alert alert-info" role="alert">{{detailReport.mensajeAdmin}}</p>
+            </div>
+        </ng-container>
+
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="activeModal.dismiss()">Cerrar</button>
