@@ -18,6 +18,10 @@ import { ViewUsersComponent } from './pages/view-users/view-users.component';
 import { ViewSuspendedUsersComponent } from './pages/view-suspended-users/view-suspended-users.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ModalHelpGraphComponent } from './components/modal-help-graph/modal-help-graph.component';
+import { SimulationModalComponent } from './components/simulation-modal/simulation-modal.component';
+import { SimulationResultModalComponent } from './components/simulation-result-modal/simulation-result-modal.component';
+import { ModalArchivingComponent } from './components/modal-archiving/modal-archiving.component';
+import { ModalDetailReportComponent } from './components/modal-detail-report/modal-detail-report.component';
 
 
 
@@ -35,6 +39,10 @@ import { ModalHelpGraphComponent } from './components/modal-help-graph/modal-hel
     ViewUsersComponent,
     ViewSuspendedUsersComponent,
     ModalHelpGraphComponent,
+    SimulationModalComponent,
+    SimulationResultModalComponent,
+    ModalArchivingComponent,
+    ModalDetailReportComponent,
   ],
   imports: [
     CommonModule,
