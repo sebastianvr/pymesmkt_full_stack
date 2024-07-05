@@ -59,21 +59,11 @@ export class UsuarioService {
   }
 
   suspenderUsuario(id: any) {
-    return this.http.put<any>(`${this.url}/api/usuario/suspend/${id}`, {})
-      .pipe(
-        tap(() => {
-          this.refresh.next();
-        }),
-      );
+    return this.http.put<any>(`${this.url}/api/usuario/suspend/${id}`, {});
   }
 
   deleteUsuario(id: any) {
-    return this.http.delete<any>(`${this.url}/api/usuario/delete/${id}`, {})
-      .pipe(
-        tap(() => {
-          this.refresh.next();
-        }),
-      );
+    return this.http.delete<any>(`${this.url}/api/usuario/delete/${id}`, {});
   }
 
   activarUsuario(id: string) {
