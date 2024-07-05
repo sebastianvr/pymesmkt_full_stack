@@ -20,7 +20,7 @@
                         </select>
 
                         <input type="text" class="form-control" formControlName="searchTerm"
-                            aria-label="Término de búsqueda"  [placeholder]="getPlaceholder()" />
+                            aria-label="Término de búsqueda" [placeholder]="getPlaceholder()" />
                         <button style="border-top-right-radius: .375rem; border-bottom-right-radius: .375rem;"
                             class="input-group-text btn btn-primary" id="basic-addon2"
                             [disabled]="isEmptyReports && !isLoading && !noSearchMatch" (click)="sendForm()">
@@ -64,8 +64,7 @@
                     <ng-container *ngIf="noSearchMatch && !isLoading">
                         <div class="col-md-12 text-center">
                             <div class="container mt-5">
-                                <img src="../../../../assets/icons/flag.svg" alt="flag.svg"
-                                    class="icon-image">
+                                <img src="../../../../assets/icons/flag.svg" alt="flag.svg" class="icon-image">
                                 <h3 class="my-3">No existen coincidencias de búsqueda. </h3>
 
                                 <div class="col-lg-12">
@@ -83,8 +82,7 @@
                     <ng-container *ngIf="isEmptyReports && !isLoading && !noSearchMatch">
                         <div class="col-md-12 text-center">
                             <div class="container mt-5">
-                                <img src="../../../../assets/icons/flag.svg" alt="flag.svg"
-                                    class="icon-image">
+                                <img src="../../../../assets/icons/flag.svg" alt="flag.svg" class="icon-image">
                                 <h3 class="my-3">No existen reportes registrados.</h3>
                             </div>
                         </div>
@@ -123,44 +121,12 @@
                                             <td>
                                                 <div class="container">
                                                     <button class="btn btn-primary btn-sm"
-                                                        (click)="openModal(content)">Ver</button>
+                                                        (click)="openReportDetailModal(reclamo)">Ver</button>
                                                 </div>
-
-                                                <ng-template #content let-modal>
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title" id="modal-basic-title">Detalles del
-                                                            reclamo</h4>
-                                                        <button type="button" class="btn-close" aria-label="Close"
-                                                            (click)="modal.dismiss('Cross click')"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <h6 class="fs-5 titleReclamo text-left">{{ reclamo.titulo }}
-                                                        </h6>
-                                                        <p class="text-left">{{ reclamo.mensaje }}</p>
-
-                                                        <div class="container">
-                                                            <div class="row justify-content-center">
-                                                                <div class="col-md-4 col-sm-12 text-center">
-                                                                    <h3 class="fs-6">Archivos adjuntos</h3>
-                                                                    <img class="d-block mx-auto mb-2" width="50"
-                                                                        src="../../../../assets/icons/file-zip.svg"
-                                                                        alt="file-zip.svg">
-                                                                    <button class="btn btn-success btn-sm my-2"
-                                                                        type="button">Descargar</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="modal-footer">
-                                                        <button (click)="modal.dismiss('Close button')" type="button"
-                                                            class="btn btn-primary">Cerrar</button>
-                                                    </div>
-                                                </ng-template>
                                             </td>
                                             <td>
                                                 <button class="btn btn-sm btn-warning"
-                                                    (click)="endReport(reclamo.id)">Archivar</button>
+                                                    (click)="endModalReport(reclamo.id)">Archivar</button>
                                             </td>
                                         </tr>
                                     </tbody>
