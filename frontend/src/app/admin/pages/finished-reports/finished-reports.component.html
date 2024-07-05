@@ -3,9 +3,9 @@
         <div class="container">
 
             <div class="col-md-12 g-5 pt-4 text-center mb-5">
-                <img class="float-end mb-3" src="../../../../assets/icons/file-earmark-plus.svg" alt="pen.svg"
+                <img class="float-end mb-3" src="../../../../assets/icons/archive.svg" alt="archive.svg.svg"
                     width="55">
-                <h2 class="fs-1 mb-1">Reclamos Nuevos</h2>
+                <h2 class="fs-1 mb-1">Reclamos Finalizados</h2>
             </div>
 
             <div class="col-md-12">
@@ -81,7 +81,7 @@
                         <div class="col-md-12 text-center">
                             <div class="container mt-5">
                                 <img src="../../../../assets/icons/flag.svg" alt="flag.svg" class="icon-image">
-                                <h3 class="my-3">No existen reportes registrados.</h3>
+                                <h3 class="my-3">No existen reportes archivados.</h3>
                             </div>
                         </div>
                     </ng-container>
@@ -108,7 +108,6 @@
                                             <th scope="col">Empresa reclamada</th>
                                             <th scope="col">Fecha</th>
                                             <th scope="col">Ver reclamo</th>
-                                            <th scope="col">Acción</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -121,10 +120,6 @@
                                                     <button class="btn btn-primary btn-sm"
                                                         (click)="openReportDetailModal(reclamo)">Ver</button>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-warning"
-                                                    (click)="endModalReport(reclamo.id)">Archivar</button>
                                             </td>
                                         </tr>
                                     </tbody>

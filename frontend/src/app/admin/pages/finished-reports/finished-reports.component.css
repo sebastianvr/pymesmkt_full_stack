@@ -1,0 +1,34 @@
+.titleReclamo p {
+    text-transform: lowercase;
+}
+
+.titleReclamo p:first-letter {
+    text-transform: uppercase;
+}
+
+
+.icon-image {
+    width: 30%;
+    height: auto;
+    max-width: 150px;
+}
+
+.customSelect {
+    max-width: 115px;
+}
+
+.icon-button-style {
+    filter: invert(100%);
+    width: 16px;
+    height: 16px;
+}
+
+.table-sm th, .table-sm td {
+    padding: 0.3rem;
+}
+
+@media (max-width: 576px) {
+    .table-sm {
+        font-size: 0.875rem;
+    }
+}

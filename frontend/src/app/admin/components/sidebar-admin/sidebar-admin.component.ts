@@ -52,11 +52,12 @@ export class SidebarAdminComponent implements OnInit {
           {
             label: 'Reclamos nuevos',
             icon: 'pi pi-fw pi-bookmark',
-            routerLink: '/admin/new-report',
+            routerLink: '/admin/new-reports',
           },
           {
             label: 'Reclamos finalizados',
             icon: 'pi pi-fw pi-bookmark-fill',
+            routerLink: '/admin/finished-reports',
           },
         ]
       }

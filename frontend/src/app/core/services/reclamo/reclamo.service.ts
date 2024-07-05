@@ -27,6 +27,16 @@ export class ReclamoService {
     const urlWithQuery = `${this.url}/api/reclamo/?${queryString}`;
     return this.http.get<any>(urlWithQuery);
   }
+  
+  getAllFinishedReclamos(filters: any) {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/reclamo/finished/?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
+  }
 
   deleteReclamo(id: any) {
     return this.http.delete<any>(`${this.url}/api/reclamo/${id}`);
