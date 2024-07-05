@@ -114,15 +114,19 @@ export class ViewSuspendedUsersComponent implements OnInit {
       reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
+
+        this.usuarioService.activarUsuario(idUsuario).subscribe((data) => {
+          // Actualizar la lista de usuarios quitando el usuario suspendido
+          if (data) {
+            this.usuarios = this.usuarios.filter((usuario: any) => usuario.id !== idUsuario);
+          }
+        });
+
         swalWithBootstrapButtons.fire(
           'Reintegrado!',
           'Este usuario ha sido reintegrado al sistema.',
           'success',
         );
-        this.usuarioService.activarUsuario(idUsuario).subscribe(() => {
-          // Actualizar la lista de usuarios quitando el usuario suspendido
-          this.usuarios = this.usuarios.filter((usuario: any) => usuario.id !== idUsuario);
-        });
       }
     });
   }
@@ -145,12 +149,14 @@ export class ViewSuspendedUsersComponent implements OnInit {
       cancelButtonText: 'Cancelar',
       reverseButtons: true,
     }).then((result) => {
-      this.usuarioService.deleteUsuario(idUsuario).subscribe(() => {
-        // Actualizar la lista de usuarios quitando el usuario suspendido
-        this.usuarios = this.usuarios.filter((usuario: any) => usuario.id !== idUsuario);
-      });
-
       if (result.isConfirmed) {
+        this.usuarioService.deleteUsuario(idUsuario).subscribe((data) => {
+          // Actualizar la lista de usuarios quitando el usuario suspendido
+          if (data) {
+            this.usuarios = this.usuarios.filter((usuario: any) => usuario.id !== idUsuario);
+          }
+        });
+
         swalWithBootstrapButtons.fire(
           'Eliminado',
           'Este usuario ha sido eliminado del sistema.',
