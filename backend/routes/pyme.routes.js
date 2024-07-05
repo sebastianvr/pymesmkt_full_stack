@@ -11,7 +11,7 @@ const { validarCampos } = require('../middlewares/validar-campos');
 
 const router = Router();
 
-router.get('/', pymesGet);
+router.get('/', validarJWT, pymesGet);
 
 router.get('/:UsuarioId', [
     validarJWT,
