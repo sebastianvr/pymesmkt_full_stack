@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { MinioFilesService } from 'src/app/core/services/files/minio-files.service';
-import { MessageService } from 'src/app/core/services/message.service';
+import { MessageService } from 'src/app/core/services/message/message.service';
 import { RegionesComunasService } from 'src/app/core/services/regiones-comunas/regiones-comunas.service';
 import { UsuarioService } from 'src/app/core/services/usuario/usuario.service';
 import { EmailValidatorService } from 'src/app/core/validations/email-validator/email-validator.service';

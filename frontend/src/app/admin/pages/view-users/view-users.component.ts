@@ -114,15 +114,19 @@ export class ViewUsersComponent implements OnInit {
       reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
+        // Solo si el usuario confirmó la eliminación
+        this.usuarioService.suspenderUsuario(idUsuario).subscribe((data) => {
+          // Actualizar la lista de usuarios quitando el usuario eliminado
+          if (data) {
+            this.usuarios = this.usuarios.filter((usuario: any) => usuario.id !== idUsuario);
+          }
+        });
+
         swalWithBootstrapButtons.fire(
-          'Usuario suspendido',
-          'Usuario añadido a la sección de usuarios suspendidos.',
+          'Eliminado',
+          'Este usuario ha sido eliminado del sistema.',
           'success',
         );
-        this.usuarioService.suspenderUsuario(idUsuario).subscribe(()=>{
-           // Actualizar la lista de usuarios quitando el usuario suspendido
-           this.usuarios = this.usuarios.filter((usuario : any) => usuario.id !== idUsuario);
-        });
       }
     })
   }
@@ -134,7 +138,7 @@ export class ViewUsersComponent implements OnInit {
         cancelButton: 'btn btn-danger mx-3',
       },
       buttonsStyling: false,
-    })
+    });
 
     swalWithBootstrapButtons.fire({
       title: '¿Estás seguro de eliminar este usuario?',
@@ -145,12 +149,15 @@ export class ViewUsersComponent implements OnInit {
       cancelButtonText: 'Cancelar',
       reverseButtons: true,
     }).then((result) => {
-      this.usuarioService.deleteUsuario(idUsuario).subscribe(()=>{
-        // Actualizar la lista de usuarios quitando el usuario eliminado
-        this.usuarios = this.usuarios.filter((usuario : any) => usuario.id !== idUsuario);
-      });
-
       if (result.isConfirmed) {
+        // Solo si el usuario confirmó la eliminación
+        this.usuarioService.deleteUsuario(idUsuario).subscribe((data) => {
+          // Actualizar la lista de usuarios quitando el usuario eliminado
+          if (data) {
+            this.usuarios = this.usuarios.filter((usuario: any) => usuario.id !== idUsuario);
+          }
+        });
+
         swalWithBootstrapButtons.fire(
           'Eliminado',
           'Este usuario ha sido eliminado del sistema.',

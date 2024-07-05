@@ -1,0 +1,44 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title text-center w-100" id="modal-basic-title">Mover Reclamo</h4>
+        <button type="button" class="btn-close" aria-label="Close"
+            (click)="activeModal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+        <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+            <div class="container-fluid">
+                <h5>¿Desea mover este reclamo a archivados?</h5>
+                <p>Ingrese un mensaje explicando la resolución final del reclamo.</p>
+                <div class="mb-3">
+                    <textarea class="form-control" id="resolution-message" rows="4"
+                        placeholder="Ingrese su mensaje aquí" formControlName="mensaje"
+                        (input)="onMessageInput()"></textarea>
+                    <div *ngIf="mensajeControl?.invalid && (mensajeControl?.dirty || mensajeControl?.touched)"
+                        class="text-danger">
+                        <small *ngIf="mensajeControl?.errors?.['required']">El mensaje es requerido.</small>
+                        <small *ngIf="mensajeControl?.errors?.['maxlength']">El mensaje no puede exceder los 300
+                            caracteres.</small>
+                    </div>
+                    <div class="text-end" *ngIf="remainingCharacters >= 0">
+                        <small class="text-success">{{ remainingCharacters }} caracteres restantes</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    (click)="activeModal.dismiss('Cancel click')">Cancelar</button>
+                <button type="submit" class="btn btn-primary" [disabled]="isLoading || reportForm.invalid">
+                    <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status"
+                        aria-hidden="true"></span>
+                    {{ isLoading ? '' : 'Mover' }}
+                </button>
+            </div>
+        </form>
+
+        <!-- Debug -->
+        <!-- <div class="container">
+            <pre><b>filterForm.value: </b>{{reportForm.value | json}}</pre>
+            <pre><b>filterForm.errors: </b>{{reportForm.errors | json}}</pre>
+        </div> -->
+    </div>
+</div>

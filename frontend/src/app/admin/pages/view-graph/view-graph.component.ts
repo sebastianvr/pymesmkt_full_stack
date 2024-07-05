@@ -62,7 +62,7 @@ export class ViewGraphComponent implements OnInit {
     this.isEmptyGraph = false;
     this.links = links;
     this.nodes = nodes;
-    console.log({ data })
+    // console.log({ data })
     this.initializeGraph();
   }
 

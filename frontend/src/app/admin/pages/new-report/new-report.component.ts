@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ReclamoService } from 'src/app/core/services/reclamo/reclamo.service';
-import Swal from 'sweetalert2';
+import { ModalArchivingComponent } from '../../components/modal-archiving/modal-archiving.component';
+import { ModalDetailReportComponent } from '../../components/modal-detail-report/modal-detail-report.component';
 
 @Component({
   selector: 'app-new-report',
@@ -63,9 +64,9 @@ export class NewReportComponent implements OnInit {
 
   private getReportsByFilters(filters: any) {
     this.isLoading = true;
-    console.log({ filters });
+    // console.log({ filters });
     this.reclamoService.getAllReclamos(filters).subscribe(res => {
-      console.log({ res });
+      // console.log({ res });
       this.isLoading = false;
 
       if (res.noSearchMatch) {
@@ -132,55 +133,40 @@ export class NewReportComponent implements OnInit {
     searchTermControl?.reset();
   }
 
-  public openModal(content: any) {
-    this.modalService.open(content, {
+  public async openReportDetailModal(report: any) {
+    const modalRef = this.modalService.open(ModalDetailReportComponent, {
       size: 'lg',
       ariaLabelledBy: 'modal-basic-title',
-      centered: true
-    }).result.then((result) => {
-      console.log(result);
-    }, (reason) => {
-      console.log(reason);
+      centered: true,
     });
+
+    modalRef.componentInstance.detailReport = report;
+
+    try {
+      await modalRef.result;
+    } catch (error) {
+      // console.error({ error });
+    }
   }
 
-  public endReport(id: string) {
-    const swalWithBootstrapButtons = Swal.mixin({
-      customClass: {
-        confirmButton: 'btn btn-primary mx-3',
-        cancelButton: 'btn btn-primary mx-3'
-      },
-      buttonsStyling: false
-    })
+  public async endModalReport(id: string) {
+    const modalRef = this.modalService.open(ModalArchivingComponent, {
+      centered: true,
+      size: 'md',
+      ariaLabelledBy: 'modal-basic-title',
+    });
+    modalRef.componentInstance.idReport = id;
 
-    swalWithBootstrapButtons.fire({
-      title: '¿Quieres finalizar este reclamo?',
-      text: 'Este reclamo se moverá a la sección de reclamos finalizados',
-      icon: 'info',
-      iconColor: '#0e6ffd',
-      showCancelButton: true,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true
-    }).then((result) => {
-      if (result.isConfirmed) {
+    modalRef.componentInstance.idReportDeleted.subscribe((idDeleted: any) => {
+      // Filtrar la lista de reclamos para remover el reclamo eliminado
+      this.reports = this.reports.filter((report: any) => report.id !== idDeleted);
+    });
 
-        // cambiar estado de reclamo a finalizado
-
-        // actualizar tabla
-
-        // swalWithBootstrapButtons.fire(
-        //   'Reclamo finalizado',
-        //   '',
-        //   'success'
-        // )
-        // this.usuarioService.deleteUsuario(idUsuario).subscribe()
-        // this.usuarioService.refresh.subscribe(response => {
-        //   this.getAll();
-        // })
-        // this.router.navigate(['/user/see-publications']; 
-      }
-    })
+    try {
+      await modalRef.result;
+    } catch (error) {
+      // console.error({ error });
+    }
   }
 
   private validateDate(control: AbstractControl): { [key: string]: boolean } | null {
@@ -212,11 +198,11 @@ export class NewReportComponent implements OnInit {
     const selectedOption = this.filterForm.get('searchOption')?.value;
 
     if (selectedOption === 'nombre') {
-        return 'Nombre de empresa';
+      return 'Nombre de empresa';
     } else if (selectedOption === 'fecha') {
-        return 'Ej: 01-05-2022';
+      return 'Ej: 01-05-2022';
     } else {
-        return '';
+      return '';
     }
-}
+  }
 }

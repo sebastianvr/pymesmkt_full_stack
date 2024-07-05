@@ -21,7 +21,7 @@ const Reclamo = db.define(
             type: DataTypes.TEXT,
         },
         mensajeAdmin: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
         },
         estado: {
             type: DataTypes.BOOLEAN,

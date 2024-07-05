@@ -36,7 +36,6 @@ const reclamosGetAll = async (req = request, res = response) => {
     }
 
     if (req.query.fecha) {
-        console.log(req.query.fecha);
         const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
         if (dateRegex.test(req.query.fecha)) {
             const fechaParts = req.query.fecha.split('-');
@@ -135,7 +134,6 @@ const reclamosGetAll = async (req = request, res = response) => {
     }
 };
 
-
 const reclamoPost = async (req = request, res = response) => {
     console.log('[reclamos] reclamoPost()');
 
@@ -223,9 +221,45 @@ const reclamoDelete = async (req = request, res = response) => {
     };
 };
 
+const reclamoUpdateAdminMessage = async (req = request, res = response) => {
+    console.log('[reclamos] reclamoUpdateAdminMessage()');
+
+    try {
+        const { id } = req.params;
+        const { mensajeAdmin } = req.body;
+
+        // Verificar si el reclamo existe
+        const reclamoExistente = await Reclamo.findOne({ where: { id } });
+        if (!reclamoExistente) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Reclamo no encontrado',
+            });
+        }
+
+        // Actualizar el mensaje del admin
+        await Reclamo.update({ mensajeAdmin }, {
+            where: { id }
+        });
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Mensaje del admin actualizado exitosamente',
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, reclamoUpdateAdminMessage()',
+        });
+    }
+};
+
 module.exports = {
     reclamosGetAll,
     reclamoPost,
     reclamoPut,
     reclamoDelete,
+    reclamoUpdateAdminMessage
 };

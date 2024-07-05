@@ -1,0 +1,72 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title text-center w-100" id="modal-basic-title">Respuesta de Simulación</h4>
+        <button type="button" class="btn-close" aria-label="Close"
+            (click)="activeModal.close()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="container">
+            <h5>Credenciales de acceso generadas:</h5>
+        </div>
+        <div class="container-fluid">
+            <div class="row mx-3" style="max-height: 400px; overflow-y: auto;">
+                <ng-container *ngIf="simulationResponse.credencialesUsuarios.admins.length > 0">
+                    <div class="alert alert-info" role="alert">
+                        <div class="col">
+                            <h6>Administradores</h6>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Email</th>
+                                            <th>Contraseña</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            *ngFor="let admin of simulationResponse?.credencialesUsuarios?.admins; let i = index">
+                                            <td>{{ i + 1 }}</td>
+                                            <td>{{ admin.email }}</td>
+                                            <td>{{ admin.contrasenia }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <div class="alert alert-success" role="alert">
+                    <div class="col">
+                        <h6>Clientes</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Email</th>
+                                        <th>Contraseña</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        *ngFor="let client of simulationResponse?.credencialesUsuarios?.clients; let i = index">
+                                        <td>{{ i + 1 }}</td>
+                                        <td>{{ client.email }}</td>
+                                        <td>{{ client.contrasenia }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary mx-4"
+            (click)="activeModal.close()">Cerrar</button>
+    </div>
+</div>

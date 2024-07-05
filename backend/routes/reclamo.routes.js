@@ -5,7 +5,8 @@ const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
 const {
     reclamosGetAll,
-    reclamoPost
+    reclamoPost,
+    reclamoUpdateAdminMessage
 } = require('../controllers/reclamo.controller');
 
 const router = Router();
@@ -24,6 +25,7 @@ router.post('/', [
 ], reclamoPost);
 
 router.get('/', [
+    validarJWT,
     query('page').optional().isInt({ min: 1 }).
         withMessage('page debe ser un número entero mayor o igual a 1'),
     query('pageSize').optional().isInt({ min: 1, max: 100 }).
@@ -41,4 +43,11 @@ router.get('/', [
         .withMessage('La fecha proporcionada no es válida'),
 ], reclamosGetAll)
 
+router.put('/:id/admin-message/', [
+    validarJWT,
+    check('id', 'El ID es obligatorio').not().isEmpty(),
+    check('mensajeAdmin', 'El mensaje del admin es obligatorio').not().isEmpty(),
+    validarCampos,
+], reclamoUpdateAdminMessage);
+ 
 module.exports = router;
