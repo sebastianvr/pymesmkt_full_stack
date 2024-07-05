@@ -1,0 +1,23 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Detalles del Reclamo</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
+    </div>
+    <div class="modal-body mx-3" style="max-height: 400px; overflow-y: auto;">
+        <h6 class="fs-5 fw-bold text-left">{{ detailReport.titulo }}</h6>
+        <p class="text-left">{{ detailReport.mensaje }}</p>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-4 col-sm-12 text-center">
+                    <h3 class="fs-6 mb-3">Archivos Adjuntos</h3>
+                    <img class="d-block mx-auto mb-2" width="50" src="../../../../assets/icons/file-zip.svg" alt="file-zip.svg">
+                    <button class="btn btn-success btn-sm my-2" type="button">Descargar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="activeModal.dismiss()">Cerrar</button>
+    </div>
+</div>
