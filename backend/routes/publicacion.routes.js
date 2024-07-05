@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { check, param, query } = require('express-validator');
+const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
-
 const {
     publicacionPost,
     publicacionesGetAll,
@@ -12,13 +12,11 @@ const {
     publicacionesCompradas,
     publicacionesFilterQuery
 } = require('../controllers/publicacion.controller');
-const { uid } = require('uid');
-const { validarJWT } = require('../middlewares/validar-jwt');
 
 
 const router = Router();
 
-router.get('/', publicacionesGetAll);
+router.get('/', validarJWT, publicacionesGetAll);
 
 router.get(
     '/query',
@@ -52,10 +50,11 @@ router.get(
     publicacionesFilterQuery
 );
 
-router.get('/:id', publicacionGet);
+router.get('/:id', validarJWT, publicacionGet);
 
 router.get('/usuario/:idUsuario',
     [
+        validarJWT,
         param('idUsuario')
             .notEmpty().withMessage('El parámetro idUsuario es obligatorio')
             .custom((value) => {
@@ -87,7 +86,7 @@ router.get('/usuario/:idUsuario',
 );
 
 // Obtener todas las publicaciones de un usuario en especifico
-router.get('/usuario/paid/:idUsuario', publicacionesCompradas);
+router.get('/usuario/paid/:idUsuario', validarJWT, publicacionesCompradas);
 
 router.post('/', [
     validarJWT,
