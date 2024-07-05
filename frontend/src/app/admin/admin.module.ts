@@ -22,6 +22,7 @@ import { SimulationModalComponent } from './components/simulation-modal/simulati
 import { SimulationResultModalComponent } from './components/simulation-result-modal/simulation-result-modal.component';
 import { ModalArchivingComponent } from './components/modal-archiving/modal-archiving.component';
 import { ModalDetailReportComponent } from './components/modal-detail-report/modal-detail-report.component';
+import { FinishedReportsComponent } from './pages/finished-reports/finished-reports.component';
 
 
 
@@ -43,6 +44,7 @@ import { ModalDetailReportComponent } from './components/modal-detail-report/mod
     SimulationResultModalComponent,
     ModalArchivingComponent,
     ModalDetailReportComponent,
+    FinishedReportsComponent,
   ],
   imports: [
     CommonModule,
