@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { catchError } from 'rxjs/operators';
 import * as d3 from 'd3';
 import { ZoomBehavior, ZoomTransform } from 'd3-zoom';
@@ -13,12 +13,16 @@ export class ViewGraphComponent implements OnInit {
   nodes: any[] = [];
   links: any[] = [];
   svg: any;
+
+  // TODO : cambiar querySelector. 
   div: Element | null = document.querySelector("#divGraph");
   zoom!: ZoomBehavior<Element, unknown>;
   showExample: boolean = false;
+  @ViewChild('zoomRange') zoomRange!: ElementRef;
 
   isEmptyGraph: boolean = false;
   isLoading: boolean = false;
+  zoomLevel: number = 1;
 
   constructor(private graphService: GraphService) { }
 
@@ -193,14 +197,14 @@ export class ViewGraphComponent implements OnInit {
     const handleMouseOver = (d: any) => {
       // Reducir la opacidad de todos los elementos
       d3.selectAll('circle, path, text').style('opacity', 0.1);
-    
+
       // Crear un conjunto para almacenar los IDs de los nodos y enlaces relacionados
       const relatedNodeIds = new Set();
       const relatedLinkIds = new Set();
-    
+
       // Agregar el nodo actual y sus conexiones
       relatedNodeIds.add(d.id);
-    
+
       this.links.forEach(link => {
         if (link.source && link.target) { // Verificar que source y target estén definidos
           if (link.source.id === d.id) {
@@ -212,12 +216,12 @@ export class ViewGraphComponent implements OnInit {
           }
         }
       });
-    
+
       // Ajustar la opacidad y propiedades de los elementos relacionados
       d3.selectAll('circle, text')
         .filter((node: any) => relatedNodeIds.has(node.id))
         .style('opacity', 1);
-    
+
       d3.selectAll('path')
         .filter((link: any) => {
           if (link.source && link.target) { // Verificar que source y target estén definidos
@@ -233,7 +237,7 @@ export class ViewGraphComponent implements OnInit {
           return link.source.id === d.id ? 'url(#arrow-out)' : 'url(#arrow-in)';
         });
     };
-    
+
     const handleMouseOut = (d: any) => {
       d3.selectAll('circle').style('opacity', 1);
       d3.selectAll('path').style('opacity', 1).attr('stroke', 'black').attr('marker-end', 'url(#arrow)');
@@ -249,19 +253,26 @@ export class ViewGraphComponent implements OnInit {
     `;
   }
 
-  private zoomed(event: any) {
-    const transform: ZoomTransform = event.transform;
+  public zoomed({ transform }: { transform: ZoomTransform }) {
     this.svg.attr('transform', transform);
   }
 
   public zoomIn() {
-    // Aumenta la escala del zoom en 1.2 veces
-    this.zoom.scaleBy(this.svg.transition().duration(200), 1.2);
+    this.zoomLevel = Math.min(this.zoomLevel + 2, 30);
+    this.svg.transition().call(this.zoom.scaleTo, this.zoomLevel);
+    this.zoomRange.nativeElement.value = this.zoomLevel;
   }
 
   public zoomOut() {
-    // Reduce la escala del zoom en 1.2 veces
-    this.zoom.scaleBy(this.svg.transition().duration(200), 0.8);
+    this.zoomLevel = Math.max(this.zoomLevel - 2, 1);
+    this.svg.transition().call(this.zoom.scaleTo, this.zoomLevel);
+    this.zoomRange.nativeElement.value = this.zoomLevel;
+  }
+
+  public onZoomChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const newZoomLevel = +input.value;
+    this.svg.transition().call(this.zoom.scaleTo, newZoomLevel);
   }
 
   public centerGraph() {
