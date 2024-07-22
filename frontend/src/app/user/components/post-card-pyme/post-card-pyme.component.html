@@ -1,125 +1,189 @@
-<div class="container p-0">
-
-  <!-- No hay Publicaciones -->
-  <div class="col-lg-12">
-    <div class="col-md-12 text-center my-4"
-      *ngIf="publicaciones && publicaciones.length === 0 ; else allPublicacionesTemplate">
-      <img src="../../../../assets/icons/empty.svg" alt="new-publication.svg" class="icon-image">
-      <h3 class="my-3">No existen coincidencias de búsqueda.</h3>
+<div class="col-md-12">
+  <div class="container">
+    <div class="container mt-5 text-center" *ngIf="isLoading;">
+      <div class="spinner-border text-primary text-center my-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
-  </div>
 
-  <!-- Card de las publicaciones -->
-  <ng-template #allPublicacionesTemplate>
-    <div class="row" *ngIf="publicaciones && publicaciones.length > 0">
-      <div class="col-lg-12">
-        <div class="card mb-3" *ngFor="let item of publicaciones; let i = index">
+    <!-- Mostrar esta sección si no hay coincidencias en la búsqueda -->
+    <ng-container *ngIf="noSearchMatch && !isLoading">
+      <div class="col-md-12 text-center">
+        <div class="container mt-5">
+          <img src="../../../../assets/icons/empty.svg" alt="empty-users.svg" class="icon-image">
+          <h3 class="my-3">No existen coincidencias de búsqueda. </h3>
 
-          <div class="card-header">
-            <h6 class="alert alert-success d-inline-block mb-0 px-2 py-1" role="alert"
-              ngbTooltip="ID de la publicación">
-              {{item.id}}</h6>
-            <h6 class="btn btn-sm btn-primary d-inline-block float-end mb-0 px-2 py-1" ngbTooltip="Ofertas recibidas">
-              {{item.cantidadOfertasRecibidas === 0 ? 'Sin ofertas': item.cantidadOfertasRecibidas}}
-            </h6>
-          </div>
-
-          <div class="card-body">
-            <h5 class="card-title"><a class="card-link">{{item.titulo | uppercase}}</a></h5>
-            <p class="card-text">{{item.descripcion | uppercase}}</p>
-
-            <table class="tableResume table table-hover table-borderless">
-              <tbody>
-                <tr>
-                  <td colspan="2" class="start-*"><strong>Monto Disponible</strong></td>
-                  <td class="text-end">{{item.precioTotal | currency : 'CLP'}}</td>
-                </tr>
-                <tr>
-                  <td colspan="2" class="start-*"><strong>Empresa</strong></td>
-                  <td class="text-end">{{item.Usuario.Pyme.nombrePyme}}</td>
-                </tr>
-                <!-- <tr>
-                      <td colspan="2" class="start-*"><strong>Calificación</strong></td>
-                      <td class="text-end">6.1</td>
-                    </tr> -->
-              </tbody>
-            </table>
-          </div>
-
-          <div class="card-footer">
-            <button class="btn btn-primary text-center" type="button" data-bs-toggle="collapse"
-              [attr.data-bs-target]="'#collapseExample' + i" aria-expanded="false" aria-controls="collapseExample">
-              Más información
-              <img src="../../../../assets/icons/three-dots.svg" alt="three-dots.svg" class="icon-button-style">
+          <div class="col-lg-12">
+            <button (click)="clearFilter()" ngbTooltip="Ir atrás" class="btn btn-sm btn-primary text-center">
+              <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg" class="icon-button-style">
             </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
 
-            <div class="cardAccordion collapse mt-2" [attr.id]="'collapseExample' + i">
-              <div class="card card-body col-12">
-                <h4 class="text-center my-2">DETALLES DE LA PUBLICACIÓN</h4>
-                <table class="tableResume table table-hover table-borderless">
-                  <tbody>
-                    <tr>
-                      <td colspan="2" class="start-*"><strong>Fecha creación</strong></td>
-                      <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy'}}</td>
-                    </tr>
-                    <tr *ngIf="item.fechaInicioServicio">
-                      <td colspan="2" class="start-*"><strong>Fecha de inicio servicio</strong></td>
-                      <td class="text-end">{{item.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
-                    </tr>
-                    <tr *ngIf="item.fechaFinServicio">
-                      <td colspan="2" class="start-*"><strong>Fecha de término servicio</strong></td>
-                      <td class="text-end">{{item.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
-                    </tr>
-                    <tr>
-                      <td colspan="2" class="start-*"><strong>Garantía</strong></td>
-                      <td class="text-end">{{item.garantia.toString() | i18nSelect:garantiaMapa}}</td>
-                    </tr>
-                    <tr *ngIf="item.aniosGarantia">
-                      <td colspan="2" class="start-*"><strong>Años de garantía</strong></td>
-                      <td class="text-end">{{item.aniosGarantia | number }}</td>
-                    </tr>
-                    <tr *ngIf="item.cantidadElementos">
-                      <td colspan="2" class="start-*"><strong>Cantidad</strong></td>
-                      <td class="text-end">{{item.cantidadElementos}}</td>
-                    </tr>
-                    <tr *ngIf="item.modelo">
-                      <td colspan="2" class="start-*"><strong>Modelo</strong></td>
-                      <td class="text-end">{{item.modelo}}</td>
-                    </tr>
-                    <tr *ngIf="item.color">
-                      <td colspan="2" class="start-*"><strong>Color</strong></td>
-                      <td class="text-end">{{item.color | titlecase}}</td>
-                    </tr>
-                  </tbody>
-                </table>
+    <!-- Mostrar esta sección si no hay ventas -->
+    <ng-container *ngIf="isEmptyPublications && !isLoading && !noSearchMatch">
+      <div class="container mt-5">
+        <img src="../../../../assets/icons/offer-icon.svg" alt="offer-icon.svg" class="icon-image">
+        <h3 class="my-3">No tienes ofertas recibidas aún.</h3>
 
-                <div class="container p-0 text-center">
-                  <div class="col-md-4 col-sm-12">
-                    <h3 class="fs-6">Archivos adjuntos</h3>
-                    <img class="d-block mx-auto" width="50" src="../../../../assets/icons/file-earmark-arrow-down.svg"
-                      alt="ile-earmark-arrow-down.svg">
-                    <button class="btn btn-primary btn-sm my-2" type="button">Descargar</button>
-                  </div>
-                </div>
+        <ng-container *ngIf="publicaciones">
+          <div class="col-lg-12">
+            <button ngbTooltip="Ir atrás" (click)="clearFilter()" class="btn btn-sm btn-primary text-center">
+              <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg" class="icon-button-style">
+            </button>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
 
-                <div *ngIf="!isIdsIguales(item.UsuarioId)" class="container">
+    <!-- Card de las publicaciones -->
+    <ng-container *ngIf="!isEmptyPublications && !isLoading  && !noSearchMatch">
+      <div class="row">
+        <!-- Botones de paginación -->
+        <div *ngIf="totalPages > 1" class="row">
+          <div class="d-flex float-start justify-content-center">
+            <div class="row">
+              <ngb-pagination [collectionSize]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"
+                [(page)]="currentPage" [maxSize]="3" [rotate]="true" [boundaryLinks]="true">
+              </ngb-pagination>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-12">
+          <div class="card mb-3" *ngFor="let item of publicaciones; let i = index">
+
+            <div class="card-header">
+              <h6 class="alert alert-success d-inline-block mb-0 px-2 py-1" role="alert"
+                ngbTooltip="ID de la publicación">
+                {{item.id}}</h6>
+              <h6 class="btn btn-sm btn-primary d-inline-block float-end mb-0 px-2 py-1" ngbTooltip="Ofertas recibidas">
+                {{item.cantidadOfertasRecibidas === 0 ? 'Sin ofertas': item.cantidadOfertasRecibidas}}
+              </h6>
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title"><a class="card-link">{{item.titulo | uppercase}}</a></h5>
+              <p class="card-text">{{item.descripcion | uppercase}}</p>
+
+              <table class="tableResume table table-hover table-borderless">
+                <tbody>
+                  <tr>
+                    <td colspan="2" class="start-*"><strong>Monto Disponible</strong></td>
+                    <td class="text-end">{{item.precioTotal | currency : 'CLP'}}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" class="start-*"><strong>Empresa</strong></td>
+                    <td class="text-end">{{item.Usuario.Pyme.nombrePyme}}</td>
+                  </tr>
+                  <!-- <tr>
+                        <td colspan="2" class="start-*"><strong>Calificación</strong></td>
+                        <td class="text-end">6.1</td>
+                      </tr> -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn btn-primary text-center" type="button" data-bs-toggle="collapse"
+                [attr.data-bs-target]="'#collapseExample' + i" aria-expanded="false" aria-controls="collapseExample">
+                Más información
+                <img src="../../../../assets/icons/three-dots.svg" alt="three-dots.svg" class="icon-button-style">
+              </button>
+
+              <div class="cardAccordion collapse mt-2" [attr.id]="'collapseExample' + i">
+                <div class="card card-body col-12">
+                  <h4 class="text-center my-2">DETALLES DE LA PUBLICACIÓN</h4>
+                  <table class="tableResume table table-hover table-borderless">
+                    <tbody>
+                      <tr>
+                        <td colspan="2" class="start-*"><strong>Fecha creación</strong></td>
+                        <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy' : '+0000'}}</td>
+                      </tr>
+                      <tr *ngIf="item.fechaInicioServicio">
+                        <td colspan="2" class="start-*"><strong>Fecha de inicio servicio</strong></td>
+                        <td class="text-end">{{item.fechaInicioServicio | date : 'dd MMMM yyyy' : '+0000'}}</td>
+                      </tr>
+                      <tr *ngIf="item.fechaFinServicio">
+                        <td colspan="2" class="start-*"><strong>Fecha de término servicio</strong></td>
+                        <td class="text-end">{{item.fechaFinServicio | date : 'dd MMMM yyyy' : '+0000'}}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" class="start-*"><strong>Garantía</strong></td>
+                        <td class="text-end">{{item.garantia.toString() | i18nSelect:garantiaMapa}}</td>
+                      </tr>
+                      <tr *ngIf="item.aniosGarantia">
+                        <td colspan="2" class="start-*"><strong>Años de garantía</strong></td>
+                        <td class="text-end">{{item.aniosGarantia | number }}</td>
+                      </tr>
+                      <tr *ngIf="item.cantidadElementos">
+                        <td colspan="2" class="start-*"><strong>Cantidad</strong></td>
+                        <td class="text-end">{{item.cantidadElementos}}</td>
+                      </tr>
+                      <tr *ngIf="item.modelo">
+                        <td colspan="2" class="start-*"><strong>Modelo</strong></td>
+                        <td class="text-end">{{item.modelo}}</td>
+                      </tr>
+                      <tr *ngIf="item.color">
+                        <td colspan="2" class="start-*"><strong>Color</strong></td>
+                        <td class="text-end">{{item.color | titlecase}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <!-- <div class="container p-0 text-center">
+                    <div class="col-md-4 col-sm-12">
+                      <h3 class="fs-6">Archivos adjuntos</h3>
+                      <img class="d-block mx-auto" width="50" src="../../../../assets/icons/file-earmark-arrow-down.svg"
+                        alt="ile-earmark-arrow-down.svg">
+                      <button class="btn btn-primary btn-sm my-2" type="button">Descargar</button>
+                    </div>
+                  </div> -->
+
+
+
+
                   <div class="row">
                     <div class="container">
-                      <button type="button" class="btn btn-primary float-end" placement="bottom"
-                        (click)="openOffer(item)">
-                        Ofertar
+                      <button class="btn btn-primary float-start" [routerLink]="['/user/publication-detail/', item.id]">
+                        Ir al detalle
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                          viewBox="0 0 16 16">
+                          <path fill-rule="evenodd"
+                            d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm5.854 8.803a.5.5 0 1 1-.708-.707L9.243 6H6.475a.5.5 0 1 1 0-1h3.975a.5.5 0 0 1 .5.5v3.975a.5.5 0 1 1-1 0V6.707z" />
+                        </svg>
                       </button>
+
+                      <ng-container *ngIf="!isEqualIds(item.UsuarioId)">
+                        <button type="button" class="btn btn-primary float-end" placement="bottom"
+                          (click)="openOffer(item)">
+                          Ofertar
+                        </button>
+                      </ng-container>
                     </div>
                   </div>
-                </div>
 
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+         <!-- Botones de paginación -->
+         <div *ngIf="totalPages > 1" class="row">
+          <div class="d-flex float-start justify-content-center">
+            <div class="row">
+              <ngb-pagination [collectionSize]="total" [pageSize]="pageSize" (pageChange)="onPageChange($event)"
+                [(page)]="currentPage" [maxSize]="3" [rotate]="true" [boundaryLinks]="true">
+              </ngb-pagination>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </ng-template>
+    </ng-container>
+  </div>
 </div>
 
 <!-- TODO: Implementar BARRA DE PAGINACIÓN con el ESTILO pequeño-->

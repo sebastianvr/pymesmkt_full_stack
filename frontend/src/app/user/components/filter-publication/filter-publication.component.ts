@@ -77,4 +77,8 @@ export class FilterPublicationComponent implements OnInit {
     }
     return filters;
   }
+
+  public clearForm(){
+    return this.buildForm();
+  }
 }
