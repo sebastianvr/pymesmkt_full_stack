@@ -24,10 +24,10 @@ export class OffersReceivedComponent implements OnInit {
   total: any;
   currentPage!: number;
   totalPages!: number;
-
+  noSearchMatch!: boolean;
   closeResult: string = '';
 
-  filterForm! : FormGroup;
+  filterForm!: FormGroup;
 
   constructor(
     private router: Router,
@@ -46,7 +46,7 @@ export class OffersReceivedComponent implements OnInit {
   private buildForm() {
     this.filterForm = this.formBuilder.group({
       searchTerm: [null, [Validators.required]],
-      searchOption: ['fecha', Validators.required],
+      searchOption: ['titulo', Validators.required],
     });
 
     this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
@@ -56,7 +56,9 @@ export class OffersReceivedComponent implements OnInit {
 
       if (option === 'fecha') {
         searchTermControl?.setValidators([Validators.required, this.validateDate]);
-      } else if (option === 'mensaje') {
+      } else if (option === 'titulo') {
+        searchTermControl?.setValidators(Validators.required);
+      } else if (option === 'pyme') {
         searchTermControl?.setValidators(Validators.required);
       }
 
@@ -67,34 +69,41 @@ export class OffersReceivedComponent implements OnInit {
 
   private getOfertasById(filters: any) {
     this.isLoading = true;
-    console.log({ filters });
-    this.ofertaService.getOfertasRecibidas(this.idUser, filters).subscribe((data) => {
-      console.log({ data });
-      this.isLoading = false;
+    // console.log({ filters });
+    this.ofertaService.getOfertasRecibidas(this.idUser, filters)
+      .subscribe((data) => {
+        // console.log({ data });
+        this.isLoading = false;
 
-      if (data.rows.length === 0) {
-        this.isEmptyOffersReceived = true;
-      } else {
-        const {
-          rows,
-          total,
-          currentPage,
-          pageSize,
-          totalPages,
-        } = data;
+        if (data.noSearchMatch) {
+          this.noSearchMatch = true;
+          this.isEmptyOffersReceived = false;
+        } else {
+          const {
+            ofertas,
+            total,
+            currentPage,
+            pageSize,
+            totalPages,
+          } = data;
 
-        this.total = total;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.totalPages = totalPages;
-        this.ofertas = rows;
-        this.isEmptyOffersReceived = false;
+          
+          if (ofertas.length === 0) {
+            this.isEmptyOffersReceived = true;
+            this.noSearchMatch = false;
+          } else {
+            this.isEmptyOffersReceived = false;
+            this.total = total;
+            this.currentPage = currentPage;
+            this.pageSize = pageSize;
+            this.totalPages = totalPages;
+            this.ofertas = ofertas;
+            this.noSearchMatch = false;
+          }
+        }
 
-        console.log(this.ofertas);
-      }
-
-      this.isLoading = false;
-    });
+        this.isLoading = false;
+      });
   }
 
   eliminarOferta(idOferta: string) {
@@ -118,7 +127,7 @@ export class OffersReceivedComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.ofertaService.deleteOferta(idOferta).subscribe((data) => {
-          console.log(data);
+          // console.log(data);
         });
 
         swalWithBootstrapButtons.fire(
@@ -147,42 +156,17 @@ export class OffersReceivedComponent implements OnInit {
     });
   }
 
-  open(content: any) {
-    this.modalService.open(content,
-      {
-        ariaLabelledBy: 'modal-basic-title',
-        centered: true,
-      }).result.then((result) => {
-        this.closeResult = `Closed with: ${result}`;
-      }, (reason) => {
-        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-      });
-  }
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
-  }
-
   public clearFilter() {
     const query = {
+      idUser: this.idUser,
       page: 1,
       pageSize: 20,
     };
-    
     this.getOfertasById(query);
 
     const searchTermControl = this.filterForm.get('searchTerm');
-    searchTermControl?.setErrors(null); 
-    searchTermControl?.reset(); 
-    
-    const searchOption = this.filterForm.get('searchOption');
-    searchOption?.setErrors(null); 
+    searchTermControl?.setValue(null);
+    searchTermControl?.reset();
   }
 
   private validateDate(control: AbstractControl): { [key: string]: boolean } | null {
@@ -209,14 +193,14 @@ export class OffersReceivedComponent implements OnInit {
 
     return { invalidDate: true };
   }
-  
+
   public sendForm() {
-    console.log('sendForm()');
+    // console.log('sendForm()');
     if (this.filterForm.invalid) {
       this.filterForm.markAllAsTouched();
       return;
     }
-
+   
     const formValues = this.filterForm.value;
     const query = {
       [formValues.searchOption]: formValues.searchTerm,
@@ -224,7 +208,7 @@ export class OffersReceivedComponent implements OnInit {
       pageSize: this.pageSize,
     };
 
-    console.log({ query });
+    // console.log({ query });
     this.getOfertasById(query);
   }
 }
