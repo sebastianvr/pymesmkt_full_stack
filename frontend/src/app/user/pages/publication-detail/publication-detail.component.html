@@ -19,9 +19,13 @@
             <ng-template #divPublicacion>
                 <div class="col-md-12 mt-3">
                     <div class="row">
-                        <button class="float-end alert alert-primary py-1 mb-0">
-                            <strong>Compra {{publication.procesoDePublicacion | lowercase}}</strong>
-                        </button>
+                        <p class="text-center float-end alert py-1 mb-0" 
+                        [ngClass]="{
+                          'alert-success': publication.procesoDePublicacion.toLowerCase() === 'iniciada',
+                          'alert-primary': publication.procesoDePublicacion.toLowerCase() === 'finalizada'
+                        }">
+                       <strong>Publicación {{ publication.procesoDePublicacion | lowercase }}</strong>
+                     </p>
                     </div>
 
                     <div class="container mt-3">
@@ -74,138 +78,26 @@
                         </table>
                     </div>
 
-                    <!-- <div class="container ">
-                        <button class="btn btn-danger float-start" data-bs-toggle="modal" data-bs-target="#modalReport"
-                            type="button">Reportar un problema</button>
-
-
-                        
-                        <div class="modal fade" id="modalReport" data-bs-backdrop="static" data-bs-keyboard="false"
-                            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="staticBackdropLabel">Reporta el problema que ocurrio
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="container px-1">
-                                            <form>
-                                                <div class="col-12">
-                                                    <label for="addresDescriptionCompany" class="form-label">Escribe los
-                                                        todos
-                                                        los detalles pertinentes </label>
-                                                    <textarea class="form-control" cols="150" rows="9"
-                                                        id="addresDescriptionCompany">
-                                                  </textarea>
-                                                </div>
-                                                <div class="col-12 mt-4">
-                                                    <label>Añadir archivo adjunto</label>
-                                                    <p-fileUpload mode="basic" name="demo[]" url="./upload.php"
-                                                        accept="image/*" [maxFileSize]="1000000"></p-fileUpload>
-
-                                                </div>
-
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary">Enviar</button>
-                                    </div>
-                                </div>
+                    <ng-container *ngIf="this.idCurrentUser === publication.UsuarioId">
+                        <div class="row my-4">
+                            <div class="col-md-6 text-center my-1">
+                                <button (click)="deletePublication()" class="btn btn-danger">
+                                    Eliminar
+                                    <img src="../../../../assets/icons/trash.svg" class="icon-buttons-style"
+                                        alt="trash.svg">
+                                </button>
+                            </div>
+    
+                            <div class="col-md-6 text-center my-1">
+                                <button class="btn btn-primary">
+                                    Editar
+                                    <img src="../../../../assets/icons/pencil-square.svg" class="icon-buttons-style"
+                                        alt="pencil-square.svg">
+                                </button>
                             </div>
                         </div>
-
-                        <button class="btn btn-secondary float-end" data-bs-toggle="modal"
-                            data-bs-target="#modalCalification" type="button">Calificar al proveedor</button>
-
-                        <div class="modal fade" id="modalCalification" data-bs-backdrop="static"
-                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="staticBackdropLabel">Califica a tu proveedor
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="container px-1">
-                                            <form>
-
-                                                <div class="col-sm-12">
-                                                    <label for="nameCompany" class="form-label">Titulo</label>
-                                                    <input type="text" class="form-control" id="nameCompany"
-                                                        placeholder="" value="" required="">
-                                                </div>
-                                                <div class="col-sm-12 mt-2">
-                                                    <label for="addresDescriptionCompany"
-                                                        class="form-label">Comentario</label>
-                                                    <textarea class="form-control" cols="150" rows="9"
-                                                        id="addresDescriptionCompany">
-                                                  </textarea>
-
-                                                </div>
-
-                                                <div class="col-sm-12 mt-2">
-                                                    <label>Puntuación </label>
-                                                    <br>
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-
-                                                </div>
-
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary">Enviar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-
-                    <!-- <div class="row col-lg-12 my-3">
-                        <div class="col-md-12">
-                            <button (click)="eliminarPublicacion()" class="btn btn-danger float-start">
-                                Eliminar publicación <img src="../../../../assets/icons/trash.svg" alt="trash.svg">
-                            </button>
-
-                            <button class="btn btn-primary float-end">Editar publicación</button>
-                        </div>
-                    </div> -->
-
-                    <div class="row my-4">
-                        <div class="col-md-6 text-center my-1">
-                            <button (click)="deletePublication()" class="btn btn-danger">
-                                Eliminar
-                                <img src="../../../../assets/icons/trash.svg" class="icon-buttons-style"
-                                    alt="trash.svg">
-                            </button>
-                        </div>
-
-                        <div class="col-md-6 text-center my-1">
-                            <button class="btn btn-primary">
-                                Editar
-                                <img src="../../../../assets/icons/pencil-square.svg" class="icon-buttons-style"
-                                    alt="pencil-square.svg">
-                            </button>
-                        </div>
-                    </div>
+                    </ng-container>
+                   
                 </div>
             </ng-template>
         </div>
