@@ -8,7 +8,7 @@ const crearOferta = async (publicacionId, oferenteId, receptorId) => {
     try {
         const oferta = {
             id: uid(15),
-            mensaje: faker.lorem.sentence(),
+            mensaje: faker.lorem.paragraph(3,7),
             precioOferta: faker.commerce.price({ min: 5101, max: 22000 }),
             procesoDeOferta: 'DISPONIBLE',
             estado: true,
