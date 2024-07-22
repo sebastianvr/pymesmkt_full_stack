@@ -114,7 +114,7 @@
                                         <tr *ngFor="let reclamo of reports; index as i">
                                             <td>{{reclamo.Publicacion.Usuario.Pyme.nombrePyme | titlecase }}</td>
                                             <td>{{reclamo.Usuario.Pyme.nombrePyme | titlecase }}</td>
-                                            <td>{{reclamo.createdAt | date : 'dd MMMM yyyy' }}</td>
+                                            <td>{{reclamo.createdAt | date : 'dd MMMM yyyy' : '+0000' }}</td>
                                             <td>
                                                 <div class="container">
                                                     <button class="btn btn-primary btn-sm"
