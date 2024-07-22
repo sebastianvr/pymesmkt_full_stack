@@ -12,22 +12,16 @@ const Calificacion = require('../models/calificacion');
 const publicacionesGetAll = async (req = request, res = response) => {
     console.log('[publicaciones] publicacionesGetAll()');
 
-    const { page, size } = req.query;
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
 
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
-
-        let size = 10;
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 100) {
-            size = sizeAsNumber;
-        }
-
-        let publicaciones = await Publicacion.findAndCountAll({
+        const publicaciones = await Publicacion.findAndCountAll({
             where: {
                 estado: true,
                 procesoDePublicacion: 'INICIADA',
@@ -63,9 +57,26 @@ const publicacionesGetAll = async (req = request, res = response) => {
             ],
         });
 
-        // console.log({ publicaciones });
+        if (!publicaciones.length) {
+            if (additionalFilters.length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    publicaciones: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron publicaciones.',
+                    publicaciones: [],
+                });
+            }
+        }
+
         return res.status(200).json({
-            totalPages: Math.ceil(publicaciones.count / size),
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
             content: publicaciones.rows,
         });
 
@@ -84,10 +95,7 @@ const publicacionGet = async (req = request, res = response) => {
     const { id } = req.params;
     try {
         const publicacion = await Publicacion.findByPk(id, {
-            where: {
-                estado: true,
-                // procesoDePublicacion: 'INICIADA'
-            },
+            where: { estado: true },
             include: [
                 {
                     model: Usuario,
@@ -99,54 +107,36 @@ const publicacionGet = async (req = request, res = response) => {
                             where: { estado: true },
                             attributes: ['nombrePyme'],
                         },
-                        {
-                            model: Calificacion,
-                            // where: { estado: true },
-                            // attributes: ['puntaje', [db.fn('AVG', db.col('puntaje')), 'promedio']],
-                            // group: ['Pyme.id', 'Usuario.id', 'Publicacion.id'],
-                            attributes: ['puntaje']
-                        },
-
+                        // {
+                        //     model: Calificacion,
+                        //     // where: { estado: true },
+                        //     // attributes: ['puntaje', [db.fn('AVG', db.col('puntaje')), 'promedio']],
+                        //     // group: ['Pyme.id', 'Usuario.id', 'Publicacion.id'],
+                        //     attributes: ['puntaje']
+                        // },
                     ],
                 }
             ],
-            // group : ['id']
-
         })
 
-        if (!publicacion.estado) {
+        // console.log({ publicacion });
+        if (!publicacion) {
             return res.status(400).json({
                 ok: false,
-                msg: `Esta publicación fue eliminada, ${id}`
-            });
-        } else if (!publicacion.UsuarioId) {
-            return res.status(400).json({
-                ok: false,
-                msg: `No existe publicación con id: ${id}`
-            });
-        } else {
-
-            // calcular promedio total
-            const calificaciones = publicacion.Usuario.Calificacions
-            let sumatoria = 0
-
-            for (let i = 0; i < calificaciones.length; i++) {
-                sumatoria = sumatoria + parseInt(publicacion.Usuario.Calificacions[i].puntaje)
-            }
-
-            publicacion.dataValues.numEstrellas = sumatoria / calificaciones.length
-
-            return res.status(200).json({
-                ok: true,
-                publicacion
+                msg: 'No existe publicación',
             });
         }
+
+        return res.status(200).json({
+            ok: true,
+            publicacion,
+        });
 
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             ok: false,
-            msg: 'Error en el servidor al obtener publicaciones',
+            msg: 'Error en el servidor, publicacionGet()',
             error
         });
     }
@@ -461,16 +451,24 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
 
     const additionalFilters = {};
 
+    // if (req.query.titulo) {
+    //     console.log(req.query.titulo);
+    //     additionalFilters.titulo = {
+    //         [Sequelize.Op.and]: [
+    //             Sequelize.fn('LOWER', Sequelize.col('titulo')),
+    //             {
+    //                 [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
+    //             },
+    //         ],
+    //     };
+    // };
     if (req.query.titulo) {
+        console.log(req.query.titulo);
         additionalFilters.titulo = {
-            [Sequelize.Op.and]: [
-                Sequelize.fn('LOWER', Sequelize.col('titulo')),
-                {
-                    [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
-                },
-            ],
+            [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
         };
     };
+    
 
     if (req.query.id) {
         additionalFilters.id = req.query.id;
@@ -528,12 +526,21 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
                 ],
             });
 
-        if (!publicaciones.length) {
-            return res.status(200).json({
-                message: 'No se encontraron coincidencias.',
-                publicaciones: [],
-            });
-        };
+            // console.log(publicaciones,additionalFilters);
+            if (!publicaciones.length) {
+                if (Object.keys(additionalFilters).length > 0) {
+                    return res.status(200).json({
+                        message: 'No se encontraron coincidencias para los filtros aplicados.',
+                        noSearchMatch: true,
+                        publicaciones: []
+                    });
+                } else {
+                    return res.status(200).json({
+                        message: 'No se encontraron publicaciones.',
+                        publicaciones: [],
+                    });
+                }
+            }
 
         return res.status(200).json({
             total: count,
@@ -544,11 +551,10 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error(error);
         return res.status(500).json({
             ok: false,
-            msg: 'Error en el servidor al buscar publicación filtrada',
-            error,
+            msj: 'Error en el servidor, publicacionesFilterQuery()',
+            error
         });
     }
 }

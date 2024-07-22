@@ -19,7 +19,7 @@
             <ng-template #divOfertas>
                 <div class="card text-bg-light mb-3 containerPublicacion">
                     <div class="card-header">
-                        <span class="float-end text-muted"> {{oferta.Publicacion.createdAt | date : 'dd MMMM yyyy'}}</span>
+                        <span class="float-end text-muted"> {{oferta.Publicacion.createdAt | date : 'dd MMMM yyyy' : '+0000'}}</span>
                     </div>
                     <div class="card-body">
                         <div class="container mt-3">
@@ -46,11 +46,11 @@
                                     </tr>
                                     <tr *ngIf="oferta.Publicacion.fechaInicioServicio">
                                         <td>Fecha inicio del servicio</td>
-                                        <td>{{oferta.Publicacion.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
+                                        <td>{{oferta.Publicacion.fechaInicioServicio | date : 'dd MMMM yyyy' : '+0000'}}</td>
                                     </tr>
                                     <tr *ngIf="oferta.Publicacion.fechaFinServicio">
                                         <td>Fecha finalización del servicio </td>
-                                        <td>{{oferta.Publicacion.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
+                                        <td>{{oferta.Publicacion.fechaFinServicio | date : 'dd MMMM yyyy' : '+0000'}}</td>
                                     </tr>
                                     <tr *ngIf="oferta.Publicacion.horasATrabajar">
                                         <td>Cantidad de horas a trabajar </td>

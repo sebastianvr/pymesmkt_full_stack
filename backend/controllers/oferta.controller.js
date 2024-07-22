@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const { response, request } = require('express');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 const { uid } = require('uid');
 
 const Usuario = require('../models/usuario');
@@ -61,7 +61,6 @@ const ofertaGetById = async (req = request, res = response) => {
     }
 }
 
-
 const ofertasRecibidasGetById = async (req = request, res = response) => {
     console.log('[ofertas] ofertasRecibidasGetById()');
 
@@ -74,15 +73,61 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    try {
-        const filter = {
-            estado: true,
-            procesoDeOferta: 'DISPONIBLE',
-            usuarioIdReceptor: idUsuario,
-        }
+    const baseFilter = {
+        estado: true,
+        procesoDeOferta: 'DISPONIBLE',
+        usuarioIdReceptor: idUsuario,
+    }
 
-        // console.log({ filter });
-        const { count, rows } = await Oferta.findAndCountAll({
+    const additionalFilters = [];
+
+    if (req.query.titulo) {
+        additionalFilters.push({
+            [Op.or]: [
+                Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Publicacion.titulo')), {
+                    [Op.like]: `%${req.query.titulo.toLowerCase()}%`
+                })
+            ]
+        });
+    }
+
+    if (req.query.fecha) {
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+            // console.log('Parsed Date:', { day, month, year });
+
+            additionalFilters.push({
+                [Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('Publicacion.createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('Publicacion.createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('Publicacion.createdAt')), year),
+                ],
+            });
+        }
+    }
+
+    if (req.query.pyme) {
+        additionalFilters.push({
+            [Op.or]: [
+                Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Usuario.Pyme.nombrePyme')), {
+                    [Op.like]: `%${req.query.pyme.toLowerCase()}%`
+                })
+            ]
+        });
+    }
+
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters.length > 0 ? { [Op.and]: additionalFilters } : {},
+    };
+
+    // console.log({ filter });
+    try {
+        const { count, rows: ofertas } = await Oferta.findAndCountAll({
             where: filter,
             limit: pageSize,
             offset: (page - 1) * pageSize,
@@ -114,20 +159,42 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
             ],
         });
 
-        // console.log({ count, rows });
-        if (!rows.length) {
-            return res.status(200).json({
-                message: 'No se encontraron coincidencias.',
-                rows: [],
-            });
+        if (!ofertas.length) {
+            if (additionalFilters.length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    ofertas: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron ofertas recibidas.',
+                    ofertas: [],
+                });
+            }
         }
 
+        // Agrupar ofertas por publicación
+        const offersByPublication = {};
+        ofertas.forEach(oferta => {
+            const publicationId = oferta.Publicacion.id;
+            if (!offersByPublication[publicationId]) {
+                offersByPublication[publicationId] = {
+                    publicacion: oferta.Publicacion,
+                    ofertas: []
+                };
+            }
+            offersByPublication[publicationId].ofertas.push(oferta);
+        });
+
+        // Convertir el objeto a un arreglo
+        const resultadosAgrupados = Object.values(offersByPublication);
         return res.status(200).json({
             total: count,
             totalPages: Math.ceil(count / pageSize),
             currentPage: page,
             pageSize,
-            rows,
+            ofertas: resultadosAgrupados,
         });
 
     } catch (error) {
@@ -152,43 +219,57 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const filter = {
+    const baseFilter = {
         UsuarioId,
         estado: true,
         procesoDeOferta: 'DISPONIBLE'
     };
 
+    const additionalFilters = [];
+
+    if (req.query.mensaje) {
+        additionalFilters.push({
+            [Op.or]: [
+                Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Oferta.mensaje')), {
+                    [Op.like]: `%${req.query.mensaje.toLowerCase()}%`
+                })
+            ]
+        });
+    }
+
     if (req.query.fecha) {
         const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
         if (dateRegex.test(req.query.fecha)) {
-            // Si la fecha es válida, incluirla en la consulta
             const fechaParts = req.query.fecha.split('-');
             const day = parseInt(fechaParts[0], 10);
             const month = parseInt(fechaParts[1], 10);
             const year = parseInt(fechaParts[2], 10);
-            // console.log({ fechaParts });
+            // console.log('Parsed Date:', { day, month, year });
 
-            filter.createdAt = {
-                [Sequelize.Op.and]: [
-                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('createdAt')), day),
-                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('createdAt')), month),
-                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('createdAt')), year),
-                ]
-            };
+            additionalFilters.push({
+                [Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('Oferta.createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('Oferta.createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('Oferta.createdAt')), year),
+                ],
+            });
         }
     }
 
-    if (req.query.mensaje) {
-        filter.mensaje = {
-            [Sequelize.Op.and]: [
-                Sequelize.fn('LOWER', Sequelize.col('mensaje')),
-                {
-                    [Sequelize.Op.like]: `%${req.query.mensaje.toLowerCase()}%`,
-                },
-            ],
-        };
+    if (req.query.pyme) {
+        additionalFilters.push({
+            [Op.or]: [
+                Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Publicacion.Usuario.Pyme.nombrePyme')), {
+                    [Op.like]: `%${req.query.pyme.toLowerCase()}%`
+                })
+            ]
+        });
+    }
+    
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters.length > 0 ? { [Op.and]: additionalFilters } : {},
     };
-
     //  console.log({ filter });
     try {
         const { count, rows } =
@@ -285,37 +366,123 @@ const ofertaPost = async (req = request, res = response) => {
     }
 }
 
-// actualiza el estado de compra de una oferta a traves de su id
-const ofertaPagada = async (req = request, res = response) => {
-    console.log('[oferta] ofertaPagada()');
+const getVentas = async (req = request, res = response) => {
+    console.log('[oferta] getVentas()');
 
-    const { id } = req.params;
-    try {
-        const oferta = await Oferta.update(
-            { procesoDeOferta: 'FINALIZADA' },
-            { where: { id } }
-        );
+    const { UsuarioId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-        if (oferta[0] === 0) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'No existe oferta con este id',
-                id,
-            });
-        } else {
-            return res.status(200).json({
-                ok: true,
-                msg: 'La oferta fue modificada correctamente',
-                oferta
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const baseFilter = {
+        UsuarioId,
+        procesoDeOferta: 'FINALIZADA'
+    };
+
+    const additionalFilters = [];
+
+    if (req.query.mensaje) {
+        additionalFilters.push({
+            [Op.or]: [
+                Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('mensaje')), {
+                    [Op.like]: `%${req.query.mensaje.toLowerCase()}%`
+                })
+            ]
+        });
+    }
+
+    if (req.query.fecha) {
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+            // console.log('Parsed Date:', { day, month, year });
+
+            additionalFilters.push({
+                [Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('Oferta.createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('Oferta.createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('Oferta.createdAt')), year),
+                ],
             });
         }
+    }
 
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters.length > 0 ? { [Op.and]: additionalFilters } : {},
+    };
+    // console.log({ filter });
+
+    try {
+
+        const { count, rows: ventas } = await Oferta.findAndCountAll({
+            where: filter,
+            limit: pageSize,
+            offset: (page - 1) * pageSize,
+            order: [['createdAt', 'DESC']],
+            include: [
+                {
+                    model: Usuario,
+                    as: 'Usuario',
+                    where: { estado: true },
+                },
+                {
+                    model: Publicacion,
+                    as: 'Publicacion',
+                    where: { estado: true },
+                    include: [
+                        {
+                            model: Usuario,
+                            as: 'Usuario',
+                            where: { estado: true },
+                            attributes: ['nombreUsuario'],
+                            include: {
+                                model: Pyme,
+                                as: 'Pyme',
+                                where: { estado: true },
+                                attributes: ['nombrePyme'],
+                            },
+                        },
+                    ],
+                },
+            ],
+        });
+
+        if (!ventas.length) {
+            if (additionalFilters.length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    ventas: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron ofertas.',
+                    ventas: [],
+                });
+            }
+        }
+
+        return res.status(200).json({
+            total: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: page,
+            pageSize,
+            ventas,
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({
+        return res.status(500).json({
             ok: false,
-            msg: 'Error en el servidor, ofertaPagada()',
-            error,
+            msg: 'Error en el servidor, getVentas().',
+            error
         });
     }
 }
@@ -379,5 +546,5 @@ module.exports = {
     ofertaPost,
     ofertaPut,
     ofertaDelete,
-    ofertaPagada,
+    getVentas,
 };

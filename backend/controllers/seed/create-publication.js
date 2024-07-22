@@ -9,8 +9,8 @@ async function crearPublicacion(usuarioId) {
 
         await Publicacion.create({
             id: uid(15),
-            titulo: faker.lorem.words(),
-            descripcion: faker.lorem.paragraph(),
+            titulo: faker.lorem.paragraph(1),
+            descripcion: faker.lorem.paragraph(8, 10),
             productoOServicio: faker.helpers.arrayElement(['PRODUCTO', 'SERVICIO']),
             cantidadElementos: faker.number.int({ max: 100 }),
             precioUnidad: faker.commerce.price({ min: 50, max: 200 }),

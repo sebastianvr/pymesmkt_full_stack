@@ -6,7 +6,6 @@ import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 import { SearchPipe } from '../core/pipes/search.pipe';
 
 import { MainComponent } from './pages/main/main.component';
-import { HomeComponent } from './pages/home/home.component';
 import { ViewGraphComponent } from './pages/view-graph/view-graph.component';
 import { NavbarAdminComponent } from './components/navbar-admin/navbar-admin.component';
 import { FooterComponent } from './components/footer/footer.component';
@@ -29,7 +28,6 @@ import { FinishedReportsComponent } from './pages/finished-reports/finished-repo
 @NgModule({
   declarations: [
     MainComponent,
-    HomeComponent,
     ViewGraphComponent,
     NavbarAdminComponent,
     FooterComponent,

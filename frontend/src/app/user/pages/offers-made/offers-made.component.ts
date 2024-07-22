@@ -47,7 +47,7 @@ export class OffersMadeComponent implements OnInit {
   private buildForm() {
     this.filterForm = this.formBuilder.group({
       searchTerm: [null, [Validators.required]],
-      searchOption: ['fecha', Validators.required],
+      searchOption: ['pyme', Validators.required],
     });
 
     this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
@@ -55,7 +55,9 @@ export class OffersMadeComponent implements OnInit {
 
       searchTermControl?.clearValidators();
 
-      if (option === 'fecha') {
+      if (option === 'pyme') {
+        searchTermControl?.setValidators(Validators.required);
+      } else if (option === 'fecha') {
         searchTermControl?.setValidators([Validators.required, this.validateDate]);
       } else if (option === 'mensaje') {
         searchTermControl?.setValidators(Validators.required);

@@ -26,7 +26,6 @@ router.put('/:id', validarJWT, pymePut);
 router.delete('/:id', validarJWT, pymeDelete);
 
 router.get('/rut/:rut', [
-    validarJWT,
     param('rut', 'El rut es obligatorio').not().isEmpty(),
     validarCampos
 ], existeRut)

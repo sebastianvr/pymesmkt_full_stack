@@ -4,7 +4,7 @@ import { switchMap } from 'rxjs';
 import Swal from 'sweetalert2'
 
 import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
-
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 @Component({
   selector: 'app-publication-detail',
@@ -13,6 +13,7 @@ import { PublicacionService } from 'src/app/core/services/publicacion/publicacio
 })
 export class PublicationDetailComponent implements OnInit {
   publication!: any;
+  idCurrentUser!: string;
 
   garantiaMapa = {
     'true': 'Si',
@@ -22,10 +23,13 @@ export class PublicationDetailComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private authService: AuthService,
     private publicacionService: PublicacionService,
   ) { }
 
   public ngOnInit() {
+    this.idCurrentUser = this.authService.usuario.id;
+    console.log(this.idCurrentUser);
     this.activatedRoute.params
       .pipe(
         switchMap(({ id }) =>
@@ -34,7 +38,7 @@ export class PublicationDetailComponent implements OnInit {
       )
       .subscribe(({ publicacion }) => {
         this.publication = publicacion;
-        // console.log(this.publication);
+        console.log(this.publication);
       });
   }
 
@@ -69,5 +73,4 @@ export class PublicationDetailComponent implements OnInit {
       }
     });
   }
-
 }

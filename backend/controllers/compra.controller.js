@@ -1,3 +1,4 @@
+const db = require('../db/connection');
 const { response, request } = require('express');
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
@@ -156,32 +157,43 @@ const compraPost = async (req = request, res = response) => {
         OfertumId,
     } = req.body;
 
-    const newId = uid(15);
-
     newPurchase = {
-        id: newId,
+        id: uid(15),
         precio,
         codAutorizacion,
-        PublicacionId, /* Id de la publicación */
-        UsuarioId, /* Id del usuario dueño de la compra */
-        OfertumId, /* Id de la oferta pagada */
-    }
+        PublicacionId,
+        UsuarioId,
+        OfertumId,
+    };
+
 
     try {
+        const transaction = await db.transaction();
 
         // comprobar si existe una compra para la misma publicacion 
         const existPublication = await Compra.findOne(
-            { where: { PublicacionId } }
+            { where: { PublicacionId }, transaction }
         );
 
         if (existPublication) {
+            await transaction.rollback();
             return res.status(400).json({
                 ok: false,
-                msg: 'Esta publicación que ya fue pagada.',
+                msg: 'Esta publicación ya fue pagada.',
             });
         }
 
-        await Compra.create(newPurchase);
+        // Crear nueva compra
+        await Compra.create(newPurchase, { transaction });
+
+        // Actualizar el campo procesoDeOferta en la tabla Oferta
+        await Oferta.update(
+            { procesoDeOferta: 'FINALIZADA' },
+            { where: { id: OfertumId }, transaction }
+        );
+
+        // Confirmar la transacción
+        await transaction.commit();
 
         return res.status(200).json({
             ok: true,
@@ -189,6 +201,7 @@ const compraPost = async (req = request, res = response) => {
         });
 
     } catch (error) {
+        await transaction.rollback();
         console.error(error);
         return res.status(500).json({
             ok: false,
@@ -338,7 +351,7 @@ const toTitleCase = (str) => {
                 txt.toLowerCase();
         }
     );
-}
+};
 
 module.exports = {
     compraPost,
