@@ -13,8 +13,8 @@
                     <form [formGroup]="filterForm" class="input-group mb-3">
                         <select class="form-select customSelect text-center" id="searchOptionSelect"
                             formControlName="searchOption">
-                            <option [value]="'titulo'">Título</option>
                             <option [value]="'fecha'">Fecha</option>
+                            <option [value]="'mensaje'">Mensaje</option>
                         </select>
 
                         <input type="text" class="form-control" formControlName="searchTerm"
@@ -58,15 +58,37 @@
                         </div>
                     </div>
 
-                    <div class="col-md-12 text-center" *ngIf="isEmptyPublications && !isLoading">
-                        <div class="container mt-5">
-                            <img src="../../../assets/icons/cash-coin.svg" alt="cash-coin.svg" class="icon-image">
-                            <h3 class="my-3">No tienes ventas aún.</h3>
+                    <!-- Mostrar esta sección si no hay coincidencias en la búsqueda -->
+                    <ng-container *ngIf="noSearchMatch && !isLoading">
+                        <div class="col-md-12 text-center">
+                            <div class="container mt-5">
+                                <img src="../../../../assets/icons/empty.svg" alt="empty-users.svg" class="icon-image">
+                                <h3 class="my-3">No existen coincidencias de búsqueda. </h3>
+
+                                <div class="col-lg-12">
+                                    <button ngbTooltip="Ir atrás" (click)="clearFilter()"
+                                        class="btn btn-sm btn-primary text-center">
+                                        <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg"
+                                            class="icon-button-style">
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </ng-container>
 
 
-                    <ng-container *ngIf="!isEmptyPublications && !isLoading">
+                    <!-- Mostrar esta sección si no hay ventas -->
+                    <ng-container *ngIf="isEmptySales && !isLoading && !noSearchMatch">
+                        <div class="col-md-12 text-center">
+                            <div class="container mt-5">
+                                <img src="../../../../assets/icons/dollar.svg" alt="dollar.svg" class="icon-image">
+                                <h3 class="my-3">No existen ventas aún.</h3>
+                            </div>
+                        </div>
+                    </ng-container>
+
+
+                    <ng-container *ngIf="!isEmptySales && !isLoading  && !noSearchMatch">
                         <div class="row container px-4">
                             <!-- Botones de paginación -->
                             <div *ngIf="totalPages > 1" class="row">
@@ -80,53 +102,121 @@
                                 </div>
                             </div>
 
-                            <div class="mb-4" *ngFor="let item of publicaciones; let i = index">
+                            <div class="mb-4" *ngFor="let item of sales; let i = index">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6 class="alert alert-success d-inline-block mb-0 px-2 py-1" role="alert"
-                                            ngbTooltip="ID de la publicación">
-                                            {{item.id}}
-                                        </h6>
-                                        <button class="btn btn-primary btn-sm float-end" pTooltip="Ofertas recibidas">
-                                            {{item.cantidadOfertasRecibidas}}
-                                        </button>
+                                        <span class="float-end">{{ item.createdAt | date : 'dd MMMM yyyy' :
+                                            '+0000' }}</span>
                                     </div>
 
                                     <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a class="card-link">{{item.titulo | uppercase}}</a>
-                                        </h5>
-                                        <p class="card-text">{{item.descripcion | uppercase}}</p>
-
-                                        <hr>
+                                        <h5 class="fs-6"><strong>Detalle de mi oferta:</strong></h5>
+                                        <p class="card-title">{{item.mensaje | uppercase}}</p>
 
                                         <table class="table table-hover table-borderless">
                                             <tbody>
                                                 <tr>
-                                                    <td colspan="2" class="start-*">
-                                                        <strong>Fecha Publicación</strong>
-                                                    </td>
-                                                    <td class="text-end">{{ item.createdAt | date : 'dd MMMM yyyy' :
-                                                        '+0000' }}</td>
-                                                </tr>
-                                                <tr>
                                                     <td colspan="2" class="start-*"><strong>Precio</strong>
                                                     </td>
-                                                    <td class="text-end">{{item.precioTotal | currency: 'CLP'}}</td>
+                                                    <td class="text-end">{{item.precioOferta | currency: 'CLP'}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                    </div>
+                                        <hr>
+                                        <div class="container">
+                                            <ngb-accordion #acc="ngbAccordion">
+                                                <ngb-panel title="Detalles de la publicación ">
+                                                    <ng-template ngbPanelContent>
+                                                        <div class="row col-lg-12 mx-3">
+                                                            <div class="container">
+                                                                <h6 class="alert alert-success py-1 float-start"
+                                                                    ngbTooltip="Estado de publicación ">
+                                                                    {{item.Publicacion.procesoDePublicacion}}
+                                                                </h6>
 
-                                    <div class="card-footer">
-                                        <button class="btn btn-primary float-end"
-                                            [routerLink]="['/user/publication-detail', item.id ]" type="button">
-                                            Leer más
-                                            <img src="../../../../assets/icons/info-circle.svg"
-                                                class="icon-button-style">
-                                        </button>
-                                    </div>
+                                                                <a pTooltip="Ir a la publicación" class="float-end"
+                                                                    [routerLink]="['/user/publication-detail/', item.PublicacionId]">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                        height="16" fill="currentColor"
+                                                                        viewBox="0 0 16 16">
+                                                                        <path fill-rule="evenodd"
+                                                                            d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm5.854 8.803a.5.5 0 1 1-.708-.707L9.243 6H6.475a.5.5 0 1 1 0-1h3.975a.5.5 0 0 1 .5.5v3.975a.5.5 0 1 1-1 0V6.707z" />
+                                                                    </svg>
+                                                                </a>
+                                                            </div>
+                                                            <h3 class="text-center">
+                                                                {{item.Publicacion.titulo | uppercase}}
+                                                            </h3>
+                                                            <p class="descriptionCard">
+                                                                {{item.Publicacion.descripcion}}
+                                                            </p>
 
+                                                            <table class="table table-hover">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td><strong>Precio total</strong></td>
+                                                                        <td>{{item.Publicacion.precioTotal | currency :
+                                                                            'CLP'}}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Cantidad</strong></td>
+                                                                        <td>{{item.Publicacion.cantidadElementos}}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr *ngIf="item.Publicacion.precioUnidad">
+                                                                        <td><strong>Precio por unidad</strong></td>
+                                                                        <td>{{item.Publicacion.precioUnidad | currency :
+                                                                            'CLP'}}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Garantía</strong></td>
+                                                                        <td>
+                                                                            {{item.Publicacion.garantia.toString() |
+                                                                            i18nSelect:garantiaMapa}}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr *ngIf="item.Publicacion.aniosGarantia">
+                                                                        <td><strong>Años de garantía</strong></td>
+                                                                        <td>{{item.Publicacion.aniosGarantia}}</td>
+                                                                    </tr>
+                                                                    <tr *ngIf="item.Publicacion.fechaInicioServicio">
+                                                                        <td><strong>Fecha inicio del servicio</strong>
+                                                                        </td>
+                                                                        <td>
+                                                                            {{item.Publicacion.fechaInicioServicio |
+                                                                            date:
+                                                                            'dd MMMM yyyy'}}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr *ngIf="item.Publicacion.fechaFinServicio">
+                                                                        <td><strong>Fecha finalización del
+                                                                                servicio</strong>
+                                                                        </td>
+                                                                        <td>{{item.Publicacion.fechaFinServicio | date :
+                                                                            'dd MMMM yyyy'}}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr *ngIf="item.Publicacion.horasATrabajar">
+                                                                        <td><strong>Cantidad de horas a
+                                                                                trabajar</strong></td>
+                                                                        <td>{{item.Publicacion.horasATrabajar}}</td>
+                                                                    </tr>
+                                                                    <tr *ngIf="item.Publicacion.modelo">
+                                                                        <td><strong>Modelo</strong></td>
+                                                                        <td>{{item.Publicacion.modelo}}</td>
+                                                                    </tr>
+                                                                    <tr *ngIf="item.Publicacion.color">
+                                                                        <td><strong>Color</strong></td>
+                                                                        <td>{{item.Publicacion.color | titlecase}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </ng-template>
+                                                </ngb-panel>
+                                            </ngb-accordion>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -142,8 +232,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                     </ng-container>
                 </div>
             </div>

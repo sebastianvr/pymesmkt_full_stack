@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
-import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
+import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
+
 
 @Component({
   selector: 'app-sales',
@@ -16,18 +17,26 @@ export class SalesComponent implements OnInit {
   page: number = 1;
 
   isLoading: boolean = false;
-  publicaciones: any;
+  sales: any;
   total: any;
   currentPage!: number;
   totalPages!: number;
-  isEmptyPublications!: boolean;
+  isEmptySales!: boolean;
+  noSearchMatch!: boolean;
+
 
   filterForm!: FormGroup;
+
+  // Custom Pipe 
+  garantiaMapa = {
+    'true': 'Si',
+    'false': 'No',
+  };
 
   constructor(
     private authService: AuthService,
     private formBuilder: FormBuilder,
-    private publicacionService: PublicacionService,
+    private ofertaService: OfertaService,
   ) {
     this.idUser = this.authService.usuario.id;
   }
@@ -40,7 +49,7 @@ export class SalesComponent implements OnInit {
   private buildForm() {
     this.filterForm = this.formBuilder.group({
       searchTerm: [null, [Validators.required]],
-      searchOption: ['titulo', Validators.required],
+      searchOption: ['fecha', Validators.required],
     });
 
     this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
@@ -50,7 +59,7 @@ export class SalesComponent implements OnInit {
 
       if (option === 'fecha') {
         searchTermControl?.setValidators([Validators.required, this.validateDate]);
-      } else if (option === 'titulo') {
+      } else if (option === 'mensaje') {
         searchTermControl?.setValidators(Validators.required);
       }
 
@@ -61,30 +70,35 @@ export class SalesComponent implements OnInit {
 
   private getPublicationsById(filters: any) {
     this.isLoading = true;
-    console.log({ filters });
-    this.publicacionService.getAllPublicacionById(this.idUser, filters).subscribe(data => {
-      console.log({ data });
+    // console.log({ filters });
+    this.ofertaService.getCompras(this.idUser, filters).subscribe(data => {
+      // console.log({ data });
       this.isLoading = false;
 
-      if (data.publicaciones.length === 0) {
-        this.isEmptyPublications = true;
+      if (data.noSearchMatch) {
+        this.noSearchMatch = true;
+        this.isEmptySales = false;
       } else {
         const {
-          publicaciones,
+          ventas,
           total,
           currentPage,
           pageSize,
           totalPages,
         } = data;
 
-        this.total = total;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.totalPages = totalPages;
-        this.publicaciones = publicaciones;
-        this.isEmptyPublications = false;
-
-        console.log(this.publicaciones);
+        if (ventas.length === 0) {
+          this.isEmptySales = true;
+          this.noSearchMatch = false;
+        } else {
+          this.isEmptySales = false;
+          this.total = total;
+          this.currentPage = currentPage;
+          this.pageSize = pageSize;
+          this.totalPages = totalPages;
+          this.sales = ventas;
+          this.noSearchMatch = false;
+        }
       }
 
       this.isLoading = false;
@@ -101,7 +115,7 @@ export class SalesComponent implements OnInit {
   }
 
   public sendForm() {
-    console.log('sendForm()');
+    // console.log('sendForm()');
     if (this.filterForm.invalid) {
       this.filterForm.markAllAsTouched();
       return;
@@ -114,7 +128,7 @@ export class SalesComponent implements OnInit {
       pageSize: this.pageSize,
     };
 
-    console.log({ query });
+    // console.log({ query });
     this.getPublicationsById(query);
   }
 
@@ -145,6 +159,7 @@ export class SalesComponent implements OnInit {
 
   public clearFilter() {
     const query = {
+      idUser: this.idUser,
       page: 1,
       pageSize: 20,
     };

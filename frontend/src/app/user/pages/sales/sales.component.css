@@ -1,25 +1,25 @@
 .icon-image {
-    width: 30%;
-    height: auto;
-    max-width: 100px;
+  width: 30%;
+  height: auto;
+  max-width: 100px;
 }
 
 .icon-button-style {
-    filter: invert(100%);
-    width: 16px;
-    height: 16px;
+  filter: invert(100%);
+  width: 16px;
+  height: 16px;
 }
 
 .card {
-    /* Transición suave para la sombra */
-    transition: box-shadow 0.3s;
+  /* Transición suave para la sombra */
+  transition: box-shadow 0.3s;
 }
 
 .card:hover {
-    /* Sombras al pasar el mouse sobre la tarjeta */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  /* Sombras al pasar el mouse sobre la tarjeta */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .customSelect {
-    max-width: 95px;
+  max-width: 110px;
 }
