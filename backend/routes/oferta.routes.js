@@ -7,7 +7,7 @@ const { ofertaDelete,
     ofertasRecibidasGetById,
     ofertasCreadasGetById,
     ofertaGetById,
-    ofertaPagada,
+    getVentas,
 } = require('../controllers/oferta.controller');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
@@ -32,8 +32,8 @@ router.get('/received/:idUsuario',
             withMessage('page debe ser un número entero mayor o igual a 1'),
         query('pageSize').optional().isInt({ min: 1, max: 100 }).
             withMessage('pageSize debe ser un número entero entre 1 y 100'),
-        query('mensaje').optional().isString()
-            .withMessage('El campo "mensaje" debe ser una cadena (string)'),
+        query('titulo').optional().isString()
+            .withMessage('El campo "titulo" debe ser una cadena (string)'),
         query('fecha').optional()
             .custom((value) => {
                 const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
@@ -43,6 +43,8 @@ router.get('/received/:idUsuario',
                 return true;
             })
             .withMessage('La fecha proporcionada no es válida'),
+        query('pyme').optional().isString()
+            .withMessage('El campo "pyme" debe ser una cadena (string)'),
     ],
     ofertasRecibidasGetById
 );
@@ -65,6 +67,8 @@ router.get('/created/:UsuarioId',
             withMessage('page debe ser un número entero mayor o igual a 1'),
         query('pageSize').optional().isInt({ min: 1, max: 100 }).
             withMessage('pageSize debe ser un número entero entre 1 y 100'),
+        query('pyme').optional().isString()
+            .withMessage('El campo "pyme" debe ser una cadena (string)'),
         query('titulo').optional().isString()
             .withMessage('El campo "titulo" debe ser una cadena (string)'),
         query('fecha').optional()
@@ -86,7 +90,6 @@ router.get('/:IdOferta', [
     validarCampos
 ], ofertaGetById);
 
-// Crear una nueva oferta
 router.post('/', [
     validarJWT,
     check('mensaje', 'El mensaje es obligatorio').not().isEmpty(),
@@ -101,19 +104,40 @@ router.post('/', [
     validarCampos,
 ], ofertaPost);
 
-// Eliminar una oferta
 router.delete('/:id', [
     validarJWT,
     param('id', 'El param id es obligatorio').not().isEmpty(),
     validarCampos
 ], ofertaDelete);
 
-//  Actualiza el estado de la oferta -> procesoDePublicacion :  FINALIZADA
-router.put('/aceptar/:id', [
+router.get('/pagada/:UsuarioId', [
     validarJWT,
-    param('id', 'El param id es obligatorio').not().isEmpty(),
-    validarCampos
-], ofertaPagada);
+    param('UsuarioId')
+        .notEmpty().withMessage('El parámetro idUsuario es obligatorio')
+        .custom((value) => {
+            const uuidRegex = /^[0-9a-fA-F]{15}$/;
+            if (!uuidRegex.test(value)) {
+                throw new Error('El ID no es válido');
+            }
+            return true;
+        })
+        .withMessage('El ID proporcionado no es válido'),
 
+    query('page').optional().isInt({ min: 1 }).
+        withMessage('page debe ser un número entero mayor o igual a 1'),
+    query('pageSize').optional().isInt({ min: 1, max: 100 }).
+        withMessage('pageSize debe ser un número entero entre 1 y 100'),
+    query('mensaje').optional().isString()
+        .withMessage('El campo "mensaje" debe ser una cadena (string)'),
+    query('fecha').optional()
+        .custom((value) => {
+            const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+            if (!dateRegex.test(value)) {
+                throw new Error('La fecha no es válida. Debe estar en formato DD-MM-YYYY');
+            }
+            return true;
+        })
+        .withMessage('La fecha proporcionada no es válida'),
+], getVentas);
 
 module.exports = router;
