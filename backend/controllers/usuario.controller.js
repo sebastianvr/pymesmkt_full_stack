@@ -2,13 +2,14 @@ const { response, request } = require('express');
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
 const db = require('../db/connection');
-const { minioClient } = require('../minio/connection');
+const { minioClient } = require('../s3/connection');
 const { uid } = require('uid');
 const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
 const DeleteUsuario = require('../models/deletedUsuario');
+const { getProfileUserImage } = require('./s3.controller');
 
 
 const usuariosGetAll = async (req = request, res = response) => {
@@ -271,56 +272,6 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
     }
 }
 
-const usuarioGet = async (req = request, res = response) => {
-    console.log('[usuarios] usuarioGet()');
-
-    const { id } = req.params;
-    try {
-        const usuario = await Usuario.findByPk(id, {
-            where: { estado: true },
-            include: [
-                {
-                    model: Pyme,
-                    where: { estado: true },
-                },
-            ],
-        })
-
-        if (!usuario) {
-            return res.status(400).json({
-                msg: `No existe usuario con id: ${id}`
-            })
-        }
-
-        if (usuario.imagen) {
-            const method = 'GET';
-            const nameBucket = 'images-bucket';
-            const pathImage = usuario.imagen;
-            const expiration = (3600 * 24 * 7);  // (segundos * horas * dias)
-
-            const url = await minioClient.presignedUrl(
-                method,
-                nameBucket,
-                pathImage,
-                expiration
-            );
-
-            // console.log({ url });
-            usuario.imagen = url;
-        }
-
-        return res.status(200).json(usuario);
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            ok: false,
-            msg: 'Error en el servidor, usuarioGet()',
-            error,
-        });
-    }
-}
-
 const usuarioPost = async (req = request, res = response) => {
     console.log('[usuarios] usuarioPost()');
 
@@ -380,6 +331,51 @@ const usuarioPost = async (req = request, res = response) => {
 
 }
 
+const usuarioGet = async (req = request, res = response) => {
+    console.log('[usuarios] usuarioGet()');
+
+    const { id } = req.params;
+    const transaction = await db.transaction();
+    
+    try {
+        const usuario = await Usuario.findByPk(id, {
+            where: { estado: true },
+            include: [
+                {
+                    model: Pyme,
+                    where: { estado: true },
+                },
+            ],
+            transaction
+        });
+
+        if (!usuario) {
+            await transaction.rollback();
+            return res.status(400).json({
+                msg: `No existe usuario con id: ${id}`
+            });
+        }
+
+        if (usuario.imagen) {
+            const url = await getProfileUserImage(usuario.imagen);
+            usuario.imagen = url;
+        }
+        
+        // console.log({usuario});
+        await transaction.commit();
+        return res.status(200).json(usuario);
+
+    } catch (error) {
+        await transaction.rollback();
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, usuarioGet()',
+            error,
+        });
+    }
+};
+
 const usuarioPut = async (req = request, res = response) => {
     console.log('[usuarios] usuarioPut()');
 
@@ -398,7 +394,7 @@ const usuarioPut = async (req = request, res = response) => {
                     where: { estado: true },
                 },
             ],
-            transaction, // Asocia la transacción a la consulta
+            transaction,
         });
 
         if (!usuario) {
@@ -414,7 +410,7 @@ const usuarioPut = async (req = request, res = response) => {
             apellidos: userData.apellidos,
             run: userData.run,
             emailUsuario: userData.email,
-            // imagen: userData.imagen,
+            imagen: userData.imagen,
             region: userData.opRegion,
             comuna: userData.opCommune,
             dir1Propietario: userData.direccionPropietario,
@@ -433,16 +429,25 @@ const usuarioPut = async (req = request, res = response) => {
             dirEmpresa: userData.direccionEmpresa,
             descripcionEmpresa: userData.descripcionEmpresa,
         });
-        // Actualiza los campos del usuario con la información proporcionada 
-        await usuario.update(userMapped, { transaction });
+        // console.log({ userMapped });
 
-        // Si existe información de la empresa (Pyme) en la solicitud, y hay campos en pymeMapped, actualiza también esa información
+        // Actualiza los campos del usuario con la información proporcionada 
+        const userUdated =  await usuario.update(userMapped, { transaction });
+        
+        // Si existe información de la empresa (Pyme) en la solicitud, y hay campos en pymeMapped, 
+        // actualiza también esa información
         if (usuario.Pyme && Object.keys(pymeMapped).length > 0) {
             await usuario.Pyme.update(pymeMapped, { transaction });
         }
 
         // Confirma la transacción
         await transaction.commit();
+
+        // Prefirmar imagen si viene
+        if(userMapped.imagen){
+            const urlPresigned = await getProfileUserImage(userData.imagen);
+            userUdated.imagen = urlPresigned;
+        }
 
         return res.status(200).json({
             ok: true,
@@ -453,7 +458,6 @@ const usuarioPut = async (req = request, res = response) => {
         console.error(error);
         // Si ocurre un error, revierte la transacción
         await transaction.rollback();
-
         return res.status(500).json({
             ok: false,
             msg: 'Error en el servidor, usuarioPut()',
