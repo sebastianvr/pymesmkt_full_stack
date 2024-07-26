@@ -75,7 +75,7 @@
                                 </button>
                                 <button *ngIf="!loadingInfoPropietario && !this.editMode.infoPropietario"
                                     (click)="updateUser('infoPropietario')"
-                                    [disabled]="userForm.get('infoPropietario')?.invalid || !userForm.get('infoPropietario')?.touched"
+                                    [disabled]="userForm.get('infoPropietario')?.invalid"
                                     class="btn btn-sm btn-primary float-start my-3 mx-2">
                                     Guardar
                                 </button>
@@ -84,23 +84,35 @@
 
                         <div class="col-lg-4">
                             <div class="text-center">
-                                <div class="container">
-                                    <!-- TODO: Arreglar error de minio para servir imagen -->
-                                    <ng-container *ngIf="user.imagen; else defaultImage">
-                                        <!-- <img src="{{ user.imagen }}" class="imgProfile img-fluid" alt="camera.jpg"
-                                            style="max-height: 130px;"> -->
-                                        <img src="../../../assets/icons/people-circle.svg" class="imgProfile img-fluid"
-                                            alt="people-circle.svg">
-                                    </ng-container>
-                                    <ng-template #defaultImage>
-                                        <img src="../../../assets/icons/people-circle.svg" class="imgProfile img-fluid"
-                                            alt="people-circle.svg">
-                                    </ng-template>
+                                <div class="container d-flex justify-content-center align-items-center">
+                                    <!-- Contenedor de la imagen -->
+                                    <div class="image-container">
+                                        <ng-container *ngIf="user.imagen; else defaultImage">
+                                            <img [src]="user.imagen" class="imgProfile" alt="camera.jpg"
+                                                loading="eager">
+                                        </ng-container>
+                                        <ng-template #defaultImage>
+                                            <img src="../../../assets/icons/people-circle.svg" class="imgProfile"
+                                                alt="people-circle.svg">
+                                        </ng-template>
+                                    </div>
                                 </div>
                                 <div class="mt-2">
-                                    <label class="custom-file-label custom-file-upload" for="formFile">Subir
-                                        imagen<input class="custom-file-input" type="file" id="formFile" (change)="onFileSelected($event)">
+                                    <label class="custom-file-label custom-file-upload" for="formFile">Subir imagen
+                                        <input class="custom-file-input" type="file" id="formFile"
+                                            (change)="onFileSelected($event)">
                                     </label>
+                                    <div
+                                        *ngIf="userForm.get('infoPropietario.imagen')?.dirty && userForm.get('infoPropietario.imagen')?.errors">
+                                        <span *ngIf="userForm.get('infoPropietario.imagen')?.errors?.['invalidType']"
+                                            class="text-danger">
+                                            La extensión del archivo debe ser tipo imagen
+                                        </span>
+                                        <span *ngIf="userForm.get('infoPropietario.imagen')?.errors?.['invalidSize']"
+                                            class="text-danger">
+                                            El archivo es demasiado grande (máximo 5MB)
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -399,10 +411,10 @@
                 </form>
 
                 <!-- Debug Mode -->
-                <!-- <div class="container">
+                <div class="container">
                     <pre><b>formulario.value: </b> {{userForm.value | json }}</pre>
                     <pre><b>formulario.errors: </b> {{userForm.errors | json }}</pre>
-                </div> -->
+                </div>
 
             </ng-template>
         </div>

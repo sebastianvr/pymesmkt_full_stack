@@ -1,23 +1,41 @@
+.image-container {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  overflow: hidden; /* Oculta cualquier parte de la imagen que sobresalga del contenedor */
+  border: 5px solid black;
+}
+
 .imgProfile {
-    height: 130px;
+  width: 100%; /* Asegura que la imagen ocupe el 100% del contenedor */
+  height: 100%; /* Asegura que la imagen ocupe el 100% del contenedor */
+  object-fit: cover; /* Mantiene las proporciones de la imagen y la ajusta al contenedor */
 }
 
 @media (max-width: 992px) {
-    .imgProfile {
-        margin-top: 3vh;
-    }
+  .image-container {
+    width: 150px;
+    height: 150px;
+  }
+  .imgProfile {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .custom-file-input {
-    visibility: hidden;
-    width: 0;
+  visibility: hidden;
+  width: 0;
 }
 
 .custom-file-upload {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 5px;
-    cursor: pointer;
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
 }

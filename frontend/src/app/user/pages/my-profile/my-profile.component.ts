@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { catchError, of } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
-import { MinioFilesService } from 'src/app/core/services/files/minio-files.service';
+import { S3FilesService } from 'src/app/core/services/files/minio-files.service';
+
 import { MessageService } from 'src/app/core/services/message/message.service';
 import { RegionesComunasService } from 'src/app/core/services/regiones-comunas/regiones-comunas.service';
 import { UsuarioService } from 'src/app/core/services/usuario/usuario.service';
@@ -46,7 +48,7 @@ export class MyProfileComponent implements OnInit {
 
   public imageUrl!: string;
   private emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
-
+  
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -56,7 +58,7 @@ export class MyProfileComponent implements OnInit {
     // private rutValidator: RutValidatorService,
     private regionesComunas: RegionesComunasService,
     private messageService: MessageService,
-    private minioFilesService: MinioFilesService,
+    private s3FilesService: S3FilesService,
   ) {
     this.userForm = this.buildForm();
   }
@@ -65,7 +67,6 @@ export class MyProfileComponent implements OnInit {
     this.usuarioService.getUsuario(this.currentUserId)
       .subscribe((user) => {
         this.user = user;
-        // console.log({ user });
 
         // Setea valores del formulario con los datos del usuario
         this.setForm(user);
@@ -73,14 +74,13 @@ export class MyProfileComponent implements OnInit {
   }
 
   private setForm(user: any, formName?: string) {
-    // console.log('setForm()');
     const formMappings: { [key: string]: any } = {
       infoPropietario: {
         nombre: user.nombreUsuario,
         apellidos: user.apellidos,
         run: user.run,
         email: user.emailUsuario,
-        imagen: user.imagen, //Solucionar imagen
+        imagen: user.imagen,
       },
       infoLocalidadPropietario: {
         opRegion: user.region,
@@ -104,153 +104,77 @@ export class MyProfileComponent implements OnInit {
     };
 
     const formValues = formName ? { [formName]: formMappings[formName] } : formMappings;
-    // console.log({ formValues });
     this.userForm.patchValue(formValues);
   }
 
   private buildForm(): FormGroup {
     return this.fb.group({
       infoPropietario: this.fb.group({
-        nombre: [
-          {
-            value: undefined,
-            disabled: true,
-          },
-          [
-            Validators.required,
-            Validators.minLength(3),
-          ]
+        nombre: [{ value: undefined, disabled: true },
+        [Validators.required, Validators.minLength(3)]
         ],
         apellidos: [
-          {
-            value: undefined,
-            disabled: true,
-          },
-          [
-            Validators.required,
-          ]
-        ],
-        run: [
-          {
-            value: undefined,
-            disabled: true,
-          },
-          [
-            Validators.required,
-          ],
-          // [
-          //   this.runValidator,
-          // ],
-        ],
-        email: [
-          {
-            value: undefined,
-            disabled: true,
-          },
-          [
-            Validators.required,
-            Validators.pattern(this.emailPattern),
-          ],
-          [
-            this.emailValidator,
-          ],
-        ],
-        imagen: [{ value: undefined }],
-      }),
-
-      infoLocalidadPropietario: this.fb.group({
-        opRegion: [
-          {
-            value: undefined,
-            disabled: true,
-          },
-          [Validators.required]],
-        opCommune: [
-          {
-            value: undefined,
-            disabled: true,
-          },
-          [Validators.required]],
-        direccionPropietario: [
-          {
-            value: undefined,
-            disabled: true,
-          },
+          { value: undefined, disabled: true },
           [Validators.required]
         ],
-        direccionPropietario2: [
-          {
-            value: undefined,
-            disabled: true,
-          }
+        run: [
+          { value: undefined, disabled: true },
+          [Validators.required],
+          // [this.runValidator],
         ],
-        descripcion: [
-          {
-            value: undefined,
-            disabled: true,
-          }
+        email: [
+          { value: undefined, disabled: true },
+          [Validators.required, Validators.pattern(this.emailPattern)],
+          [this.emailValidator],
         ],
+        imagen: [null, [this.fileValidator]],
       }),
-
+      infoLocalidadPropietario: this.fb.group({
+        opRegion: [
+          { value: undefined, disabled: true },
+          [Validators.required]],
+        opCommune: [
+          { value: undefined, disabled: true },
+          [Validators.required]],
+        direccionPropietario: [
+          { value: undefined, disabled: true },
+          [Validators.required]
+        ],
+        direccionPropietario2: [{ value: undefined, disabled: true }],
+        descripcion: [{ value: undefined, disabled: true }],
+      }),
       infoEmpresa: this.fb.group({
         nombreEmpresa: [
-          {
-            value: undefined,
-            disabled: true,
-          },
+          { value: undefined, disabled: true },
           [Validators.required]
         ],
         rut: [
-          {
-            value: undefined,
-            disabled: true,
-          },
+          { value: undefined, disabled: true },
           [Validators.required],
-          // [
-          //   this.rutValidator,
-          // ],
+          // [this.rutValidator],
         ],
         tipoEmpresa: [
-          {
-            value: undefined,
-            disabled: true,
-          },
+          { value: undefined, disabled: true },
           [Validators.required]
         ],
-        rubro: [{
-          value: undefined,
-          disabled: true,
-        },
+        rubro: [{ value: undefined, disabled: true },
         [Validators.required]
         ],
       }),
-
       infoLocalidadEmpresa: this.fb.group({
-        regionEmpresa: [{
-          value: undefined,
-          disabled: true,
-        },
+        regionEmpresa: [{ value: undefined, disabled: true },
         [Validators.required]
         ],
         communeEmpresa: [
-          {
-            value: undefined,
-            disabled: true,
-          },
+          { value: undefined, disabled: true },
           [Validators.required]
         ],
         direccionEmpresa: [
-          {
-            value: undefined,
-            disabled: true,
-          },
+          { value: undefined, disabled: true },
           [Validators.required]
         ],
         descripcionEmpresa: [
-          {
-            value: undefined,
-            disabled: true,
-          }, []],
+          { value: undefined, disabled: true }],
       }),
     });
   }
@@ -310,11 +234,18 @@ export class MyProfileComponent implements OnInit {
 
     // Obtener los datos del formulario específico
     const updateData = this.userForm.get(formName)?.value;
-    // console.log({ updateData });
+
+    // Verificar si la imagen ha cambiado
+    if (formName === 'infoPropietario') {
+      const newImageUrl = this.userForm.get('infoPropietario.imagen')?.value;
+      if (newImageUrl instanceof File) {
+        // Si es un archivo, no incluir la imagen en los datos de actualización
+        delete updateData.imagen;
+      }
+    }
 
     this.usuarioService.updateUser(this.currentUserId, updateData)
       .subscribe((res: any) => {
-        // console.log({ res });
         switch (formName) {
           case 'infoPropietario':
             // Desactivar el loader específico después de completar la operación
@@ -352,6 +283,70 @@ export class MyProfileComponent implements OnInit {
       });
   }
 
+  private fileValidator(control: FormControl): { [key: string]: any } | null {
+    const file = control.value;
+    if (!file) {
+      return null;
+    }
+
+    const fileType = file.type;
+    const fileSize = file.size;
+
+    // Validar tipo de archivo (por ejemplo, solo imágenes)
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(fileType)) {
+      return { invalidType: true };
+    }
+
+    // Validar tamaño máximo (5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+    if (fileSize > maxSize) {
+      return { invalidSize: true };
+    }
+
+    return null;
+  }
+
+  public onFileSelected(event: Event) {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files ? fileInput.files[0] : null;
+
+    if (file) {
+      const fileControl = this.userForm.get('infoPropietario.imagen');
+      if (!fileControl) {
+        return;
+      }
+
+      fileControl.setValue(file);
+      fileControl.markAsDirty();
+      fileControl.markAsTouched();
+
+      // Verificar si el control tiene errores antes de continuar
+      if (fileControl.errors) {
+        return;
+      }
+
+      this.s3FilesService.uploadImage(file).pipe(
+        catchError((error: any) => {
+          console.error({ error });
+
+          this.messageService.showErrorMessage('Error al subir imagen');
+          return of(null);
+        })
+      ).subscribe((response: any) => {
+        if (response && response.filePath) {
+          this.imageUrl = response.filePath;
+
+          this.usuarioService.updateUser(this.currentUserId, { imagen: this.imageUrl })
+            .subscribe((data) => {
+              this.user.imagen = data.usuario.imagen;
+              this.messageService.showSuccessMessage('Imagen actualizada')
+            });
+        }
+      });
+    }
+  }
+
   public onRegionChange(event: Event, formControlName: string) {
     const selectedRegion = (event.target as HTMLSelectElement).value;
     if (selectedRegion) {
@@ -365,23 +360,6 @@ export class MyProfileComponent implements OnInit {
     } else {
       this.selectedRegionCommunes = [];
     }
-  }
-
-  public onFileSelected(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    if (!inputElement.files) {
-      return;
-    }
-    const file: File = inputElement.files[0];
-
-    this.minioFilesService.uploadImage(file).subscribe(
-      (response: any) => {
-        this.imageUrl = response.filePath;
-      },
-      (error: any) => {
-        console.error('Error al subir la imagen:', error);
-      }
-    );
   }
 
   public campoInvalido(field: string, arrayForm: string) {
