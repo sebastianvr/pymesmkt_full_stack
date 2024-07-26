@@ -6,18 +6,18 @@ import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root'
 })
-export class MinioFilesService {
-  private url: string = environment.baseUrl
+export class S3FilesService {
+  private url: string = environment.baseUrl;
   
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
   ) { }
 
   uploadImage(imageFile: File): Observable<any> {
     const formData = new FormData();
     formData.append('image', imageFile);
 
-    return this.http.post(`${this.url}/api/minio/uploadUserImage`, formData); 
+    return this.http.post(`${this.url}/api/s3/uploadUserImage`, formData); 
   }
 
   postNewReportFiles(files: File[]): Observable<any> {
@@ -25,6 +25,14 @@ export class MinioFilesService {
     for (let file of files) {
       formData.append('files', file);
     }
-    return this.http.post(`${this.url}/api/minio/reportFiles`, formData); 
+    return this.http.post(`${this.url}/api/s3/reportFiles`, formData); 
+  }
+  
+  postNewPublicationFiles(files: File[]): Observable<any> {
+    const formData = new FormData();
+    for (let file of files) {
+      formData.append('files', file);
+    }
+    return this.http.post(`${this.url}/api/s3/publication`, formData); 
   }
 }

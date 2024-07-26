@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MinioFilesService } from './minio-files.service';
+import { S3FilesService } from './minio-files.service';
 
 describe('MinioFilesService', () => {
-  let service: MinioFilesService;
+  let service: S3FilesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(MinioFilesService);
+    service = TestBed.inject(S3FilesService);
   });
 
   it('should be created', () => {

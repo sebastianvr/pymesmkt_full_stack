@@ -15,25 +15,10 @@ services:
     networks:
       - red_privada
 
-  minio:
-    restart: always
-    image: quay.io/minio/minio
-    command: server /data --console-address ":9001"
-    env_file:
-      - ./config/minio.env  
-    volumes:
-      - minio_data:/data
-    ports:
-      - 9000:9000
-      - 9001:9001
-    networks:
-      - red_privada
-
   api:
     restart: always
     depends_on:
       - db 
-      - minio
     build: ./backend
     env_file:
       - ./config/api.env

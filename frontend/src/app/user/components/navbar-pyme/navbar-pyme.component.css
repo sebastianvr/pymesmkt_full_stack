@@ -1,5 +1,23 @@
 @media (max-width: 768px) {
-    .hide-on-small-screen {
-        display: none; /* Oculta la etiqueta <a> en pantallas pequeñas */
-    }
+  .hide-on-small-screen {
+    display: none; /* Oculta la etiqueta <a> en pantallas pequeñas */
+  }
+}
+
+.user-image-container {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Oculta cualquier parte de la imagen que sobresalga del contenedor */
+  border: 2px solid black;
+  border-radius: 50%;
+
+}
+
+.user-image-container img {
+  width: 100%; /* Asegura que la imagen ocupe el 100% del contenedor */
+  height: 100%; /* Asegura que la imagen ocupe el 100% del contenedor */
+  object-fit: cover; /* Mantiene las proporciones de la imagen y la ajusta al contenedor */
 }

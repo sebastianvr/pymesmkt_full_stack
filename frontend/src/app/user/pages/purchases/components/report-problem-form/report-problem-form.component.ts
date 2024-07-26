@@ -3,7 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators }
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from 'primeng/api';
 import { catchError, finalize, of } from 'rxjs';
-import { MinioFilesService } from 'src/app/core/services/files/minio-files.service';
+import { S3FilesService } from 'src/app/core/services/files/minio-files.service';
 import { ReclamoService } from 'src/app/core/services/reclamo/reclamo.service';
 import Swal from 'sweetalert2';
 
@@ -25,7 +25,7 @@ export class ReportProblemFormComponent implements OnInit {
     private activeModal: NgbActiveModal,
     private reclamoService: ReclamoService,
     private messageService: MessageService,
-    private minioFilesService: MinioFilesService,
+    private s3FilesService: S3FilesService,
 
   ) {
 
@@ -66,7 +66,7 @@ export class ReportProblemFormComponent implements OnInit {
     }
 
     // Subir los archivos a Minio
-    this.minioFilesService.postNewReportFiles(this.uploadedFiles).pipe(
+    this.s3FilesService.postNewReportFiles(this.uploadedFiles).pipe(
       catchError(error => {
         console.error('Error al subir archivos a Minio:', error);
         Swal.fire({

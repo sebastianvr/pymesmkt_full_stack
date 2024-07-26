@@ -3,7 +3,7 @@
 
         <div class="container">
             <div class="col-md-12 pt-2">
-                <form [formGroup]="formularioPublicacion" (ngSubmit)="enviarPublicacion()">
+                <form [formGroup]="publicationForm" (ngSubmit)="sendPublication()">
 
                     <!-- OPCIONES -->
                     <div class="container">
@@ -17,7 +17,7 @@
                                 <label class="btn btn-primary fs-4"
                                     [ngClass]="{ 'btn-success': selectedOption === 'Producto' }">
                                     <input class="inputRadio" type="radio" value="Producto"
-                                        (click)="limpiarFormulario('Producto')" formControlName="productoOServicio">
+                                        (click)="selectionToggle('Producto')" formControlName="productoOServicio">
                                     <div class="d-flex flex-column align-items-center">
                                         <img src="../../../../assets/icons/new-product.svg" alt="new-product.svg"
                                             class="icon-buttons-style">
@@ -29,7 +29,7 @@
                                 <label class="btn btn-primary fs-4"
                                     [ngClass]="{ 'btn-success': selectedOption === 'Servicio' }">
                                     <input class="inputRadio" type="radio" value="Servicio"
-                                        (click)="limpiarFormulario('Servicio')" formControlName="productoOServicio">
+                                        (click)="selectionToggle('Servicio')" formControlName="productoOServicio">
                                     <div class="d-flex flex-column align-items-center">
                                         <img src="../../../../assets/icons/new-service.svg" alt="new-service.svg"
                                             class="icon-buttons-style">
@@ -42,7 +42,7 @@
                     </div>
 
                     <!-- Formulario PRODUCTO -->
-                    <div class="row" *ngIf="this.formularioPublicacion.get('productoOServicio')?.value == 'Producto'">
+                    <div class="row" *ngIf="this.publicationForm.get('productoOServicio')?.value == 'Producto'">
 
                         <div class="col-md-12 mb-2">
                             <img class="iconPublicacion float-end" src="../../../assets/icons/new-product.svg"
@@ -59,7 +59,7 @@
                             </label>
                             <input pInputText type="text" formControlName="titulo" class="form-control"
                                 id="titlePublication">
-                            <span *ngIf="campoInvalido('titulo')" class="form-text text-danger">
+                            <span *ngIf="invalidField('titulo')" class="form-text text-danger">
                                 El titulo es obligatorio
                             </span>
                         </div>
@@ -69,7 +69,7 @@
                             <label for="descriptionPublication" class="form-label">Descripción</label>
                             <textarea pInputTextarea class="form-control" formControlName="descripcion"
                                 id="descriptionPublication"></textarea>
-                            <span *ngIf="campoInvalido('descripcion')" class="form-text text-danger">
+                            <span *ngIf="invalidField('descripcion')" class="form-text text-danger">
                                 La descripción es obligatoria.
                             </span>
                         </div>
@@ -111,7 +111,7 @@
                         </div>
 
                         <!-- Años de garantia -->
-                        <div *ngIf="tieneGarantia()" class="col-md-6 mb-2">
+                        <div *ngIf="isGuaranteed()" class="col-md-6 mb-2">
                             <label for="aniosGarantia" class="form-label">Años de garantía
                                 <a class="descripcionLabel text-muted">
                                     (Opcional)
@@ -124,10 +124,10 @@
                         <!-- Cantidad de productos -->
                         <div class="col-md-6 mb-2">
                             <label for="horizontal" class="form-label d-block">Cantidad de productos</label>
-                            <p-inputNumber (onBlur)="calcularTotal()" formControlName="cantidad" [showButtons]="true"
-                                buttonLayout="horizontal" [min]="1" name="horizontal" inputId="horizontal"
-                                locale="es-CH" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
-                                target="undefined">
+                            <p-inputNumber (onBlur)="calculateTotalPrice()" formControlName="cantidad"
+                                [showButtons]="true" buttonLayout="horizontal" [min]="1" name="horizontal"
+                                inputId="horizontal" locale="es-CH" incrementButtonIcon="pi pi-plus"
+                                decrementButtonIcon="pi pi-minus" target="undefined">
                             </p-inputNumber>
                         </div>
 
@@ -136,7 +136,7 @@
                             <label for="precioUnidad" class="form-label d-block">Precio por unidad</label>
                             <div class="p-inputgroup">
                                 <span class="p-inputgroup-addon">$</span>
-                                <p-inputNumber (onBlur)="calcularTotal()" inputId="precioUnidad"
+                                <p-inputNumber (onBlur)="calculateTotalPrice()" inputId="precioUnidad"
                                     formControlName="precioPorUnidad" mode="decimal" locale="es-CH"
                                     name="precioPorUnidad">
                                 </p-inputNumber>
@@ -152,22 +152,18 @@
                                     mode="decimal" locale="es-CH" currency="CLP" name="maximumPrice">
                                 </p-inputNumber>
                             </div>
-                            <span *ngIf="campoInvalido('totalPrecio')" class="form-text text-danger">
+                            <span *ngIf="invalidField('totalPrecio')" class="form-text text-danger">
                                 El precio total es obligatorio.
                             </span>
                         </div>
 
                         <!-- Subir archivos -->
-                        <div class="col-md-12 mb-2">
-                            <label for="files[]" class="mb-2">Subir archivos</label>
+                        <div class="my-3 col-md-12">
+                            <label for="files[]" class="mb-2 fw-bold">Adjuntar archivos (máximo 8 archivos, máximo 15
+                                MB)</label>
                             <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
-                                [showUploadButton]="false" url="./upload.php" (onUpload)="onUpload($event)"
-                                [multiple]="true" accept="" [maxFileSize]="1000000">
-                                <ng-template pTemplate="content">
-                                    <ul *ngIf="uploadedFiles.length">
-                                        <li *ngFor="let file of uploadedFiles">{{file.name}} - {{file.size}} bytes</li>
-                                    </ul>
-                                </ng-template>
+                                [showUploadButton]="false" (onSelect)="onUpload($event)" [multiple]="true"
+                                accept=".jpg,.jpeg,.png,.pdf,.zip" [maxFileSize]="15000000" [fileLimit]="8">
                             </p-fileUpload>
                         </div>
 
@@ -180,7 +176,7 @@
                     </div>
 
                     <!-- Formulario SERVICIO -->
-                    <div class="row" *ngIf="this.formularioPublicacion.get('productoOServicio')?.value == 'Servicio'">
+                    <div class="row" *ngIf="this.publicationForm.get('productoOServicio')?.value == 'Servicio'">
                         <div class="col-md-12 mb-2">
                             <img class="iconPublicacion float-end" src="../../../../assets/icons/new-service.svg"
                                 alt="new-service.svg" width="80">
@@ -194,7 +190,7 @@
                             </label>
                             <input pInputText type="text" formControlName="titulo" class="form-control"
                                 id="titlePublication">
-                            <span *ngIf="campoInvalido('titulo')" class="form-text text-danger">
+                            <span *ngIf="invalidField('titulo')" class="form-text text-danger">
                                 El titulo es obligatorio.
                             </span>
                         </div>
@@ -204,7 +200,7 @@
                             <label for="descriptionPublication" class="form-label">Descripción</label>
                             <textarea pInputTextarea class="form-control" formControlName="descripcion"
                                 id="descriptionPublication"></textarea>
-                            <span *ngIf="campoInvalido('descripcion')" class="form-text text-danger">
+                            <span *ngIf="invalidField('descripcion')" class="form-text text-danger">
                                 La descripción es obligatoria.
                             </span>
                         </div>
@@ -229,7 +225,7 @@
                         </div>
 
                         <!-- Años de garantia -->
-                        <div *ngIf="tieneGarantia()"  class="col-md-6 mb-2">
+                        <div *ngIf="isGuaranteed()" class="col-md-6 mb-2">
                             <label for="aniosGarantia" class="form-label">Años de garantía
                                 <a class="descripcionLabel text-muted">
                                     (Opcional)
@@ -237,7 +233,7 @@
                             </label>
                             <input pInputNumber type="number" formControlName="aniosGarantia" class="form-control"
                                 id="aniosGarantia">
-                            <span *ngIf="campoInvalido('aniosGarantia')" class="form-text text-danger">
+                            <span *ngIf="invalidField('aniosGarantia')" class="form-text text-danger">
                                 Ingresar años de garantía del producto.
                             </span>
                         </div>
@@ -250,7 +246,7 @@
                                 <p-inputNumber inputId="maximumPrice" name="maximumPrice" formControlName="totalPrecio"
                                     mode="decimal" locale="es-CH" currency="CLP" name="maximumPrice"></p-inputNumber>
                             </div>
-                            <span *ngIf="campoInvalido('totalPrecio')" class="form-text text-danger">
+                            <span *ngIf="invalidField('totalPrecio')" class="form-text text-danger">
                                 El precio total es obligatorio.
                             </span>
 
@@ -265,7 +261,7 @@
                                     dateFormat="d 'de' MM yy">
                                 </p-calendar>
                             </div>
-                            <span *ngIf="campoInvalido('fechaInicio')" class="form-text text-danger">
+                            <span *ngIf="invalidField('fechaInicio')" class="form-text text-danger">
                                 La fecha de inicio es obligatoria.
                             </span>
                         </div>
@@ -280,7 +276,7 @@
                                     dateFormat="d 'de' MM yy">
                                 </p-calendar>
                             </div>
-                            <span *ngIf="campoInvalido('fechaTermino')" class="form-text text-danger">
+                            <span *ngIf="invalidField('fechaTermino')" class="form-text text-danger">
                                 La fecha de finalización es obligatoria.
                             </span>
                         </div>
@@ -295,23 +291,19 @@
                         </div>
 
                         <!-- Subir archivos -->
-                        <div class="col-md-12 mb-3">
-                            <label for="files[]" class="mb-2">Subir archivos</label>
+                        <div class="my-3 col-md-12">
+                            <label for="files[]" class="mb-2 fw-bold">Adjuntar archivos (máximo 8 archivos, máximo 15
+                                MB)</label>
                             <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
-                                [showUploadButton]="false" url="./upload.php" (onUpload)="onUpload($event)"
-                                [multiple]="true" accept="" [maxFileSize]="1000000">
-                                <ng-template pTemplate="content">
-                                    <ul *ngIf="uploadedFiles.length">
-                                        <li *ngFor="let file of uploadedFiles">{{file.name}} - {{file.size}} bytes</li>
-                                    </ul>
-                                </ng-template>
+                                [showUploadButton]="false" (onSelect)="onUpload($event)" [multiple]="true"
+                                accept=".jpg,.jpeg,.png,.pdf,.zip" [maxFileSize]="15000000" [fileLimit]="8">
                             </p-fileUpload>
                         </div>
 
                         <!-- BOTON ENVIAR-->
                         <div class="row">
                             <div class="container mb-5">
-                                <button (click)="this.formularioPublicacion.markAllAsTouched()"
+                                <button (click)="this.publicationForm.markAllAsTouched()"
                                     class="float-end btn btn-primary">Publicar</button>
                             </div>
                         </div>
@@ -321,9 +313,9 @@
             </div>
 
             <!-- Ver json del formulario -->
-            <!-- <div class="container">
-                <pre>{{formularioPublicacion.value | json}}</pre>
-            </div> -->
+            <div class="container">
+                <pre>{{publicationForm.value | json}}</pre>
+            </div>
 
         </div>
     </div>

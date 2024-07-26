@@ -91,20 +91,19 @@
                     <!-- Card Compras -->
                     <ng-container *ngIf="!isEmptyPurchases && !isLoading  && !noSearchMatch">
                         <div class="row container mx-4">
+                            <!-- Paginación -->
+                            <div *ngIf="totalPages > 1" class="row">
+                                <div class="d-flex float-start justify-content-center">
+                                    <div class="row">
+                                        <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                            (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                            [rotate]="true" [boundaryLinks]="true">
+                                        </ngb-pagination>
+                                    </div>
+                                </div>¡
+                            </div>
+
                             <div class="my-4" *ngFor="let item of this.purchases; let i = index">
-
-                                <!-- Paginación -->
-                                <div *ngIf="totalPages > 1" class="row">
-                                    <div class="d-flex float-start justify-content-center">
-                                        <div class="row">
-                                            <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
-                                                (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
-                                                [rotate]="true" [boundaryLinks]="true">
-                                            </ngb-pagination>
-                                        </div>
-                                    </div>¡
-                                </div>
-
                                 <div class="card">
                                     <div class="card-header pt-2">
                                         <h5 class="float-start card-title fs-4 m-0"><a>{{'Comprobante' | uppercase}}</a>
@@ -127,7 +126,8 @@
                                                     <td colspan="2" class="start-*"><strong>Fecha de compra</strong>
                                                     </td>
 
-                                                    <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy' : '+0000'}}</td>
+                                                    <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy' :
+                                                        '+0000'}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2" class="start-*"><strong>Estado</strong>
@@ -299,7 +299,20 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <br>
+                            </div>
+
+                            <!-- Paginación -->
+                            <div *ngIf="totalPages > 1" class="row">
+                                <div class="d-flex float-start justify-content-center">
+                                    <div class="row">
+                                        <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                            (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                            [rotate]="true" [boundaryLinks]="true">
+                                        </ngb-pagination>
+                                    </div>
+                                </div>¡
                             </div>
                         </div>
                     </ng-container>
