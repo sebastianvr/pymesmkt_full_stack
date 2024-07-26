@@ -1,5 +1,4 @@
 const Calificacion = require('./calificacion');
-const Colaboracion = require('./colaboracion');
 const Compra = require('./compra');
 const Oferta = require('./oferta');
 const Publicacion = require('./publicacion')
@@ -8,8 +7,7 @@ const Reclamo = require('./reclamo');
 const Usuario = require('./usuario')
 
 /**
- * NOTA IMPORTANTE
- * !Las asociaciones en Sequelize se definen por PARES! 
+ * NOTA IMPORTANTE:!Las asociaciones en Sequelize se definen por PARES! 
  */
 
 /* Un usuario TIENE una pyme */
@@ -58,10 +56,6 @@ Compra.belongsTo(Oferta);
 Usuario.hasMany(Calificacion);
 Calificacion.belongsTo(Usuario);
 
-/**
- * Todo: mostar botones de realizar calificaciones y realizar reclamos, 
- * realizar logica para quitarlos en caso de estar realizados
- * ya que solo podemos hacer un reclamo por publicacion y una calificaacion por cada compra 
- * */
+
 Calificacion.hasOne(Compra);
 Compra.belongsTo(Calificacion)
