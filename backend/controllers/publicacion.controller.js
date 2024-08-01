@@ -7,6 +7,7 @@ const Publicacion = require('../models/publicacion');
 const Pyme = require('../models/pyme');
 const Usuario = require('../models/usuario');
 const Calificacion = require('../models/calificacion');
+const { getPublicationFile } = require('./s3.controller');
 
 
 const publicacionesGetAll = async (req = request, res = response) => {
@@ -119,12 +120,16 @@ const publicacionGet = async (req = request, res = response) => {
             ],
         })
 
-        // console.log({ publicacion });
         if (!publicacion) {
             return res.status(400).json({
                 ok: false,
                 msg: 'No existe publicación',
             });
+        }
+
+        if (publicacion.archivoAdjunto) {
+            const url = await getPublicationFile(publicacion.archivoAdjunto);
+            publicacion.archivoAdjunto = url;
         }
 
         return res.status(200).json({
@@ -288,7 +293,6 @@ const publicacionPost = async (req = request, res = response) => {
         UsuarioId
     };
 
-    // console.log(nuevaPublicacion);
     try {
         const { id } = await Publicacion.create(nuevaPublicacion);
         return res.status(200).json({
@@ -406,7 +410,6 @@ const publicacionesCompradas = async (req = request, res = response) => {
             order: [['createdAt', 'DESC']],
         });
 
-
         if (publicacion.count === 0) {
             return res.status(200).json({
                 ok: true,
@@ -450,25 +453,11 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
     };
 
     const additionalFilters = {};
-
-    // if (req.query.titulo) {
-    //     console.log(req.query.titulo);
-    //     additionalFilters.titulo = {
-    //         [Sequelize.Op.and]: [
-    //             Sequelize.fn('LOWER', Sequelize.col('titulo')),
-    //             {
-    //                 [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
-    //             },
-    //         ],
-    //     };
-    // };
     if (req.query.titulo) {
-        console.log(req.query.titulo);
         additionalFilters.titulo = {
             [Sequelize.Op.like]: `%${req.query.titulo.toLowerCase()}%`,
         };
     };
-    
 
     if (req.query.id) {
         additionalFilters.id = req.query.id;
@@ -526,21 +515,20 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
                 ],
             });
 
-            // console.log(publicaciones,additionalFilters);
-            if (!publicaciones.length) {
-                if (Object.keys(additionalFilters).length > 0) {
-                    return res.status(200).json({
-                        message: 'No se encontraron coincidencias para los filtros aplicados.',
-                        noSearchMatch: true,
-                        publicaciones: []
-                    });
-                } else {
-                    return res.status(200).json({
-                        message: 'No se encontraron publicaciones.',
-                        publicaciones: [],
-                    });
-                }
+        if (!publicaciones.length) {
+            if (Object.keys(additionalFilters).length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    publicaciones: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron publicaciones.',
+                    publicaciones: [],
+                });
             }
+        }
 
         return res.status(200).json({
             total: count,
@@ -549,7 +537,6 @@ const publicacionesFilterQuery = async (req = request, res = response) => {
             pageSize,
             publicaciones,
         });
-
     } catch (error) {
         return res.status(500).json({
             ok: false,
