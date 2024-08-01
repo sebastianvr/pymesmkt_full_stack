@@ -8,12 +8,12 @@ const { ofertaDelete,
     ofertasCreadasGetById,
     ofertaGetById,
     getVentas,
+    getFileOferta,
 } = require('../controllers/oferta.controller');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
 
-// Obtener todas las ofertas recibidas
 router.get('/received/:idUsuario',
     [
         validarJWT,
@@ -49,7 +49,6 @@ router.get('/received/:idUsuario',
     ofertasRecibidasGetById
 );
 
-// Obtener todas las ofertas creadas 
 router.get('/created/:UsuarioId',
     [
         validarJWT,
@@ -139,5 +138,11 @@ router.get('/pagada/:UsuarioId', [
         })
         .withMessage('La fecha proporcionada no es válida'),
 ], getVentas);
+
+router.get('/file/:IdOferta', [
+    validarJWT,
+    param('IdOferta', 'El param id es obligatorio').not().isEmpty(),
+    validarCampos
+], getFileOferta);
 
 module.exports = router;
