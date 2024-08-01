@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs';
 import Swal from 'sweetalert2'
 
 import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { ModalOfferDetailComponent } from '../../components/modal-offer-detail/modal-offer-detail.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-publication-detail',
@@ -14,6 +16,7 @@ import { AuthService } from 'src/app/core/services/auth/auth.service';
 export class PublicationDetailComponent implements OnInit {
   publication!: any;
   idCurrentUser!: string;
+  @ViewChild('downloadLink') downloadLink!: ElementRef;
 
   garantiaMapa = {
     'true': 'Si',
@@ -23,13 +26,13 @@ export class PublicationDetailComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private modalService: NgbModal,
     private authService: AuthService,
     private publicacionService: PublicacionService,
   ) { }
 
   public ngOnInit() {
     this.idCurrentUser = this.authService.usuario.id;
-    console.log(this.idCurrentUser);
     this.activatedRoute.params
       .pipe(
         switchMap(({ id }) =>
@@ -38,7 +41,6 @@ export class PublicationDetailComponent implements OnInit {
       )
       .subscribe(({ publicacion }) => {
         this.publication = publicacion;
-        console.log(this.publication);
       });
   }
 
@@ -72,5 +74,25 @@ export class PublicationDetailComponent implements OnInit {
         this.router.navigate(['/user/see-publications']);
       }
     });
+  }
+
+  public downloadFile(url: string) {
+    const link: HTMLAnchorElement = this.downloadLink.nativeElement;
+    link.href = url;
+    link.download = ''; // Optional: set the download attribute to force the browser to download the file
+    link.click();
+  }
+
+  public async openOffer(publication: any) {
+    const modalRef = this.modalService.open(ModalOfferDetailComponent, { size: 'lg' });
+    modalRef.componentInstance.idOffer = publication.id;
+    modalRef.componentInstance.senderUserId = this.idCurrentUser;
+    modalRef.componentInstance.recipientdUserId = publication.UsuarioId;
+
+    const result = await modalRef.result;
+    if (result) {
+      // console.log({ result });
+      // this.closeResult = `Closed with: ${result}`;
+    }
   }
 }
