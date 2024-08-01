@@ -15,6 +15,11 @@
               <button ngbTooltip="Refrescar grafo" (click)="refresh()" class="btn btn-sm btn-primary float-start">
                 <img src="../../../../assets/icons/magic.svg" alt="magic.svg">
               </button>
+              <ng-container *ngIf="isEmptyGraph && !isLoading">
+                <div class="float-end">
+                  <app-simulation-modal></app-simulation-modal>
+                </div>
+              </ng-container>
             </div>
           </div>
 
@@ -46,15 +51,15 @@
                   <component-modal-help-graph></component-modal-help-graph>
                 </div>
                 <div class="card-body p-0">
-                  <div #divGraph  id="divGraph" style="width: 100%; height: 100vh;"
+                  <div #divGraph id="divGraph" style="width: 100%; height: 100vh;"
                     class="graph-container position-relative">
                     <div class="zoom-controls" style="width: 30px;">
                       <button class="btn-zoom-in btn btn-secondary btn-sm shadow-md" (click)="zoomIn()">
                         <img class="icon-button-style" src="../../../../assets/icons/plus-circle.svg"
                           alt="plus-circle.svg">
                       </button>
-                      <input id="zoomRange" #zoomRange type="range" class="zoom-slider" min="1" max="30" [(ngModel)]="zoomLevel"
-                        (input)="onZoomChange($event)">
+                      <input id="zoomRange" #zoomRange type="range" class="zoom-slider" min="1" max="30"
+                        [(ngModel)]="zoomLevel" (input)="onZoomChange($event)">
                       <button class="btn-zoom-out btn btn-secondary btn-sm shadow-md" (click)="zoomOut()">
                         <img class="icon-button-style" src="../../../../assets/icons/dash-circle.svg"
                           alt="dash-circle.svg">
