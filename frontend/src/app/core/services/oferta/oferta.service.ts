@@ -35,18 +35,17 @@ export class OfertaService {
     const queryString = Object.keys(queryParams)
       .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
       .join('&');
-      
+
     const urlWithQuery = `${this.url}/api/oferta/received/${id}?${queryString}`;
     return this.http.get<any>(urlWithQuery);
   }
- 
+
   getOfertasRealizadas(id: string, filters: any): Observable<any> {
-    console.log({id, filters})
     const queryParams = { ...filters };
     const queryString = Object.keys(queryParams)
       .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
       .join('&');
-      
+
     const urlWithQuery = `${this.url}/api/oferta/created/${id}?${queryString}`;
     return this.http.get<any>(urlWithQuery);
   }
@@ -56,8 +55,12 @@ export class OfertaService {
     const queryString = Object.keys(queryParams)
       .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
       .join('&');
-      
+
     const urlWithQuery = `${this.url}/api/oferta/pagada/${idUsuario}?${queryString}`;
     return this.http.get<any>(urlWithQuery);
+  }
+
+  getUrlOffer(idOferta: string): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/oferta/file/${idOferta}`);
   }
 }
