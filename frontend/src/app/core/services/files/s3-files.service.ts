@@ -28,11 +28,17 @@ export class S3FilesService {
     return this.http.post(`${this.url}/api/s3/reportFiles`, formData); 
   }
   
-  postNewPublicationFiles(files: File[]): Observable<any> {
+  postNewPublicationFiles(file: File): Observable<any> {
     const formData = new FormData();
-    for (let file of files) {
-      formData.append('files', file);
-    }
+    formData.append('file', file);
+    
     return this.http.post(`${this.url}/api/s3/publication`, formData); 
+  }
+  
+  postOfferFiles(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return this.http.post(`${this.url}/api/s3/offer`, formData); 
   }
 }
