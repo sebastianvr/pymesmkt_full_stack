@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { catchError, of } from 'rxjs';
 import { PrimeNGConfig } from 'primeng/api';
-import Swal from 'sweetalert2';
 import moment from 'moment';
+import JSZip from 'jszip';
 
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { S3FilesService } from 'src/app/core/services/files/s3-files.service';
 import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
-import { S3FilesService } from 'src/app/core/services/files/minio-files.service';
-import { catchError, of } from 'rxjs';
 import { MessageService } from 'src/app/core/services/message/message.service';
+
 
 @Component({
   selector: 'app-create-publication',
@@ -21,6 +22,12 @@ export class CreatePublicationComponent implements OnInit {
   uploadedFiles: any[] = [];
   selectedOption: string | null = null;
   publicationForm!: FormGroup
+  isOpLoading!: boolean;
+
+  maxTitleCharacters = 100;
+  maxDescriptionCharacters = 400;
+  remainingTitleCharacters!: number;
+  remainingDescriptionCharacters!: number;
 
   constructor(
     private fb: FormBuilder,
@@ -32,30 +39,56 @@ export class CreatePublicationComponent implements OnInit {
     private messageService: MessageService,
   ) { }
 
+  get titleControl(): AbstractControl | null {
+    return this.publicationForm.get('titulo');
+  }
+
+  get descriptionControl(): AbstractControl | null {
+    return this.publicationForm.get('descripcion');
+  }
+
   ngOnInit() {
     this.primengConfig.ripple = true;
     this.buildForm();
-    // console.log(this.authService.usuario.id);
   }
 
   private buildForm() {
     this.publicationForm = this.fb.group({
-      titulo: [, Validators.required],
-      descripcion: [, Validators.required],
+      titulo: ['', [
+        Validators.required,
+        Validators.maxLength(this.maxTitleCharacters)
+      ]],
+      descripcion: ['', [
+        Validators.required,
+        Validators.maxLength(this.maxDescriptionCharacters)
+      ]],
       productoOServicio: [, Validators.required],
       cantidad: [1, Validators.required],
-      precioPorUnidad: [,],
+      precioPorUnidad: [],
       totalPrecio: [, Validators.required],
-      modelo: [,],
-      color: [,],
+      color: ['', [Validators.maxLength(20)]],
+      modelo: ['', [Validators.maxLength(30)]],
       fechaInicio: [, Validators.required],
       fechaTermino: [, Validators.required],
       horasATrabajar: [,],
-      garantia: [false, Validators.required],
-      aniosGarantia: [,
-        // {value :null ,disabled: true}
-      ],
-      archivos: [null, []],
+      garantia: [true, Validators.required],
+      aniosGarantia: [],
+      archivos: [],
+    });
+
+    this.remainingTitleCharacters = this.maxTitleCharacters;
+    this.remainingDescriptionCharacters = this.maxDescriptionCharacters;
+
+    this.publicationForm.get('titulo')?.valueChanges.subscribe(value => {
+      this.remainingTitleCharacters = this.maxTitleCharacters - (value ? value.length : 0);
+    });
+
+    this.publicationForm.get('descripcion')?.valueChanges.subscribe(value => {
+      this.remainingDescriptionCharacters = this.maxDescriptionCharacters - (value ? value.length : 0);
+    });
+
+    this.publicationForm.get('garantia')?.valueChanges.subscribe(value => {
+      this.toggleGarantia(value);
     });
   }
 
@@ -64,83 +97,103 @@ export class CreatePublicationComponent implements OnInit {
       && this.publicationForm.get(campo)?.touched;
   }
 
+  private toggleGarantia(value: boolean) {
+    const aniosGarantiaControl = this.publicationForm.get('aniosGarantia');
+    if (value) {
+      aniosGarantiaControl?.setValidators([Validators.required]);
+    } else {
+      aniosGarantiaControl?.clearValidators();
+    }
+    aniosGarantiaControl?.updateValueAndValidity();
+  }
+
   public selectionToggle(option: string) {
     this.selectedOption = option;
-    if (option == 'Producto') {
-      this.publicationForm.reset();
+    this.publicationForm.reset();
+    this.publicationForm.setErrors(null);
 
-      this.publicationForm.patchValue({
-        titulo: 'Adquisición de articulos de aseo y ornato',
-        descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
-        productoOServicio: 'Producto',
-        cantidad: 1,
-        precioPorUnidad: null,
-        totalPrecio: 15000,
-        modelo: 'XL-Z22-4D1A-K',
-        color: 'Azul',
-        garantia: true,
-        aniosGarantia: 1,
-      });
-
-      this.publicationForm.setErrors(null);
-
-      // desabilitar atributos que no son para el formulario de producto
-      this.publicationForm.get('fechaInicio')?.disable();
-      this.publicationForm.get('fechaTermino')?.disable();
-      this.publicationForm.get('horasATrabajar')?.disable();
-
-      // habilito los atributos que pudiesen estar deshabilitados
-      this.publicationForm.get('cantidad')?.enable();
-      this.publicationForm.get('precioPorUnidad')?.enable();
-      this.publicationForm.get('modelo')?.enable();
-      this.publicationForm.get('color')?.enable();
-
-      this.publicationForm.patchValue({
-        productoOServicio: 'Producto',
-        cantidad: 1,
-        garantia: false,
-        aniosGarantia: null,
-      });
+    if (option === 'Producto') {
+      this.setProductForm();
+      // Descomentar para setear valores de ejemplo
+      // this.setProductoExampleValues();
     }
 
-    if (option == 'Servicio') {
-      // console.log(' Es Servicio')
-      this.publicationForm.reset();
-      this.publicationForm.setErrors(null);
-
-      //quitar estas lineas solo test
-      // this.formularioPublicacion.patchValue({
-      //   titulo: 'Adquisicion de articulos de aseo y ornato',
-      //   descripcion: 'La empresa XXXX necesita articulos para desempeñar sus funciones de aseo en la comuna de san antonio',
-      //   productoOServicio: 'Servicio',
-      //   totalPrecio: 15000,
-      //   fechaInicio: '',
-      //   fechaTermino: '',
-      //   horasATrabajar: 1,
-      //   garantia: false,
-      //   aniosGarantia: null,
-      //   archivos: 'archivo.zip',
-      //   UsuarioId: 'cb8bcb308b7ccf1',
-      // });
-
-      // Desabilitar atributos que no son para el formulario de servicio
-      this.publicationForm.get('cantidad')?.disable();
-      this.publicationForm.get('precioPorUnidad')?.disable();
-      this.publicationForm.get('modelo')?.disable();
-      this.publicationForm.get('color')?.disable();
-
-      // Habilito los atributos que pudiesen estar deshabilitados
-      this.publicationForm.get('fechaInicio')?.enable();
-      this.publicationForm.get('fechaTermino')?.enable();
-      this.publicationForm.get('horasATrabajar')?.enable();
-
-      this.publicationForm.patchValue({
-        productoOServicio: 'Servicio',
-        cantidad: 1,
-        garantia: false,
-        aniosGarantia: null,
-      });
+    if (option === 'Servicio') {
+      this.setServiceForm();
+      // Descomentar para setear valores de ejemplo
+      // this.setServicioExampleValues();
     }
+  }
+
+  private setProductForm() {
+    // Deshabilitar atributos que no son para el formulario de producto
+    this.publicationForm.get('fechaInicio')?.disable();
+    this.publicationForm.get('fechaTermino')?.disable();
+    this.publicationForm.get('horasATrabajar')?.disable();
+
+    // Habilitar los atributos que pudiesen estar deshabilitados
+    this.publicationForm.get('cantidad')?.enable();
+    this.publicationForm.get('precioPorUnidad')?.enable();
+    this.publicationForm.get('modelo')?.enable();
+    this.publicationForm.get('color')?.enable();
+
+    this.publicationForm.patchValue({
+      productoOServicio: 'Producto',
+      cantidad: 1,
+      garantia: true,
+      aniosGarantia: null,
+    });
+  }
+
+  private setServiceForm() {
+    // Deshabilitar atributos que no son para el formulario de servicio
+    this.publicationForm.get('cantidad')?.disable();
+    this.publicationForm.get('precioPorUnidad')?.disable();
+    this.publicationForm.get('modelo')?.disable();
+    this.publicationForm.get('color')?.disable();
+
+    // Habilitar los atributos que pudiesen estar deshabilitados
+    this.publicationForm.get('fechaInicio')?.enable();
+    this.publicationForm.get('fechaTermino')?.enable();
+    this.publicationForm.get('horasATrabajar')?.enable();
+
+    this.publicationForm.patchValue({
+      productoOServicio: 'Servicio',
+      cantidad: 1,
+      garantia: true,
+      aniosGarantia: null,
+    });
+  }
+
+  private setProductoExampleValues() {
+    this.publicationForm.patchValue({
+      titulo: 'Compra de Laptop Dell XPS 15',
+      descripcion: 'La empresa XYZ está en la búsqueda de laptops de alta gama para mejorar la eficiencia y el rendimiento de su equipo de desarrollo. Necesitan adquirir una Dell XPS 15, una computadora portátil de última generación conocida por su excelente combinación de potencia, portabilidad y diseño elegante. La Dell XPS 15 es ideal para desarrolladores que requieren una máquina robusta y confiable.',
+      productoOServicio: 'Producto',
+      cantidad: 5,
+      precioPorUnidad: 3033990,
+      totalPrecio: 3033990 * 5,
+      modelo: 'XPS 15 9500',
+      color: 'Plata',
+      garantia: true,
+      aniosGarantia: 2,
+      UsuarioId: 'cb8bcb308b7ccf1',
+    });
+  }
+
+  private setServicioExampleValues() {
+    this.publicationForm.patchValue({
+      titulo: 'Implementación de Estrategias de Sostenibilidad Ambiental para Empresas Tecnológicas',
+      descripcion: 'La empresa XYZ, un líder innovador en el sector tecnológico, busca un servicio de consultoría especializada en sostenibilidad ambiental. Este proyecto incluye una evaluación exhaustiva del impacto ambiental actual, el desarrollo de estrategias personalizadas para reducir el consumo energético y gestionar residuos, la implementación de tecnologías verdes, y la capacitación del personal.',
+      productoOServicio: 'Servicio',
+      totalPrecio: 75000,
+      fechaInicio: '2024-09-01',
+      fechaTermino: '2025-02-28',
+      horasATrabajar: 300,
+      garantia: false,
+      aniosGarantia: null,
+      UsuarioId: 'cb8bcb308b7ccf1',
+    });
   }
 
   public isGuaranteed() {
@@ -154,18 +207,18 @@ export class CreatePublicationComponent implements OnInit {
   }
 
   public onUpload(event: any) {
-    // console.log('this.uploadedFiles', this.uploadedFiles);
     for (let file of event.files) {
       this.uploadedFiles.push(file);
     }
   }
 
-  public sendPublication() {
+  public async sendPublication() {
     if (this.publicationForm.invalid) {
       this.publicationForm.markAllAsTouched();
       return;
     }
 
+    this.isOpLoading = true;
     const newPublication = {
       titulo: this.publicationForm.get('titulo')?.value,
       descripcion: this.publicationForm.get('descripcion')?.value,
@@ -180,7 +233,7 @@ export class CreatePublicationComponent implements OnInit {
       horasATrabajar: this.publicationForm.get('horasATrabajar')?.value,
       garantia: this.publicationForm.get('garantia')?.value,
       aniosGarantia: this.publicationForm.get('aniosGarantia')?.value,
-      archivos: this.publicationForm.get('archivos')?.value,
+      archivoAdjunto: this.publicationForm.get('archivos')?.value,
       UsuarioId: this.authService.usuario.id,
     };
 
@@ -192,54 +245,66 @@ export class CreatePublicationComponent implements OnInit {
 
     // Subir archivos a s3
     if (this.uploadedFiles.length > 0) {
-      console.log(this.uploadedFiles);
-      this.sendFiles();
+      try {
+        const filesPath = await this.zipAndUploadFiles();
+        newPublication.archivoAdjunto = filesPath;
+      } catch (error) {
+        this.messageService.showErrorMessage('Error al subir archivos');
+        this.isOpLoading = false;
+        return;
+      }
     }
 
-    // this.publicacionService.postPublicacion(newPublication).subscribe(data => {
-    //   // console.log(data)
-    //   if (data.ok === true) {
-    //     Swal.fire({
-    //       icon: 'success',
-    //       title: 'Publicación creada!',
-    //       showConfirmButton: false,
-    //       timer: 1200,
-    //     });
-    //     this.router.navigate([`user/publication-detail/${data.id}`]);
-    //   }
-    // });
-  }
-
-  private sendFiles() {
-    // Subir los archivos a Minio
-    this.s3FilesService.postNewPublicationFiles(this.uploadedFiles).pipe(
+    this.publicacionService.postPublicacion(newPublication).pipe(
       catchError(error => {
-        console.error('Error al subir archivos a Minio:', error);
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Hubo un problema al subir los archivos',
-          showConfirmButton: true
-        });
+        console.error('Error al crear la publicación:', error);
+        this.messageService.showErrorMessage('Error al intentar crear la publicación.');
+        this.isOpLoading = false;
         return of(null);
       })
-    ).subscribe((res: any) => {
-      console.log({ res });
-      if (res && res.filepaths) {
-        // const filepathsString = res.filepaths.join(', ');
-        // const newReport = {
-        //   titulo: this.reportForm.get('titulo')?.value,
-        //   mensaje: this.reportForm.get('descripcion')?.value,
-        //   documentos: filepathsString,
-        //   PublicacionId: publicationId,
-        //   UsuarioId: userId,
-        //   CompraId: compraId 
-        // };
+    ).subscribe(data => {
+      if (data.ok === true) {
+        this.messageService.showSuccessMessage('Publicación creada');
+        this.isOpLoading = false;
+        this.router.navigate([`user/publication-detail/${data.id}`]);
+      }
+    });
+  }
 
-        // console.log({ newReport });
+  private async zipAndUploadFiles() {
+    const zip = new JSZip();
+    this.uploadedFiles.forEach(file => {
+      zip.file(file.name, file);
+    });
 
-        // Guardar el reporte
+    return new Promise(async (resolve, reject) => {
+      try {
+        const zipBlob = await zip.generateAsync({
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: { level: 6 }
+        });
+        const zipFile = new File([zipBlob], 'archivos.zip', { type: 'application/zip' });
 
+        this.s3FilesService.postNewPublicationFiles(zipFile).pipe(
+          catchError(error => {
+            console.error('Error al subir archivos a s3:', error);
+            this.messageService.showErrorMessage('Error al intentar subir archivos');
+            reject(error);
+            return of(null);
+          })
+        ).subscribe((response: any) => {
+          if (response && response.filepath) {
+            const filePath = response.filepath;
+            resolve(filePath);
+          } else {
+            reject('No se obtuvieron rutas de archivo');
+          }
+        });
+      } catch (error) {
+        console.error('Error al crear el archivo zip:', error);
+        this.messageService.showErrorMessage('Hubo un problema al comprimir los archivos');
+        reject(error);
       }
     });
   }
