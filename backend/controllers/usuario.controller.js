@@ -2,14 +2,13 @@ const { response, request } = require('express');
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
 const db = require('../db/connection');
-const { minioClient } = require('../s3/connection');
 const { uid } = require('uid');
 const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
 const Pyme = require('../models/pyme');
 const DeleteUsuario = require('../models/deletedUsuario');
-const { getProfileUserImage } = require('./s3.controller');
+const { getUserImage } = require('./s3.controller');
 
 
 const usuariosGetAll = async (req = request, res = response) => {
@@ -56,7 +55,6 @@ const usuariosGetAll = async (req = request, res = response) => {
         ...baseFilter,
         ...additionalFilters
     };
-    // console.log({ filter });
 
     try {
         const { count, rows: usuarios } =
@@ -148,7 +146,6 @@ const usuariosGetAllSuspended = async (req = request, res = response) => {
         ...baseFilter,
         ...additionalFilters
     };
-    // console.log({ filter });
 
     try {
         const { count, rows: usuarios } =
@@ -230,7 +227,6 @@ const usuariosGetAllDeleted = async (req = request, res = response) => {
         };
     }
 
-    // console.log({ filter });
     try {
         const { count, rows: usuarios } =
             await DeleteUsuario.findAndCountAll({
@@ -336,7 +332,7 @@ const usuarioGet = async (req = request, res = response) => {
 
     const { id } = req.params;
     const transaction = await db.transaction();
-    
+
     try {
         const usuario = await Usuario.findByPk(id, {
             where: { estado: true },
@@ -356,18 +352,17 @@ const usuarioGet = async (req = request, res = response) => {
             });
         }
 
+        await transaction.commit();
+
         if (usuario.imagen) {
-            const url = await getProfileUserImage(usuario.imagen);
+            const url = await getUserImage(usuario.imagen);
             usuario.imagen = url;
         }
-        
-        // console.log({usuario});
-        await transaction.commit();
         return res.status(200).json(usuario);
 
     } catch (error) {
-        await transaction.rollback();
         console.error(error);
+        await transaction.rollback();
         return res.status(500).json({
             ok: false,
             msg: 'Error en el servidor, usuarioGet()',
@@ -429,11 +424,10 @@ const usuarioPut = async (req = request, res = response) => {
             dirEmpresa: userData.direccionEmpresa,
             descripcionEmpresa: userData.descripcionEmpresa,
         });
-        // console.log({ userMapped });
 
         // Actualiza los campos del usuario con la información proporcionada 
-        const userUdated =  await usuario.update(userMapped, { transaction });
-        
+        const userUdated = await usuario.update(userMapped, { transaction });
+
         // Si existe información de la empresa (Pyme) en la solicitud, y hay campos en pymeMapped, 
         // actualiza también esa información
         if (usuario.Pyme && Object.keys(pymeMapped).length > 0) {
@@ -444,8 +438,8 @@ const usuarioPut = async (req = request, res = response) => {
         await transaction.commit();
 
         // Prefirmar imagen si viene
-        if(userMapped.imagen){
-            const urlPresigned = await getProfileUserImage(userData.imagen);
+        if (userMapped.imagen) {
+            const urlPresigned = await getUserImage(userData.imagen);
             userUdated.imagen = urlPresigned;
         }
 
@@ -482,7 +476,6 @@ const usuarioDelete = async (req = request, res = response) => {
     const { id } = req.params
 
     try {
-        // buscar usuario
         const usuario = await Usuario.findByPk(id)
 
         if (!usuario) {
@@ -492,17 +485,12 @@ const usuarioDelete = async (req = request, res = response) => {
             })
         }
 
-        // Eliminar usuario
-        const usuarioEliminado = await Usuario.destroy({
-            where: { id }
-        })
 
-        // console.log('usuarioEliminado', usuarioEliminado)
+        await Usuario.destroy({ where: { id } });
+
         // copiar datos en una tabla usuariosEliminados
-        const myId = uid(10);
-
         const deleteUsuario = {
-            id: myId,
+            id: uid(10),
             nombreUsuario: usuario.nombreUsuario,
             apellidos: usuario.apellidos,
             emailUsuario: usuario.emailUsuario,
@@ -512,20 +500,21 @@ const usuarioDelete = async (req = request, res = response) => {
         };
 
         try {
-            await DeleteUsuario.create(deleteUsuario);
+            const userDeleted =  await DeleteUsuario.create(deleteUsuario);
+            
+            return res.status(200).json({
+                ok: true,
+                msg: 'Usuario eliminado de la bd',
+                userDeleted
+            });
         } catch (error) {
-            console.log(error)
+            console.error(error);
             return res.status(400).json({
                 ok: false,
-                msg: 'Error al añadir usuario a lista de eliminados'
+                msg: 'Error al añadir usuario a lista de eliminados',
+                error
             });
         }
-
-        return res.status(200).json({
-            ok: true,
-            msg: 'Usuario eliminado de la bd'
-        });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({
@@ -590,12 +579,11 @@ const usuarioSuspended = async (req = request, res = response) => {
             { where: { id } },
         );
 
-        // console.log('usuario', usuario);
         return res.status(200).json({
             ok: true,
             msg: 'Usuario suspendido de la bd',
+            usuario
         });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({
