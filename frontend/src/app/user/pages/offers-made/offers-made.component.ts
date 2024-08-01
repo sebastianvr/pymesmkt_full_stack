@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
@@ -25,6 +25,8 @@ export class OffersMadeComponent implements OnInit {
   totalPages!: number;
 
   filterForm! : FormGroup;
+  @ViewChild('downloadLink') downloadLink!: ElementRef;
+  isLoadingFile! : boolean;
 
   // Custom Pipe 
   garantiaMapa = {
@@ -193,5 +195,18 @@ export class OffersMadeComponent implements OnInit {
 
     console.log({ query });
     this.getOfertasById(query);
+  }
+
+  public downloadFile(idOffer : string) {
+    console.log({idOffer})
+    this.isLoadingFile = true;
+    this.ofertaService.getUrlOffer(idOffer).subscribe((data :any) =>{
+      console.log({data})
+      const link: HTMLAnchorElement = this.downloadLink.nativeElement;
+      link.href = data.oferta.archivo;
+      link.download = '';
+      link.click();
+      this.isLoadingFile = false;
+    });
   }
 }

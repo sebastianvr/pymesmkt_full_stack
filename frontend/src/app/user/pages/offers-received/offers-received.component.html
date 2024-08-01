@@ -94,86 +94,124 @@
                         </div>
                     </ng-container>
 
-
                     <ng-container *ngIf="!isEmptyOffersReceived && !isLoading  && !noSearchMatch">
                         <div *ngFor="let oferta of ofertas" class="containerPublicacion py-4">
                             <div class="card">
-                                <div class="card-body">
+                                <div class="card-header">
                                     <span class="text-muted float-end fst-italic">
                                         {{oferta.publicacion.createdAt | date : 'dd MMMM yyyy' : '+0000'}}
                                     </span>
-                                    <h3 class="fs-5 underline-link">
-                                        {{oferta.publicacion.titulo | uppercase}}
-                                    </h3>
-                                    <p class="m-0">Costo de mi(s) {{'producto' || 'servicio'}}(s):
-                                        <strong>
-                                            {{oferta.publicacion.precioTotal | currency : 'CLP'}}
-                                        </strong>
-                                    </p>
-
-                                    <a pTooltip="Ir a mi publicación" class="float-start"
-                                        [routerLink]="['/user/publication-detail/', oferta.publicacion.id]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd"
-                                                d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm5.854 8.803a.5.5 0 1 1-.708-.707L9.243 6H6.475a.5.5 0 1 1 0-1h3.975a.5.5 0 0 1 .5.5v3.975a.5.5 0 1 1-1 0V6.707z" />
-                                        </svg>
-                                    </a>
-
                                 </div>
+                                <div class="card-body">
+                                    <div class="row mx-1">
+                                        <h3 class="fs-5">
+                                            {{oferta.publicacion.titulo | uppercase}}
+                                            <a pTooltip="Ir a mi publicación" class="float-end"
+                                                [routerLink]="['/user/publication-detail/', oferta.publicacion.id]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd"
+                                                        d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm5.854 8.803a.5.5 0 1 1-.708-.707L9.243 6H6.475a.5.5 0 1 1 0-1h3.975a.5.5 0 0 1 .5.5v3.975a.5.5 0 1 1-1 0V6.707z" />
+                                                </svg>
+                                            </a>
+                                        </h3>
 
-                                <div class="card-footer">
-                                    <span class="py-2">Empresas ofertantes: </span>
-                                    <ngb-accordion *ngFor="let oferta of oferta.ofertas" #acc="ngbAccordion">
-                                        <ngb-panel title="{{oferta.Usuario.Pyme.nombrePyme}}">
-                                            <ng-template ngbPanelContent>
-                                                <div class="row my-1">
-                                                    <span class="text-muted text-end fst-italic">Creada el
-                                                        {{oferta.createdAt | date : 'dd MMMM yyyy' : '+0000'}}
-                                                    </span>
-                                                </div>
-                                                <p class=descriptionCard>
-                                                    {{oferta.mensaje}}
-                                                </p>
-                                                <div class="containerPrecio my-2">
-                                                    <h4 class="fs-4">Precio : {{oferta.precioOferta| currency : 'CLP'}}
-                                                    </h4>
-                                                </div>
-                                                <hr>
-                                                <div class="row mt-3">
-                                                    <span class="text-muted text-start fst-italic">Contacto :</span>
-                                                </div>
-                                                <table class="table table-hover">
-                                                    <tbody class="text-center">
-                                                        <tr>
-                                                            <td class="fw-bold">Dueño de la empresa</td>
-                                                            <td>{{ oferta.Usuario.nombreUsuario}}
-                                                                {{oferta.Usuario.apellidos}}
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="fw-bold">Email</td>
-                                                            <td>{{ oferta.Usuario.emailUsuario }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                                <div class="row py-2">
-                                                    <div class="col-12">
+                                        <div class="col-md-12">
+                                            <p class="fs-6">{{oferta.publicacion.descripcion}}</p>
+                                            <p class="float-end d-flex fs-6 fw-bold alert alert-info py-2 px-1 mb-0"
+                                                style="max-width: fit-content;">
+                                                Costo del {{oferta.publicacion.productoOServicio | lowercase}}:
+                                                {{oferta.publicacion.precioTotal | currency : 'CLP'}}
+                                            </p>
+                                        </div>
+                                    </div>
 
-                                                        <button type="button" (click)="eliminarOferta(oferta.id)"
-                                                            class="btn btn-danger float-start">Rechazar oferta
-                                                        </button>
-
-                                                        <button type="button"
-                                                            [routerLink]="['/user/offer-detail', oferta.id]"
-                                                            class="btn btn-primary float-end">Ir al detalle
-                                                        </button>
+                                    <div class="container">
+                                        <h5 class="fs-5">Empresas ofertantes :</h5>
+                                        <ngb-accordion *ngFor="let oferta of oferta.ofertas" #acc="ngbAccordion">
+                                            <ngb-panel title="{{oferta.Usuario.Pyme.nombrePyme}}">
+                                                <ng-template ngbPanelContent>
+                                                    <div class="row">
+                                                        <span class="text-muted text-end fst-italic">{{oferta.createdAt
+                                                            |
+                                                            date : 'dd MMMM yyyy' : '+0000'}}
+                                                        </span>
                                                     </div>
-                                                </div>
-                                            </ng-template>
-                                        </ngb-panel>
-                                    </ngb-accordion>
+                                                    <p class="fs-6 mt-2">
+                                                        <span class="text-muted fst-italic">Mensaje :</span><br>
+                                                        {{oferta.mensaje}}
+                                                    </p>
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <ng-container *ngIf="oferta.archivo">
+                                                            <div class="mb-3 mb-sm-0">
+                                                                <h3 class="fs-6"><strong>Archivos adjuntos</strong></h3>
+                                                                <button [disabled]="isLoadingFile"
+                                                                    class="btn btn-success btn-sm mt-1" type="button"
+                                                                    (click)="downloadFile(oferta.id)">
+                                                                    <ng-container *ngIf="!isLoadingFile">Descargar
+                                                                        <img class="icon-button-style"
+                                                                            src="../../../../assets/icons/download.svg"
+                                                                            alt="download.svg">
+                                                                    </ng-container>
+                                                                    <ng-container *ngIf="isLoadingFile">
+                                                                        Descargando...
+                                                                        <div class="spinner-border spinner-border-sm text-light"
+                                                                            role="status">
+                                                                            <span
+                                                                                class="visually-hidden">Loading...</span>
+                                                                        </div>
+                                                                    </ng-container>
+                                                                </button>
+                                                                <a #downloadLink style="display: none;"></a>
+                                                            </div>
+                                                        </ng-container>
+                                                        <p
+                                                            class="d-flex float-end fs-6 alert alert-info p-1 px-2 mb-0 fw-bold">
+                                                            Precio ofrecido:
+                                                            {{oferta.precioOferta | currency : 'CLP'}}
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="row mt-3">
+                                                        <span class="text-muted text-start fst-italic">Información de
+                                                            contacto:</span>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-hover mx-md-3">
+                                                                <tbody class="text-center">
+                                                                    <tr>
+                                                                        <td class="fw-bold">Representante de la empresa
+                                                                        </td>
+                                                                        <td>{{ oferta.Usuario.nombreUsuario}}
+                                                                            {{oferta.Usuario.apellidos}}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="fw-bold">Correo electrónico</td>
+                                                                        <td>{{ oferta.Usuario.emailUsuario }}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row py-2">
+                                                        <div class="col-md-12">
+                                                            <button type="button" (click)="eliminarOferta(oferta.id)"
+                                                                class="btn btn-danger float-start">Rechazar oferta
+                                                            </button>
+
+                                                            <button type="button"
+                                                                [routerLink]="['/user/offer-detail', oferta.id]"
+                                                                class="btn btn-primary float-end">Ver detalles
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+                                            </ngb-panel>
+                                        </ngb-accordion>
+                                    </div>
                                 </div>
+
+                                <div class="card-footer"></div>
                             </div>
                         </div>
                     </ng-container>

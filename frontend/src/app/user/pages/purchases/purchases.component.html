@@ -106,19 +106,19 @@
                             <div class="my-4" *ngFor="let item of this.purchases; let i = index">
                                 <div class="card">
                                     <div class="card-header pt-2">
-                                        <h5 class="float-start card-title fs-4 m-0"><a>{{'Comprobante' | uppercase}}</a>
+                                        <h5 class="float-start card-title fs-4 m-0"><a>{{'Comprobante de compra'}}</a>
                                         </h5>
                                         <h6 class="float-end alert alert-success d-inline-block mb-0 px-2 py-1"
                                             role="alert">
-                                            Compra finalizada con éxito.</h6>
+                                            Compra exitosa</h6>
                                     </div>
 
                                     <div class="card-body">
                                         <table class="tableResume table-hover table table-borderless">
                                             <tbody>
                                                 <tr>
-                                                    <td colspan="2" class="start-*"><strong>Código de
-                                                            autorización</strong>
+                                                    <td colspan="2" class="start-* fs-5 m-0"><strong>Código de
+                                                            autorización :</strong>
                                                     </td>
                                                     <td class="text-end">{{item.codAutorizacion}}</td>
                                                 </tr>
@@ -141,8 +141,36 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        
+                                        <hr class="m-0 my-3">
 
-                                        <hr class="m-0 mb-3">
+                                        <p class="fs-5 m-0 fw-bold">Empresa vendedora :</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-borderless tableResume">
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="2" class="start-*"><strong>Nombre</strong>
+                                                        </td>
+                                                        <td class="text-end">{{item.Ofertum.Usuario.Pyme.nombrePyme |
+                                                            titlecase}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="start-*"><strong>Representante</strong>
+                                                        </td>
+                                                        <td class="text-end">{{item.Ofertum.Usuario.nombreUsuario |
+                                                            titlecase}}
+                                                            {{item.Ofertum.Usuario.apellidos | titlecase}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="start-*"><strong>Correo
+                                                                electrónico</strong>
+                                                        </td>
+                                                        <td class="text-end">{{item.Ofertum.Usuario.emailUsuario}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
                                         <!-- Detalle de la publicacion -->
                                         <div class="container">
                                             <ngb-accordion #acc="ngbAccordion">
@@ -245,36 +273,9 @@
                                                 </ngb-panel>
                                             </ngb-accordion>
                                         </div>
+                                    </div>
 
-                                        <hr class="m-0 my-3">
-
-                                        <p class="fs-5 m-0 fw-bold">Información empresa vendedora :</p>
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-borderless tableResume">
-                                                <tbody>
-                                                    <tr>
-                                                        <td colspan="2" class="start-*"><strong>Nombre</strong>
-                                                        </td>
-                                                        <td class="text-end">{{item.Ofertum.Usuario.Pyme.nombrePyme |
-                                                            titlecase}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2" class="start-*"><strong>Representante</strong>
-                                                        </td>
-                                                        <td class="text-end">{{item.Ofertum.Usuario.nombreUsuario |
-                                                            titlecase}}
-                                                            {{item.Ofertum.Usuario.apellidos | titlecase}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2" class="start-*"><strong>Correo
-                                                                electrónico</strong>
-                                                        </td>
-                                                        <td class="text-end">{{item.Ofertum.Usuario.emailUsuario}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-
+                                    <div class="card-footer">
                                         <div class="col-lg-12">
 
                                             <button *ngIf="!item.CalificacionId" class="btn btn-primary float-end"
@@ -287,9 +288,7 @@
                                                 <span>Calificación enviada ✓</span>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="card-footer">
                                         <button *ngIf="!item.Reclamo" class="btn btn-danger float-start" type="button"
                                             (click)="openReportProblemModal(item, i)">Reportar problema
                                         </button>

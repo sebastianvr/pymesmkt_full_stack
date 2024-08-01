@@ -7,6 +7,7 @@ const Usuario = require('../models/usuario');
 const Oferta = require('../models/oferta');
 const Publicacion = require('../models/publicacion');
 const Pyme = require('../models/pyme');
+const { getOfferFile } = require('./s3.controller');
 
 
 const ofertaGetById = async (req = request, res = response) => {
@@ -29,16 +30,11 @@ const ofertaGetById = async (req = request, res = response) => {
                 },
                 {
                     model: Usuario,
-                    where: { estado: true },
-                    // include : { 
-                    //     model :  Pyme,
-                    //     where
-                    // }
+                    where: { estado: true }
                 }
             ]
         });
 
-        // console.log(oferta)
         if (!oferta) {
             return res.status(400).json({
                 ok: false,
@@ -125,7 +121,6 @@ const ofertasRecibidasGetById = async (req = request, res = response) => {
         ...additionalFilters.length > 0 ? { [Op.and]: additionalFilters } : {},
     };
 
-    // console.log({ filter });
     try {
         const { count, rows: ofertas } = await Oferta.findAndCountAll({
             where: filter,
@@ -265,12 +260,12 @@ const ofertasCreadasGetById = async (req = request, res = response) => {
             ]
         });
     }
-    
+
     const filter = {
         ...baseFilter,
         ...additionalFilters.length > 0 ? { [Op.and]: additionalFilters } : {},
     };
-    //  console.log({ filter });
+
     try {
         const { count, rows } =
             await Oferta.findAndCountAll({
@@ -330,22 +325,24 @@ const ofertaPost = async (req = request, res = response) => {
     const {
         mensaje,
         precioOferta,
+        archivo,
         PublicacionId,
         usuarioIdReceptor,
         UsuarioId
     } = req.body;
 
-    nuevaOferta = {
+    const newOffer = {
         id: uid(15),
         mensaje,
         precioOferta,
+        archivo,
         PublicacionId, /** Id de la publicación */
         usuarioIdReceptor,
         UsuarioId,
     };
 
     try {
-        const createdOferta = await Oferta.create(nuevaOferta);
+        const createdOffer = await Oferta.create(newOffer);
 
         // Incrementar la cantidad de ofertas recibidas en la publicación
         await Publicacion.increment('cantidadOfertasRecibidas', { where: { id: PublicacionId } });
@@ -353,7 +350,7 @@ const ofertaPost = async (req = request, res = response) => {
         return res.status(200).json({
             ok: true,
             msg: 'Oferta creada',
-            oferta: createdOferta
+            oferta: createdOffer
         });
 
     } catch (error) {
@@ -539,6 +536,49 @@ const ofertaDelete = async (req = request, res = response) => {
     }
 }
 
+const getFileOferta = async (req = request, res = response) => {
+    console.log('[oferta] fileOferta()');
+    const { IdOferta } = req.params;
+
+    if (!IdOferta) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'El id es obligatorio',
+        });
+    }
+
+    try {
+        const oferta = await Oferta.findByPk(IdOferta, {
+            attributes: ['archivo']
+        });
+
+        if (!oferta) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No existe oferta con este id',
+            });
+        }
+
+        if (oferta.archivo) {
+            const url = await getOfferFile(oferta.archivo);
+            oferta.archivo = url;
+        }
+
+        return res.status(200).json({
+            ok: true,
+            oferta,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor,  fileOferta()',
+            error,
+        });
+    }
+}
+
 module.exports = {
     ofertaGetById,
     ofertasRecibidasGetById,
@@ -547,4 +587,5 @@ module.exports = {
     ofertaPut,
     ofertaDelete,
     getVentas,
+    getFileOferta,
 };

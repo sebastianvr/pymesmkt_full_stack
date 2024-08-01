@@ -52,7 +52,7 @@ const Publicacion = db.define('Publicacion', {
         type: DataTypes.INTEGER
     },
     archivoAdjunto: {
-        type: DataTypes.BLOB
+        type: DataTypes.STRING
     },
 
     // ESTADOS DE COMPRA

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { S3FilesService } from './minio-files.service';
+import { S3FilesService } from './s3-files.service';
 
 describe('MinioFilesService', () => {
   let service: S3FilesService;

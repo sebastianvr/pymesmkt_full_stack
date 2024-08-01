@@ -5,7 +5,15 @@ const multer = require('multer');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const validateFiles = require('../middlewares/files/validate-file');
-const { uploadUserImage, getProfileUserImage, postReportFiles, postPublicationFiles } = require('../controllers/s3.controller');
+const {
+    postUserImage,
+    getUserImage,
+    getPublicationFile,
+    postPublicationFile,
+    postOfferFile,
+    getOfferFile,
+    postReportFile
+} = require('../controllers/s3.controller');
 const validateImageFile = require('../middlewares/files/validate-image');
 
 const router = Router();
@@ -16,8 +24,7 @@ const upload = multer({ storage });
 router.post('/uploadUserImage', [
     upload.single('image'),
     // validateImageFile,
-],
-    uploadUserImage
+], postUserImage
 );
 
 router.get('/profileImage', [
@@ -25,16 +32,37 @@ router.get('/profileImage', [
     query('image').notEmpty().withMessage('El parámetro image es obligatorio'),
     validarCampos,
     validateImageFile
-], getProfileUserImage);
+], getUserImage);
 
-router.post('/reportFiles', [
+router.get('/publication', [
     validarJWT,
-    validateFiles,
-], postReportFiles);
+    // query('image').notEmpty().withMessage('El parámetro image es obligatorio'),
+    validarCampos,
+    // validateImageFile
+], getPublicationFile);
 
 router.post('/publication', [
     validarJWT,
-    validateFiles
-], postPublicationFiles);
+    // validateFiles
+    upload.single('file')
+], postPublicationFile);
+
+router.get('/offer', [
+    validarJWT,
+    // query('image').notEmpty().withMessage('El parámetro image es obligatorio'),
+    validarCampos,
+    // validateImageFile
+], getOfferFile);
+
+router.post('/offer', [
+    validarJWT,
+    // validateFiles
+    upload.single('file')
+], postOfferFile);
+
+router.post('/reportFile', [
+    validarJWT,
+    validateFiles,
+], postReportFile);
 
 module.exports = router;

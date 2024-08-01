@@ -59,9 +59,16 @@
                             </label>
                             <input pInputText type="text" formControlName="titulo" class="form-control"
                                 id="titlePublication">
-                            <span *ngIf="invalidField('titulo')" class="form-text text-danger">
-                                El titulo es obligatorio
-                            </span>
+                            <div *ngIf="titleControl?.invalid && (titleControl?.dirty || titleControl?.touched)"
+                                class="text-danger">
+                                <small *ngIf="titleControl?.errors?.['required']">El titulo es obligatorio.</small>
+                                <small *ngIf="titleControl?.errors?.['maxlength']">El titulo no puede exceder los
+                                    100 caracteres.</small>
+                            </div>
+                            <div class="float-end" *ngIf="remainingTitleCharacters >= 0">
+                                <small class="text-success">{{ remainingTitleCharacters }} caracteres
+                                    restantes</small>
+                            </div>
                         </div>
 
                         <!-- Descripción -->
@@ -69,9 +76,17 @@
                             <label for="descriptionPublication" class="form-label">Descripción</label>
                             <textarea pInputTextarea class="form-control" formControlName="descripcion"
                                 id="descriptionPublication"></textarea>
-                            <span *ngIf="invalidField('descripcion')" class="form-text text-danger">
-                                La descripción es obligatoria.
-                            </span>
+                            <div *ngIf="descriptionControl?.invalid && (descriptionControl?.dirty || descriptionControl?.touched)"
+                                class="text-danger">
+                                <small *ngIf="descriptionControl?.errors?.['required']">La descripción es
+                                    requerido.</small>
+                                <small *ngIf="descriptionControl?.errors?.['maxlength']">La descripción no puede exceder
+                                    los 400 caracteres.</small>
+                            </div>
+                            <div class="float-end" *ngIf="remainingDescriptionCharacters >= 0">
+                                <small class="text-success">{{ remainingDescriptionCharacters }} caracteres
+                                    restantes</small>
+                            </div>
                         </div>
 
                         <!-- Color -->
@@ -80,6 +95,9 @@
                                 <a class="descripcionLabel text-muted">(Opcional)</a>
                             </label>
                             <input pInputText type="text" formControlName="color" class="form-control" id="colorInput">
+                            <small *ngIf="publicationForm.get('color')?.errors?.['maxlength'] && 
+                                (publicationForm.get('color')?.dirty || publicationForm.get('color')?.touched)"
+                                class="text-danger">Demasiado largo.</small>
                         </div>
 
                         <!-- Modelo -->
@@ -89,6 +107,9 @@
                             </label>
                             <input pInputText type="text" formControlName="modelo" class="form-control"
                                 id="modeloInput">
+                            <small *ngIf="publicationForm.get('modelo')?.errors?.['maxlength'] && 
+                                (publicationForm.get('modelo')?.dirty || publicationForm.get('modelo')?.touched)"
+                                class="text-danger">Demasiado largo.</small>
                         </div>
 
                         <!-- Garantía -->
@@ -112,14 +133,14 @@
 
                         <!-- Años de garantia -->
                         <div *ngIf="isGuaranteed()" class="col-md-6 mb-2">
-                            <label for="aniosGarantia" class="form-label">Años de garantía
-                                <a class="descripcionLabel text-muted">
-                                    (Opcional)
-                                </a>
-                            </label>
+                            <label for="aniosGarantia" class="form-label">Años de garantía</label>
                             <input pInputNumber type="number" formControlName="aniosGarantia" class="form-control"
-                                id="aniosGarantia" min="0">
+                                id="aniosGarantia">
+                            <span *ngIf="invalidField('aniosGarantia')" class="form-text text-danger">
+                                Ingresar años de garantía del producto.
+                            </span>
                         </div>
+
 
                         <!-- Cantidad de productos -->
                         <div class="col-md-6 mb-2">
@@ -170,7 +191,16 @@
                         <!-- Boton para enviar -->
                         <div class="row">
                             <div class="container mb-5">
-                                <button class="float-end btn btn-primary">Publicar</button>
+                                <button type="button" class="btn btn-primary float-end"
+                                    [disabled]="isOpLoading || publicationForm.invalid" (click)="sendPublication()">
+                                    <ng-container *ngIf="!isOpLoading">Publicar</ng-container>
+                                    <ng-container *ngIf="isOpLoading">
+                                        Publicando...
+                                        <div class="spinner-border spinner-border-sm text-light" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </ng-container>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -190,9 +220,16 @@
                             </label>
                             <input pInputText type="text" formControlName="titulo" class="form-control"
                                 id="titlePublication">
-                            <span *ngIf="invalidField('titulo')" class="form-text text-danger">
-                                El titulo es obligatorio.
-                            </span>
+                            <div *ngIf="titleControl?.invalid && (titleControl?.dirty || titleControl?.touched)"
+                                class="text-danger">
+                                <small *ngIf="titleControl?.errors?.['required']">El titulo es obligatorio.</small>
+                                <small *ngIf="titleControl?.errors?.['maxlength']">El titulo no puede exceder los
+                                    100 caracteres.</small>
+                            </div>
+                            <div class="float-end" *ngIf="remainingTitleCharacters >= 0">
+                                <small class="text-success">{{ remainingTitleCharacters }} caracteres
+                                    restantes</small>
+                            </div>
                         </div>
 
                         <!-- Descripcion -->
@@ -200,9 +237,17 @@
                             <label for="descriptionPublication" class="form-label">Descripción</label>
                             <textarea pInputTextarea class="form-control" formControlName="descripcion"
                                 id="descriptionPublication"></textarea>
-                            <span *ngIf="invalidField('descripcion')" class="form-text text-danger">
-                                La descripción es obligatoria.
-                            </span>
+                            <div *ngIf="descriptionControl?.invalid && (descriptionControl?.dirty || descriptionControl?.touched)"
+                                class="text-danger">
+                                <small *ngIf="descriptionControl?.errors?.['required']">La descripción es
+                                    requerido.</small>
+                                <small *ngIf="descriptionControl?.errors?.['maxlength']">La descripción no puede exceder
+                                    los 400 caracteres.</small>
+                            </div>
+                            <div class="float-end" *ngIf="remainingDescriptionCharacters >= 0">
+                                <small class="text-success">{{ remainingDescriptionCharacters }} caracteres
+                                    restantes</small>
+                            </div>
                         </div>
 
                         <!-- Garantia -->
@@ -226,17 +271,14 @@
 
                         <!-- Años de garantia -->
                         <div *ngIf="isGuaranteed()" class="col-md-6 mb-2">
-                            <label for="aniosGarantia" class="form-label">Años de garantía
-                                <a class="descripcionLabel text-muted">
-                                    (Opcional)
-                                </a>
-                            </label>
+                            <label for="aniosGarantia" class="form-label">Años de garantía</label>
                             <input pInputNumber type="number" formControlName="aniosGarantia" class="form-control"
                                 id="aniosGarantia">
                             <span *ngIf="invalidField('aniosGarantia')" class="form-text text-danger">
-                                Ingresar años de garantía del producto.
+                                Ingresar años de garantía del servicio.
                             </span>
                         </div>
+
 
                         <!-- Precio total -->
                         <div class="col-md-12 mb-2">
@@ -293,7 +335,7 @@
                         <!-- Subir archivos -->
                         <div class="my-3 col-md-12">
                             <label for="files[]" class="mb-2 fw-bold">Adjuntar archivos (máximo 8 archivos, máximo 15
-                                MB)</label>
+                                MB total)</label>
                             <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
                                 [showUploadButton]="false" (onSelect)="onUpload($event)" [multiple]="true"
                                 accept=".jpg,.jpeg,.png,.pdf,.zip" [maxFileSize]="15000000" [fileLimit]="8">
@@ -303,8 +345,16 @@
                         <!-- BOTON ENVIAR-->
                         <div class="row">
                             <div class="container mb-5">
-                                <button (click)="this.publicationForm.markAllAsTouched()"
-                                    class="float-end btn btn-primary">Publicar</button>
+                                <button type="button" class="btn btn-primary float-end"
+                                    [disabled]="isOpLoading || publicationForm.invalid" (click)="sendPublication()">
+                                    <ng-container *ngIf="!isOpLoading">Publicar</ng-container>
+                                    <ng-container *ngIf="isOpLoading">
+                                        Publicando...
+                                        <div class="spinner-border spinner-border-sm text-light" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </ng-container>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -312,11 +362,13 @@
                 <p-toast></p-toast>
             </div>
 
-            <!-- Ver json del formulario -->
-            <div class="container">
+            <!-- Debug Mode -->
+            <!-- <div class="container">
+                <span>publicationForm.value: </span>
                 <pre>{{publicationForm.value | json}}</pre>
-            </div>
-
+                <span>publicationForm.errors: </span>
+                <pre>{{publicationForm.errors | json}}</pre>
+            </div> -->
         </div>
     </div>
 </div>

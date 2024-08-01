@@ -4,7 +4,7 @@ const { uid } = require('uid');
 const { PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
-const uploadUserImage = async (req = request, res = response) => {
+const postUserImage = async (req = request, res = response) => {
     console.log('[s3] uploadUserImage()');
 
     try {
@@ -14,8 +14,8 @@ const uploadUserImage = async (req = request, res = response) => {
 
         const file = req.file;
         const fileName = `${uid()}.${file.originalname.split('.').pop()}`; // Genera un nombre único para el archivo
- 
-        const uploadParams = { 
+
+        const uploadParams = {
             Bucket: process.env.AWS_BUCKET_NAME,
             Key: `user-images/${fileName}`, // Carpeta dentro del bucket
             Body: file.buffer,
@@ -35,7 +35,7 @@ const uploadUserImage = async (req = request, res = response) => {
     }
 };
 
-const getProfileUserImage = async (imageName) => {
+const getUserImage = async (imageName) => {
     console.log('[s3] getProfileUserImage()');
 
     try {
@@ -45,8 +45,6 @@ const getProfileUserImage = async (imageName) => {
         };
 
         const command = new GetObjectCommand(params);
-
-        // console.log({ command });
         const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL válida por 1 hora
         return url;
 
@@ -68,71 +66,196 @@ const getProfileUserImage = async (imageName) => {
     }
 }
 
-const postReportFiles = async (req = request, res = response) => {
-    console.log('[minio] postReportFiles()');
+const getPublicationFile = async (zipName) => {
+    console.log('[s3] getDataPublication()');
 
     try {
-        const filepaths = await postReportFilesToMinio(req.files);
-        return res.status(200).json({
-            ok: true,
-            filepaths
-        });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            ok: false,
-            msg: 'Error interno del servidor postReportFiles()',
-            error
-        });
-    }
-}
-
-const postReportFilesToMinio = async (files) => {
-    console.log('[minio] postReportFilesToMinio()');
-}
-
-const postPublicationFiles = async (req = request, res = response) => {
-    console.log('[s3] postPublicationFiles()');
-    try {
-        const filepaths = await postFilesToS3(req.files, 'user-publications');
-        return res.status(200).json({
-            ok: true,
-            filepaths
-        });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            ok: false,
-            msg: 'Error interno del servidor postPublicationFiles()',
-            error
-        });
-    }
-}
-
-const postFilesToS3 = async (files, nameFolder) => {
-    const uploadPromises = files.map(async (file) => {
-        const fileName = `${uid()}.${file.originalname.split('.').pop()}`;
-        const uploadParams = {
+        const params = {
             Bucket: process.env.AWS_BUCKET_NAME,
-            Key: `${nameFolder}/${fileName}`, // Guardar en la carpeta nameFolder
-            Body: file.buffer,
-            ContentType: file.mimetype,
+            Key: `user-publications/${zipName}`
         };
 
-        const command = new PutObjectCommand(uploadParams);
-        await s3Client.send(command);
+        const command = new GetObjectCommand(params);
 
-        return fileName;
-    });
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL válida por 1 hora
+        return url;
 
-    return Promise.all(uploadPromises);
+    } catch (error) {
+        console.error(error);
+        if (error.code === 'NoSuchKey') {
+            return ({
+                ok: false,
+                msg: 'La información solicitada no existe',
+                error
+            });
+        }
+
+        return ({
+            ok: false,
+            msg: 'Error en el servidor, getDataPublication()',
+            error
+        });
+    }
+}
+
+const postPublicationFile = async (req = request, res = response) => {
+    console.log('[s3] postPublicationFile()');
+
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No se ha proporcionado ningún archivo'
+            });
+        }
+
+        const filepath = await postFileToS3(req.file, 'user-publications');
+        return res.status(200).json({
+            ok: true,
+            filepath
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor postPublicationFile()',
+            error
+        });
+    }
+}
+
+const getOfferFile = async (zipName) => {
+    console.log('[s3] getDataOffer()');
+
+    try {
+        const params = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: `user-offers/${zipName}`
+        };
+
+        const command = new GetObjectCommand(params);
+
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL válida por 1 hora
+        return url;
+
+    } catch (error) {
+        console.error(error);
+        if (error.code === 'NoSuchKey') {
+            return ({
+                ok: false,
+                msg: 'La información solicitada no existe',
+                error
+            });
+        }
+
+        return ({
+            ok: false,
+            msg: 'Error en el servidor, getDataOffer()',
+            error
+        });
+    }
+}
+
+const postOfferFile = async (req = request, res = response) => {
+    console.log('[s3] postOfferFile()');
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No se ha proporcionado ningún archivo'
+            });
+        }
+
+        const filepath = await postFileToS3(req.file, 'user-offers');
+        return res.status(200).json({
+            ok: true,
+            filepath
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor postOfferFile()',
+            error
+        });
+    }
+}
+
+const postFileToS3 = async (file, nameFolder) => {
+    const fileName = `${uid()}.${file.originalname.split('.').pop()}`;
+    const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${nameFolder}/${fileName}`,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+    };
+
+    const command = new PutObjectCommand(uploadParams);
+    await s3Client.send(command);
+
+    return fileName;
 };
 
+const postReportFile = async (req = request, res = response) => {
+    console.log('[s3] postReportFile()');
+
+    try {
+        const filepath = await postFileToS3(req.file, 'user-reports');
+        return res.status(200).json({
+            ok: true,
+            filepath
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor postReportFile()',
+            error
+        });
+    }
+}
+
+const getReportFile = async (zipName) => {
+    console.log('[s3] getReportFile()');
+
+    try {
+        const params = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: `user-reports/${zipName}`
+        };
+
+        const command = new GetObjectCommand(params);
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL válida por 1 hora
+        return url;
+
+    } catch (error) {
+        console.error(error);
+        if (error.code === 'NoSuchKey') {
+            return ({
+                ok: false,
+                msg: 'La información solicitada no existe',
+                error
+            });
+        }
+
+        return ({
+            ok: false,
+            msg: 'Error en el servidor, getReportFile()',
+            error
+        });
+    }
+}
+
 module.exports = {
-    uploadUserImage,
-    getProfileUserImage,
-    postReportFiles,
-    postPublicationFiles
+    postUserImage,
+    getUserImage,
+    postReportFile,
+    postPublicationFile,
+    getPublicationFile,
+    getOfferFile,
+    postOfferFile,
+    getReportFile,
 }

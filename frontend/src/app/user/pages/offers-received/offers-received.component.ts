@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
@@ -28,7 +28,8 @@ export class OffersReceivedComponent implements OnInit {
   closeResult: string = '';
 
   filterForm!: FormGroup;
-
+  @ViewChild('downloadLink') downloadLink!: ElementRef;
+  isLoadingFile!: boolean;
   constructor(
     private router: Router,
     private ofertaService: OfertaService,
@@ -72,7 +73,7 @@ export class OffersReceivedComponent implements OnInit {
     // console.log({ filters });
     this.ofertaService.getOfertasRecibidas(this.idUser, filters)
       .subscribe((data) => {
-        // console.log({ data });
+        console.log({ data });
         this.isLoading = false;
 
         if (data.noSearchMatch) {
@@ -87,7 +88,7 @@ export class OffersReceivedComponent implements OnInit {
             totalPages,
           } = data;
 
-          
+
           if (ofertas.length === 0) {
             this.isEmptyOffersReceived = true;
             this.noSearchMatch = false;
@@ -200,7 +201,7 @@ export class OffersReceivedComponent implements OnInit {
       this.filterForm.markAllAsTouched();
       return;
     }
-   
+
     const formValues = this.filterForm.value;
     const query = {
       [formValues.searchOption]: formValues.searchTerm,
@@ -211,4 +212,16 @@ export class OffersReceivedComponent implements OnInit {
     // console.log({ query });
     this.getOfertasById(query);
   }
+
+  public downloadFile(idOffer: string) {
+    this.isLoadingFile = true;
+    this.ofertaService.getUrlOffer(idOffer).subscribe((data: any) => {
+      const link: HTMLAnchorElement = this.downloadLink.nativeElement;
+      link.href = data.oferta.archivo;
+      link.download = '';
+      link.click();
+      this.isLoadingFile = false;
+    });
+  }
+
 }
