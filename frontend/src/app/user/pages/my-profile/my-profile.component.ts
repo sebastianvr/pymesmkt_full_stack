@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { catchError, of } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
-import { S3FilesService } from 'src/app/core/services/files/minio-files.service';
+import { S3FilesService } from 'src/app/core/services/files/s3-files.service';
 
 import { MessageService } from 'src/app/core/services/message/message.service';
 import { RegionesComunasService } from 'src/app/core/services/regiones-comunas/regiones-comunas.service';

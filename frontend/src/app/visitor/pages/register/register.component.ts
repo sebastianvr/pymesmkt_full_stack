@@ -5,7 +5,7 @@ import { catchError, concatMap, of } from 'rxjs';
 import Swal from 'sweetalert2';
 
 import { AuthService } from 'src/app/core/services/auth/auth.service';
-import { S3FilesService } from 'src/app/core/services/files/minio-files.service';
+import { S3FilesService } from 'src/app/core/services/files/s3-files.service';
 import { RegionesComunasService } from 'src/app/core/services/regiones-comunas/regiones-comunas.service';
 import { RunValidatorService } from 'src/app/core/validations/run-validator/run-validator.service';
 import { RutValidatorService } from 'src/app/core/validations/rut-validator/rut-validator.service';

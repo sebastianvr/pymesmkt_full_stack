@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from 'primeng/api';
 import { catchError, finalize, of } from 'rxjs';
-import { S3FilesService } from 'src/app/core/services/files/minio-files.service';
+import { S3FilesService } from 'src/app/core/services/files/s3-files.service';
 import { ReclamoService } from 'src/app/core/services/reclamo/reclamo.service';
 import Swal from 'sweetalert2';
 
