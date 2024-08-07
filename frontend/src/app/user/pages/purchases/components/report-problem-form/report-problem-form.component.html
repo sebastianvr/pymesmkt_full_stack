@@ -4,43 +4,74 @@
         <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()">
         </button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body mx-2">
         <div class="col-12 mb-3">
-            <label for="address2" class="form-label fw-bold">Titulo</label>
+            <label for="address2" class="form-label fw-bold">Título</label>
             <input type="text" class="form-control" id="address2" formControlName="titulo">
-            <span *ngIf="fieldInvalidFormReport('titulo')" class="form-text text-danger">
-                El titulo es obligatorio.
-            </span>
+            <div *ngIf="titleControl?.invalid && (titleControl?.dirty || titleControl?.touched)" class="text-danger">
+                <small *ngIf="titleControl?.errors?.['required']">El título es obligatorio.</small>
+                <small *ngIf="titleControl?.errors?.['maxlength']">El título no puede exceder los
+                    {{maxTitleCharacters}} caracteres.</small>
+            </div>
+            <div class="float-end" *ngIf="remainingTitleCharacters >= 0">
+                <small class="text-success">{{ remainingTitleCharacters }} caracteres
+                    restantes</small>
+            </div>
         </div>
 
         <div class="col-12 mb-3">
             <label for="addresDescription" class="form-label fw-bold">Descripción</label>
             <textarea class="form-control" placeholder="Redacta el problema que ha ocurrido." id="addresDescription"
-                formControlName="descripcion"></textarea>
-            <span *ngIf="fieldInvalidFormReport('descripcion')" class="form-text text-danger">
-                La descripcion es obligatoria.
-            </span>
+                formControlName="descripcion" rows="5"></textarea>
+            <div *ngIf="descriptionControl?.invalid && (descriptionControl?.dirty || descriptionControl?.touched)"
+                class="text-danger">
+                <small *ngIf="descriptionControl?.errors?.['required']">La descripción es obligatoria.</small>
+                <small *ngIf="descriptionControl?.errors?.['maxlength']">La descripción no puede exceder los
+                    {{maxDescriptionCharacters}} caracteres.</small>
+            </div>
+            <div class="float-end" *ngIf="remainingDescriptionCharacters >= 0">
+                <small class="text-success">{{ remainingDescriptionCharacters }} caracteres
+                    restantes</small>
+            </div>
         </div>
 
         <div class="container p-0">
             <div class="mb-3 col-md-12">
                 <label for="files[]" class="mb-2 fw-bold">Adjuntar archivos (máximo 8 archivos, máximo 15 MB)</label>
                 <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false" [showUploadButton]="false"
-                    (onSelect)="onUpload($event)" [multiple]="true" accept=".jpg,.jpeg,.png,.pdf,.zip"
-                    [maxFileSize]="15000000" [fileLimit]="8">
+                    (onSelect)="onUpload($event)" (onRemove)="onRemove($event)" [multiple]="true"
+                    accept=".jpg,.jpeg,.png,.pdf,.zip" [maxFileSize]="15000000" [fileLimit]="8">
                 </p-fileUpload>
+                <!-- <div *ngIf="archivosControl?.invalid && (archivosControl?.dirty || archivosControl?.touched)"
+                    class="text-danger">
+                    <small *ngIf="archivosControl?.errors?.['required']">Adjuntar al menos un archivo es
+                        obligatorio.</small>
+                </div> -->
             </div>
         </div>
 
         <!-- Formulario FORMATO JSON -->
-        <div class="container">
+        <!-- <div class="container">
             <span>reportForm.value :</span>
             <pre>{{reportForm.value | json}}</pre>
             <span>reportForm.errors :</span>
-            <pre>{{reportForm.errors | json}}</pre>
-        </div>
+            <pre>{{reportForm.activeModalerrors | json}}</pre>
+        </div> -->
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary float-start" [disabled]="reportForm.invalid">Enviar</button>
+        <button (click)="closeModal()" type="button" class="btn btn-secondary">
+            Cerrar
+        </button>
+
+        <button type="button" class="btn btn-primary" [disabled]="isLoading || reportForm.invalid"
+            (click)="sendReport()">
+            <ng-container *ngIf="!isLoading">Enviar</ng-container>
+            <ng-container *ngIf="isLoading">
+                Enviando...
+                <div class="spinner-border spinner-border-sm text-light" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </ng-container>
+        </button>
     </div>
 </form>
