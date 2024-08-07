@@ -51,7 +51,7 @@ export class ModalArchivingComponent implements OnInit {
   }
 
   private setExampleMessage(): void {
-    const exampleMessage = 'Este es un mensaje de ejemplo para la resolución del reclamo.';
+    const exampleMessage = 'Nos complace informar que el reclamo presentado ha sido resuelto de manera satisfactoria. Ambas partes han acordado los términos de la solución, asegurando que todas las preocupaciones fueron atendidas. Agradecemos a ambas pymes por su cooperación y disposición para llegar a un acuerdo amistoso';
     this.reportForm.get('mensaje')?.setValue(exampleMessage);
   }
 
@@ -80,7 +80,10 @@ export class ModalArchivingComponent implements OnInit {
           if (response && response.ok) {
             this.messageService.showSuccessMessage('Reclamo archivado.');
             this.idReportDeleted.emit(this.idReport); // Emitir el ID del reclamo eliminado
-            this.activeModal.close(this.reportForm.value);
+            this.activeModal.close({
+              idReport: this.idReport,
+              reportForm: this.reportForm.value
+            });
           }
         });
     }
