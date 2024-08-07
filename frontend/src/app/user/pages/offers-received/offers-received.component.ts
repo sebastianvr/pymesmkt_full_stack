@@ -70,10 +70,9 @@ export class OffersReceivedComponent implements OnInit {
 
   private getOfertasById(filters: any) {
     this.isLoading = true;
-    // console.log({ filters });
+
     this.ofertaService.getOfertasRecibidas(this.idUser, filters)
       .subscribe((data) => {
-        console.log({ data });
         this.isLoading = false;
 
         if (data.noSearchMatch) {
@@ -88,7 +87,6 @@ export class OffersReceivedComponent implements OnInit {
             totalPages,
           } = data;
 
-
           if (ofertas.length === 0) {
             this.isEmptyOffersReceived = true;
             this.noSearchMatch = false;
@@ -102,7 +100,6 @@ export class OffersReceivedComponent implements OnInit {
             this.noSearchMatch = false;
           }
         }
-
         this.isLoading = false;
       });
   }
@@ -196,7 +193,6 @@ export class OffersReceivedComponent implements OnInit {
   }
 
   public sendForm() {
-    // console.log('sendForm()');
     if (this.filterForm.invalid) {
       this.filterForm.markAllAsTouched();
       return;
@@ -209,7 +205,6 @@ export class OffersReceivedComponent implements OnInit {
       pageSize: this.pageSize,
     };
 
-    // console.log({ query });
     this.getOfertasById(query);
   }
 

@@ -17,7 +17,7 @@ export class PurchasesComponent implements OnInit {
   purchases: any;
 
   page: number = 1;
-  pageSize: number = 20;
+  pageSize: number = 5;
   isLoading!: boolean;
   total: any;
   currentPage!: number;
@@ -174,28 +174,49 @@ export class PurchasesComponent implements OnInit {
   }
 
   public async openReportProblemModal(report: any, index: number) {
-    // console.log({ report });
-    const modalRef = this.modalService.open(ReportProblemFormComponent,
-      { centered: true, size: 'xl' }
-    );
+    const modalRef = this.modalService.open(
+      ReportProblemFormComponent,
+      {
+        centered: true,
+        size: 'xl',
+        backdrop: 'static'
+      });
     modalRef.componentInstance.report = report;
 
-    const resultReport = await modalRef.result;
-    if (resultReport) {
-      this.purchases[index].Reclamo = { id: report };
+    try {
+      const resultReport = await modalRef.result;
+      if (resultReport) {
+        console.log({ resultReport });
+        this.purchases[index].Reclamo = { id: report };
+      }
+    } catch (error) {
+      if (error !== 'Cross click' && error !== 1) {
+        console.error('Error inesperado:', error);
+      }
     }
   }
 
   public async openQualifySeller(purchase: any, index: number) {
-    const modalRef = this.modalService.open(VendorQualificationFormComponent,
-      { centered: true }
-    );
+    const modalRef = this.modalService.open(
+      VendorQualificationFormComponent,
+      {
+        centered: true,
+        backdrop: 'static',
+        size: 'xl',
+      });
     modalRef.componentInstance.purchase = purchase;
 
-    const calificationId = await modalRef.result;
-    if (calificationId) {
-      this.purchases[index].CalificacionId = calificationId;
+    try {
+
+      const calificationId = await modalRef.result;
+      if (calificationId) {
+        this.purchases[index].CalificacionId = calificationId;
+      }
+
+    } catch (error) {
+      if (error !== 'Cross click' && error !== 1) {
+        console.error('Error inesperado:', error);
+      }
     }
   }
-
 }

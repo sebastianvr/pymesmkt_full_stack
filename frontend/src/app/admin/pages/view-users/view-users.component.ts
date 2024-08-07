@@ -123,8 +123,8 @@ export class ViewUsersComponent implements OnInit {
         });
 
         swalWithBootstrapButtons.fire(
-          'Eliminado',
-          'Este usuario ha sido eliminado del sistema.',
+          'Suspendido',
+          'Este usuario ha sido suspendido.',
           'success',
         );
       }

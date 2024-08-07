@@ -353,8 +353,52 @@ const toTitleCase = (str) => {
     );
 };
 
+const getFileCompra = async (req = request, res = response) => {
+    console.log('[oferta] fileOferta()');
+    const { IdOferta } = req.params;
+
+    if (!IdOferta) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'El id es obligatorio',
+        });
+    }
+
+    try {
+        const oferta = await Oferta.findByPk(IdOferta, {
+            attributes: ['archivo']
+        });
+
+        if (!oferta) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No existe oferta con este id',
+            });
+        }
+
+        if (oferta.archivo) {
+            const url = await getOfferFile(oferta.archivo);
+            oferta.archivo = url;
+        }
+
+        return res.status(200).json({
+            ok: true,
+            oferta,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor,  fileOferta()',
+            error,
+        });
+    }
+}
+
 module.exports = {
     compraPost,
     dataGraphGet,
     comprasGetById,
+    getFileCompra
 };

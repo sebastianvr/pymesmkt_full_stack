@@ -100,10 +100,10 @@
                                             [rotate]="true" [boundaryLinks]="true">
                                         </ngb-pagination>
                                     </div>
-                                </div>¡
+                                </div>
                             </div>
 
-                            <div class="my-4" *ngFor="let item of this.purchases; let i = index">
+                            <div class="my-1" *ngFor="let item of this.purchases; let i = index">
                                 <div class="card">
                                     <div class="card-header pt-2">
                                         <h5 class="float-start card-title fs-4 m-0"><a>{{'Comprobante de compra'}}</a>
@@ -141,7 +141,7 @@
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        
+
                                         <hr class="m-0 my-3">
 
                                         <p class="fs-5 m-0 fw-bold">Empresa vendedora :</p>
@@ -278,12 +278,15 @@
                                     <div class="card-footer">
                                         <div class="col-lg-12">
 
-                                            <button *ngIf="!item.CalificacionId" class="btn btn-primary float-end"
-                                                type="button" (click)="openQualifySeller(item, i)">Calificar
-                                                colaboración
+                                            <button *ngIf="!item.CalificacionId"
+                                                class="btn btn-primary float-end d-flex align-items-center"
+                                                type="button" (click)="openQualifySeller(item, i)">
+                                                Calificar colaboración
+                                                <img src="../../../../assets/icons/star.svg" alt="star.svg"
+                                                    class="ms-2 star-icon" style="filter: invert(100%);">
                                             </button>
 
-                                            <div *ngIf="item.CalificacionId" class="py-1 alert alert-success float-end"
+                                            <div *ngIf="item.CalificacionId" class="py-1 mb-0 alert alert-success float-end"
                                                 role="alert">
                                                 <span>Calificación enviada ✓</span>
                                             </div>
@@ -291,10 +294,12 @@
 
                                         <button *ngIf="!item.Reclamo" class="btn btn-danger float-start" type="button"
                                             (click)="openReportProblemModal(item, i)">Reportar problema
+                                            <img src="../../../../assets/icons/thumb-down.svg" alt="thumb-down.svg"
+                                                class="ms-2 star-icon" style="filter: invert(100%);">
                                         </button>
                                         <div *ngIf="item.Reclamo" class="py-1 my-0 alert alert-warning float-start"
                                             role="alert">
-                                            <span>Tu reclamo está en revisión.</span>
+                                            <span>Tu reclamo está en revisión</span>
                                         </div>
                                     </div>
                                 </div>

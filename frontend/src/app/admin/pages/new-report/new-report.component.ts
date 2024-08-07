@@ -64,9 +64,7 @@ export class NewReportComponent implements OnInit {
 
   private getReportsByFilters(filters: any) {
     this.isLoading = true;
-    // console.log({ filters });
     this.reclamoService.getAllReclamos(filters).subscribe(res => {
-      // console.log({ res });
       this.isLoading = false;
 
       if (res.noSearchMatch) {
@@ -109,7 +107,6 @@ export class NewReportComponent implements OnInit {
   }
 
   public sendForm() {
-    // console.log('sendForm()');
     if (this.filterForm.invalid) {
       this.filterForm.markAllAsTouched();
       return;
@@ -120,8 +117,7 @@ export class NewReportComponent implements OnInit {
       [formValues.searchOption]: formValues.searchTerm,
       ...this.initQuery
     };
-
-    // console.log({ query });
+    
     this.getReportsByFilters(query);
   }
 
@@ -143,9 +139,13 @@ export class NewReportComponent implements OnInit {
     modalRef.componentInstance.detailReport = report;
 
     try {
-      await modalRef.result;
+      const resultModelDetail = await modalRef.result;
+      if (resultModelDetail)
+        this.reports =
+          this.reports.filter((report: any) => report.id !== resultModelDetail.idReport);
+
     } catch (error) {
-      // console.error({ error });
+      // console.error(error);
     }
   }
 
@@ -165,7 +165,7 @@ export class NewReportComponent implements OnInit {
     try {
       await modalRef.result;
     } catch (error) {
-      // console.error({ error });
+      // console.error(error);
     }
   }
 

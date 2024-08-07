@@ -27,7 +27,7 @@ export class ReclamoService {
     const urlWithQuery = `${this.url}/api/reclamo/?${queryString}`;
     return this.http.get<any>(urlWithQuery);
   }
-  
+
   getAllFinishedReclamos(filters: any) {
     const queryParams = { ...filters };
     const queryString = Object.keys(queryParams)
@@ -44,5 +44,9 @@ export class ReclamoService {
 
   updateAdminMessage(id: any, mensajeAdmin: string): Observable<any> {
     return this.http.put<any>(`${this.url}/api/reclamo/${id}/admin-message`, { mensajeAdmin });
+  }
+
+  getUrlFile(fileName: string) {
+    return this.http.get<any>(`${this.url}/api/reclamo/file/${fileName}`);
   }
 }

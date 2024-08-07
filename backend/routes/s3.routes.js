@@ -22,6 +22,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.post('/uploadUserImage', [
+    validarJWT,
     upload.single('image'),
     // validateImageFile,
 ], postUserImage
@@ -60,9 +61,10 @@ router.post('/offer', [
     upload.single('file')
 ], postOfferFile);
 
-router.post('/reportFile', [
+router.post('/report-file', [
     validarJWT,
-    validateFiles,
+    // validateFiles,
+    upload.single('file')
 ], postReportFile);
 
 module.exports = router;

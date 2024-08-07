@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { check, query } = require('express-validator');
+const { check, query, param } = require('express-validator');
 
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
@@ -9,6 +9,7 @@ const {
     reclamoUpdateAdminMessage,
     reclamosFinishedGetAll
 } = require('../controllers/reclamo.controller');
+const { getReportFile } = require('../controllers/s3.controller');
 
 const router = Router();
 
@@ -69,5 +70,11 @@ router.put('/:id/admin-message/', [
     check('mensajeAdmin', 'El mensaje del admin es obligatorio').not().isEmpty(),
     validarCampos,
 ], reclamoUpdateAdminMessage);
+
+router.get('/file/:fileName', [
+    validarJWT,
+    param('fileName', 'El param fileName es obligatorio').not().isEmpty(),
+    validarCampos
+], getReportFile);
 
 module.exports = router;
