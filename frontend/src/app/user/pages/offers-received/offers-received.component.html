@@ -104,7 +104,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row mx-1">
-                                        <h3 class="fs-5">
+                                        <h3 class="fs-5 mt-3">
                                             {{oferta.publicacion.titulo | uppercase}}
                                             <a pTooltip="Ir a mi publicación" class="float-end"
                                                 [routerLink]="['/user/publication-detail/', oferta.publicacion.id]">
@@ -172,37 +172,47 @@
                                                         </p>
                                                     </div>
 
-                                                    <div class="row mt-3">
+                                                    <div class="mt-3">
                                                         <span class="text-muted text-start fst-italic">Información de
                                                             contacto:</span>
-                                                        <div class="table-responsive">
-                                                            <table class="table table-hover mx-md-3">
-                                                                <tbody class="text-center">
-                                                                    <tr>
-                                                                        <td class="fw-bold">Representante de la empresa
-                                                                        </td>
-                                                                        <td>{{ oferta.Usuario.nombreUsuario}}
-                                                                            {{oferta.Usuario.apellidos}}
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td class="fw-bold">Correo electrónico</td>
-                                                                        <td>{{ oferta.Usuario.emailUsuario }}</td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
+                                                        <div class="d-flex justify-content-between">
+                                                            <div class="table-responsive p-1 m-1 alert alert-info">
+                                                                <table class="table table-borderless mb-0">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td class="fw-bold text-start">Representante
+                                                                                de la empresa
+                                                                            </td>
+                                                                            <td class="text-end">{{
+                                                                                oferta.Usuario.nombreUsuario}}
+                                                                                {{oferta.Usuario.apellidos}}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="fw-bold text-start">Correo
+                                                                                electrónico</td>
+                                                                            <td class="text-end">{{
+                                                                                oferta.Usuario.emailUsuario }}</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="row py-2">
+                                                    <div class="row pt-2">
                                                         <div class="col-md-12">
-                                                            <button type="button" (click)="eliminarOferta(oferta.id)"
-                                                                class="btn btn-danger float-start">Rechazar oferta
-                                                            </button>
+                                                            <div class="btn-group float-end" role="group"
+                                                                aria-label="Basic example">
+                                                                <button type="button"
+                                                                    (click)="eliminarOferta(oferta.id)"
+                                                                    class="btn btn-danger">Rechazar oferta
+                                                                </button>
 
-                                                            <button type="button"
-                                                                [routerLink]="['/user/offer-detail', oferta.id]"
-                                                                class="btn btn-primary float-end">Ver detalles
-                                                            </button>
+                                                                <button type="button"
+                                                                    [routerLink]="['/user/offer-detail', oferta.id]"
+                                                                    class="btn btn-primary">Ver detalles
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </ng-template>
