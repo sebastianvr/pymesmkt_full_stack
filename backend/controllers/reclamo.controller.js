@@ -22,6 +22,7 @@ const reclamosGetAll = async (req = request, res = response) => {
 
     const baseFilter = {
         estado: true,
+        mensajeAdmin : null,
     };
 
     const additionalFilters = [];
@@ -382,6 +383,49 @@ const reclamoUpdateAdminMessage = async (req = request, res = response) => {
     }
 };
 
+const getFileReport = async (req = request, res = response) => {
+    console.log('[oferta] getFileReport()');
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'El id es obligatorio',
+        });
+    }
+
+    try {
+        const oferta = await Reclamo.findByPk(IdOferta, {
+            attributes: ['archivo']
+        });
+
+        if (!oferta) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No existe oferta con este id',
+            });
+        }
+
+        if (oferta.archivo) {
+            const url = await getOfferFile(oferta.archivo);
+            oferta.archivo = url;
+        }
+
+        return res.status(200).json({
+            ok: true,
+            oferta,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor,  getFileReport()',
+            error,
+        });
+    }
+}
+
 module.exports = {
     reclamosGetAll,
     reclamoPost,
@@ -389,4 +433,5 @@ module.exports = {
     reclamoDelete,
     reclamoUpdateAdminMessage,
     reclamosFinishedGetAll,
+    getFileCompra: getFileReport
 };
