@@ -202,6 +202,13 @@ const postReportFile = async (req = request, res = response) => {
     console.log('[s3] postReportFile()');
 
     try {
+        if (!req.file) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No se ha proporcionado ningún archivo'
+            });
+        }
+
         const filepath = await postFileToS3(req.file, 'user-reports');
         return res.status(200).json({
             ok: true,
@@ -218,34 +225,46 @@ const postReportFile = async (req = request, res = response) => {
     }
 }
 
-const getReportFile = async (zipName) => {
+const getReportFile = async (req = request, res = response) => {
     console.log('[s3] getReportFile()');
+
+    const { fileName } = req.params;
 
     try {
         const params = {
             Bucket: process.env.AWS_BUCKET_NAME,
-            Key: `user-reports/${zipName}`
+            Key: `user-reports/${fileName}`
         };
 
         const command = new GetObjectCommand(params);
         const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // URL válida por 1 hora
-        return url;
 
-    } catch (error) {
-        console.error(error);
-        if (error.code === 'NoSuchKey') {
-            return ({
-                ok: false,
-                msg: 'La información solicitada no existe',
-                error
+        if (url) {
+            return res.status(200).json({
+                ok: true,
+                url,
             });
         }
 
-        return ({
+        return res.status(404).json({
+            ok: false,
+            msg: 'No existe archivos',
+        });
+    } catch (error) {
+        console.error(error);
+        if (error.code === 'NoSuchKey') {
+            return res.status(500).json(({
+                ok: false,
+                msg: 'La información solicitada no existe',
+                error
+            }));
+        }
+
+        return res.status(500).json(({
             ok: false,
             msg: 'Error en el servidor, getReportFile()',
             error
-        });
+        }));
     }
 }
 
