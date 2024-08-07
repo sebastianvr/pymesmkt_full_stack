@@ -55,7 +55,7 @@ export class SidebarAdminComponent implements OnInit {
             routerLink: '/admin/new-reports',
           },
           {
-            label: 'Reclamos finalizados',
+            label: 'Reclamos archivados',
             icon: 'pi pi-fw pi-bookmark-fill',
             routerLink: '/admin/finished-reports',
           },
