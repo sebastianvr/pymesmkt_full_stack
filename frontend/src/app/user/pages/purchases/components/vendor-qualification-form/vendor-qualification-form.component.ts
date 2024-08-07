@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { catchError, finalize, of } from 'rxjs';
 import { CalificacionService } from 'src/app/core/services/calificacion/calificacion.service';
@@ -10,10 +10,17 @@ import Swal from 'sweetalert2';
   templateUrl: './vendor-qualification-form.component.html',
   styleUrls: ['./vendor-qualification-form.component.css']
 })
-export class VendorQualificationFormComponent implements OnInit {
+export class VendorQualificationFormComponent {
   calificationForm: any;
   @Input() purchase!: any;
   isLoading: boolean = false;
+
+  maxCharacters = 300;
+  remainingCharacters!: number;
+
+  get messageControl(): AbstractControl | null {
+    return this.calificationForm.get('reseña');
+  }
 
   constructor(
     private calificacionService: CalificacionService,
@@ -24,21 +31,29 @@ export class VendorQualificationFormComponent implements OnInit {
     // this.setFormCalificationExample();
   }
 
-  ngOnInit(): void {
-    // console.log(this.purchase);
-  }
-
-  private buildCalificationForm(): FormGroup {
-    return this.calificationForm = this.fb.group({
-      reseña: [null, [Validators.required]],
-      calificacion: [null, [Validators.required, Validators.min(1), Validators.max(5)]],
+  private buildCalificationForm() {
+    this.calificationForm = this.fb.group({
+      reseña: [null, [
+        Validators.required,
+        Validators.maxLength(this.maxCharacters)
+      ]],
+      calificacion: [null, [
+        Validators.required,
+        Validators.min(1), Validators.max(5)
+      ]],
     });
+
+    this.remainingCharacters = this.maxCharacters;
+    this.calificationForm.get('reseña')?.valueChanges.subscribe((value: string) => {
+      this.remainingCharacters = this.maxCharacters - (value ? value.length : 0);
+    });
+
   }
 
   private setFormCalificationExample() {
     return this.calificationForm.reset({
-      reseña: 'Lorem Ipsum dolor dolor dolor lorem lorem lorem',
-      calificacion: 3,
+      reseña: 'El producto llegó en perfecto estado y a tiempo. La calidad de las computadoras es excelente y ha superado mis expectativas. El rendimiento es excepcional y el tiempo de espera para la entrega fue muy breve. Estoy muy satisfecho con la compra y definitivamente recomendaría este producto a otros.',
+      calificacion: 5,
     });
   }
 
@@ -76,16 +91,14 @@ export class VendorQualificationFormComponent implements OnInit {
       )
       .subscribe(response => {
         if (response) {
-          console.log({ response });
           const idCalification = response.id;
+          this.activeModal.close(idCalification); // Cierra el modal con éxito
           Swal.fire({
             position: 'center',
             icon: 'success',
             title: 'Tu reseña ha sido guardada!',
             showConfirmButton: false,
             timer: 3000
-          }).then(() => {
-            this.activeModal.close(idCalification); // Cierra el modal con éxito
           });
         }
       });
