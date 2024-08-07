@@ -31,4 +31,7 @@ export class CompraService {
     return this.http.get<any>(urlWithQuery);
   }
 
+  getUrlOffer(idOferta: string): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/compra/file/${idOferta}`);
+  }
 }
