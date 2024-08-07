@@ -1,12 +1,13 @@
 const { Router } = require('express');
-const { check, query } = require('express-validator');
+const { check, query, param } = require('express-validator');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
 
 const {
     compraPost,
     dataGraphGet,
-    comprasGetById
+    comprasGetById,
+    getFileCompra
 } = require('../controllers/compra.controller');
 
 const router = Router();
@@ -40,5 +41,11 @@ router.post('/', [
     check('codAutorizacion', 'El codigo de autorizacion es obligatorio').not().isEmpty(),
     validarCampos,
 ], compraPost);
+
+router.get('/file/:IdOferta', [
+    validarJWT,
+    param('IdOferta', 'El param id es obligatorio').not().isEmpty(),
+    validarCampos
+], getFileCompra);
 
 module.exports = router;
