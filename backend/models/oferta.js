@@ -18,18 +18,22 @@ const Oferta = db.define(
          * ESTADOS DE OFERTA
          * DISPONIBLE: oferta que no ha sido rechazada ni pagada.
          * FINALIZADA: oferta pagada. 
+         * RECHAZADA: oferta rechazada. 
          * */
         procesoDeOferta: {
             type: DataTypes.ENUM('FINALIZADA', 'DISPONIBLE', 'RECHAZADA'),
             defaultValue: 'DISPONIBLE',
         },
-        /** 
-         * Para la ELIMINACIÓN, 
-         * SOLO SE MODIFICA A FALSO, AUN EXISTE!
-         * */
         estado: {
             type: DataTypes.BOOLEAN,
             defaultValue: true,
+        },
+        archivo: {
+            type: DataTypes.STRING,
+        },
+        usuarioIdReceptor: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         createdAt: {
             type: DataTypes.DATE,

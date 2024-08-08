@@ -1,76 +1,101 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
-import { Subscription } from 'rxjs';
 import { UsuarioService } from 'src/app/core/services/usuario/usuario.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-view-users',
   templateUrl: './view-users.component.html',
   styleUrls: ['./view-users.component.css']
 })
-export class ViewUsersComponent implements OnInit, OnDestroy {
-
-  searchText: string = '';
-  allUsuarios: any;
-  suscription!: Subscription;
-
-  pageSize: number = 20;
+export class ViewUsersComponent implements OnInit {
+  pageSize: number = 10;
   page: number = 1;
+
+  initQuery = {
+    pageSize: this.pageSize,
+    page: this.page
+  };
+
   currentPage!: number;
   total!: number;
   totalPages!: number;
 
-  isEmptyUsers: boolean = false;
   isLoading: boolean = false;
+  filterForm!: FormGroup;
+  noSearchMatch!: boolean;
+  isEmptyUsers!: boolean;
+  usuarios: any;
 
   constructor(
+    private formBuilder: FormBuilder,
     private usuarioService: UsuarioService,
   ) { }
 
-  ngOnInit(): void {
-    this.getAll(this.pageSize, this.page);
-
-    this.suscription = this.usuarioService.refresh.subscribe(() => {
-      this.getAll(this.pageSize, this.page);
-    })
+  public ngOnInit(): void {
+    this.buildForm();
+    this.getUsersByFilters(this.initQuery);
   }
 
-  ngOnDestroy(): void {
-    this.suscription.unsubscribe();
+  private buildForm() {
+    this.filterForm = this.formBuilder.group({
+      searchTerm: [null, [Validators.required]],
+      searchOption: ['nombre', Validators.required],
+    });
+
+    this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
+      const searchTermControl = this.filterForm.get('searchTerm');
+
+      searchTermControl?.clearValidators();
+
+      if (option === 'email') {
+        searchTermControl?.setValidators(Validators.required);
+      } else if (option === 'nombre') {
+        searchTermControl?.setValidators(Validators.required);
+      }
+
+      searchTermControl?.reset();
+      searchTermControl?.updateValueAndValidity();
+    });
   }
 
-  getAll(pageSize: number, page: number) {
-    console.log('getAll()');
+  private getUsersByFilters(filters: any) {
     this.isLoading = true;
-    this.usuarioService.getAllUsuarios(page, pageSize).subscribe((data) => {
-      console.log({ data });
-
+    // console.log({ filters });
+    this.usuarioService.getAllUsersById(filters).subscribe(res => {
+      // console.log({ res });
       this.isLoading = false;
 
-      if (data.total === 0) {
+      if (res.noSearchMatch) {
+        this.noSearchMatch = true;
         this.isEmptyUsers = true;
-      }else{
+      } else {
         const {
           usuarios,
           total,
           currentPage,
           pageSize,
           totalPages,
-        } = data;
-      
-        this.total = total;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.totalPages = totalPages;
-        this.allUsuarios = usuarios;
-        this.isEmptyUsers = false;
-        
-        console.log(this.allUsuarios);
+        } = res;
+
+        if (usuarios.length === 0) {
+          this.isEmptyUsers = true;
+        } else {
+          this.isEmptyUsers = false;
+          this.total = total;
+          this.currentPage = currentPage;
+          this.pageSize = pageSize;
+          this.totalPages = totalPages;
+          this.usuarios = usuarios;
+          this.noSearchMatch = false;
+        }
       }
+
+      this.isLoading = false;
     });
   }
 
-  suspenderUsuario(idUsuario: string) {
+  public suspendUser(idUsuario: string) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: 'btn btn-success mx-3',
@@ -89,24 +114,31 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
       reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
+        // Solo si el usuario confirmó la eliminación
+        this.usuarioService.suspenderUsuario(idUsuario).subscribe((data) => {
+          // Actualizar la lista de usuarios quitando el usuario eliminado
+          if (data) {
+            this.usuarios = this.usuarios.filter((usuario: any) => usuario.id !== idUsuario);
+          }
+        });
+
         swalWithBootstrapButtons.fire(
-          'Usuario suspendido',
-          'Usuario añadido a la sección de usuarios suspendidos.',
+          'Suspendido',
+          'Este usuario ha sido suspendido.',
           'success',
         );
-        this.usuarioService.suspenderUsuario(idUsuario).subscribe();
       }
     })
   }
 
-  eliminarUsuario(idUsuario: string) {
+  public deleteUser(idUsuario: string) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: 'btn btn-success mx-3',
         cancelButton: 'btn btn-danger mx-3',
       },
       buttonsStyling: false,
-    })
+    });
 
     swalWithBootstrapButtons.fire({
       title: '¿Estás seguro de eliminar este usuario?',
@@ -117,9 +149,15 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
       cancelButtonText: 'Cancelar',
       reverseButtons: true,
     }).then((result) => {
-      this.usuarioService.deleteUsuario(idUsuario).subscribe();
-
       if (result.isConfirmed) {
+        // Solo si el usuario confirmó la eliminación
+        this.usuarioService.deleteUsuario(idUsuario).subscribe((data) => {
+          // Actualizar la lista de usuarios quitando el usuario eliminado
+          if (data) {
+            this.usuarios = this.usuarios.filter((usuario: any) => usuario.id !== idUsuario);
+          }
+        });
+
         swalWithBootstrapButtons.fire(
           'Eliminado',
           'Este usuario ha sido eliminado del sistema.',
@@ -129,12 +167,37 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
     });
   }
 
-  OnDestroy() {
-    this.usuarioService.refresh.unsubscribe();
+  public onPageChange(newPage: number) {
+    const query = {
+      page: newPage,
+      pageSize: this.pageSize,
+    };
+
+    this.getUsersByFilters(query);
   }
 
-  onPageChange(newPage: number) {
-    console.log({newPage});
-    this.getAll(this.pageSize, newPage);
+  public sendForm() {
+    // console.log('sendForm()');
+    if (this.filterForm.invalid) {
+      this.filterForm.markAllAsTouched();
+      return;
+    }
+
+    const formValues = this.filterForm.value;
+    const query = {
+      [formValues.searchOption]: formValues.searchTerm,
+      ...this.initQuery
+    };
+
+    // console.log({ query });
+    this.getUsersByFilters(query);
+  }
+
+  public clearFilter() {
+    this.getUsersByFilters(this.initQuery);
+
+    const searchTermControl = this.filterForm.get('searchTerm');
+    searchTermControl?.setValue(null);
+    searchTermControl?.reset();
   }
 }

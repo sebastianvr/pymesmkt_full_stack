@@ -10,18 +10,18 @@ const Reclamo = db.define(
             primaryKey: true,
         },
         titulo: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         mensaje: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
-        documento: {
-            type: DataTypes.BLOB,
+        documentos: {
+            type: DataTypes.TEXT,
         },
         mensajeAdmin: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
         },
         estado: {
             type: DataTypes.BOOLEAN,

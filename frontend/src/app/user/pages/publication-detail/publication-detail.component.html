@@ -1,6 +1,5 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-center">
-
         <div class="container">
             <div class="col-lg-12 pt-4">
                 <img class="float-end icon-image" src="../../../assets/icons/detail-publication.svg"
@@ -10,7 +9,7 @@
 
             <hr>
 
-            <div class="col-12 text-center my-3" *ngIf="!publicacion; else divPublicacion">
+            <div class="col-12 text-center my-3" *ngIf="!publication; else divPublicacion">
                 <div class="spinner-border  text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
@@ -19,193 +18,112 @@
             <ng-template #divPublicacion>
                 <div class="col-md-12 mt-3">
                     <div class="row">
-                        <button class="float-end alert alert-primary py-1 mb-0">
-                            <strong>Compra {{publicacion.procesoDePublicacion | lowercase}}</strong>
-                        </button>
+                        <p class="text-center float-end alert py-1 mb-0" [ngClass]="{
+                          'alert-success': publication.procesoDePublicacion.toLowerCase() === 'iniciada',
+                          'alert-primary': publication.procesoDePublicacion.toLowerCase() === 'finalizada'
+                        }">
+                            <strong>Publicación {{ publication.procesoDePublicacion | lowercase }}</strong>
+                        </p>
                     </div>
 
                     <div class="container mt-3">
-                        <h3 class="text-center">{{publicacion.titulo | uppercase }}</h3>
-                        <p class="descriptionCard">{{publicacion.descripcion}}</p>
+                        <h3>{{publication.titulo | uppercase }}</h3>
+                        <p class="descriptionCard">{{publication.descripcion}}</p>
 
                         <table class="table table-hover">
                             <tbody>
                                 <tr>
                                     <td><strong>Precio total</strong></td>
-                                    <td>{{publicacion.precioTotal | currency : 'CLP'}}</td>
+                                    <td>{{publication.precioTotal | currency : 'CLP'}}</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Cantidad</strong></td>
-                                    <td>{{publicacion.cantidadElementos}}</td>
+                                    <td>{{publication.cantidadElementos}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.precioUnidad">
+                                <tr *ngIf="publication.precioUnidad">
                                     <td><strong>Precio por unidad</strong></td>
-                                    <td>{{publicacion.precioUnidad | currency : 'CLP'}}</td>
+                                    <td>{{publication.precioUnidad | currency : 'CLP'}}</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Garantía</strong></td>
-                                    <td>{{publicacion.garantia.toString() | i18nSelect:garantiaMapa}}</td>
+                                    <td>{{publication.garantia.toString() | i18nSelect:garantiaMapa}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.aniosGarantia">
+                                <tr *ngIf="publication.aniosGarantia">
                                     <td><strong>Años de garantía</strong></td>
-                                    <td>{{publicacion.aniosGarantia}}</td>
+                                    <td>{{publication.aniosGarantia}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.fechaInicioServicio">
+                                <tr *ngIf="publication.fechaInicioServicio">
                                     <td><strong>Fecha inicio del servicio</strong></td>
-                                    <td>{{publicacion.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
+                                    <td>{{publication.fechaInicioServicio | date : 'dd MMMM yyyy'}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.fechaFinServicio">
+                                <tr *ngIf="publication.fechaFinServicio">
                                     <td><strong>Fecha finalización del servicio</strong></td>
-                                    <td>{{publicacion.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
+                                    <td>{{publication.fechaFinServicio | date : 'dd MMMM yyyy'}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.horasATrabajar">
+                                <tr *ngIf="publication.horasATrabajar">
                                     <td><strong>Cantidad de horas a trabajar</strong></td>
-                                    <td>{{publicacion.horasATrabajar}}</td>
+                                    <td>{{publication.horasATrabajar}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.modelo">
+                                <tr *ngIf="publication.modelo">
                                     <td><strong>Modelo</strong></td>
-                                    <td>{{publicacion.modelo}}</td>
+                                    <td>{{publication.modelo}}</td>
                                 </tr>
-                                <tr *ngIf="publicacion.color">
+                                <tr *ngIf="publication.color">
                                     <td><strong>Color</strong></td>
-                                    <td>{{publicacion.color | titlecase}}</td>
+                                    <td>{{publication.color | titlecase}}</td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
 
-                    <!-- <div class="container ">
-                        <button class="btn btn-danger float-start" data-bs-toggle="modal" data-bs-target="#modalReport"
-                            type="button">Reportar un problema</button>
-
-
-                        
-                        <div class="modal fade" id="modalReport" data-bs-backdrop="static" data-bs-keyboard="false"
-                            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="staticBackdropLabel">Reporta el problema que ocurrio
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="container px-1">
-                                            <form>
-                                                <div class="col-12">
-                                                    <label for="addresDescriptionCompany" class="form-label">Escribe los
-                                                        todos
-                                                        los detalles pertinentes </label>
-                                                    <textarea class="form-control" cols="150" rows="9"
-                                                        id="addresDescriptionCompany">
-                                                  </textarea>
-                                                </div>
-                                                <div class="col-12 mt-4">
-                                                    <label>Añadir archivo adjunto</label>
-                                                    <p-fileUpload mode="basic" name="demo[]" url="./upload.php"
-                                                        accept="image/*" [maxFileSize]="1000000"></p-fileUpload>
-
-                                                </div>
-
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary">Enviar</button>
+                        <ng-container *ngIf="publication.archivoAdjunto">
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-4 col-sm-12 text-center">
+                                        <h3 class="fs-6 mb-3"><strong>Archivos adjuntos</strong></h3>
+                                        <img class="d-block mx-auto mb-2" width="50"
+                                            src="../../../../assets/icons/file-zip.svg" alt="file-zip.svg">
+                                        <button class="btn btn-success btn-sm my-2" type="button"
+                                            (click)="downloadFile(publication.archivoAdjunto)">Descargar</button>
+                                        <a #downloadLink style="display: none;"></a>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </ng-container>
+                    </div>
+                    <hr>
 
-                        <button class="btn btn-secondary float-end" data-bs-toggle="modal"
-                            data-bs-target="#modalCalification" type="button">Calificar al proveedor</button>
+                    <ng-container
+                        *ngIf="this.idCurrentUser === publication.UsuarioId && publication.procesoDePublicacion.toLowerCase() !== 'finalizada'">
+                        <div class="row my-4">
+                            <div class="col-6 my-1 d-flex justify-content-start">
+                                <button (click)="deletePublication()" class="btn btn-danger">
+                                    Eliminar
+                                    <img src="../../../../assets/icons/trash.svg" class="icon-buttons-style"
+                                        alt="trash.svg">
+                                </button>
+                            </div>
 
-                        <div class="modal fade" id="modalCalification" data-bs-backdrop="static"
-                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="staticBackdropLabel">Califica a tu proveedor
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="container px-1">
-                                            <form>
-
-                                                <div class="col-sm-12">
-                                                    <label for="nameCompany" class="form-label">Titulo</label>
-                                                    <input type="text" class="form-control" id="nameCompany"
-                                                        placeholder="" value="" required="">
-                                                </div>
-                                                <div class="col-sm-12 mt-2">
-                                                    <label for="addresDescriptionCompany"
-                                                        class="form-label">Comentario</label>
-                                                    <textarea class="form-control" cols="150" rows="9"
-                                                        id="addresDescriptionCompany">
-                                                  </textarea>
-
-                                                </div>
-
-                                                <div class="col-sm-12 mt-2">
-                                                    <label>Puntuación </label>
-                                                    <br>
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-                                                    <img class="mx-1" src="../../../assets/icons/star.svg" height="30px"
-                                                        alt="">
-
-                                                </div>
-
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary">Enviar</button>
-                                    </div>
-                                </div>
+                            <div class="col-6 my-1 d-flex justify-content-end">
+                                <button class="btn btn-primary">
+                                    Editar
+                                    <img src="../../../../assets/icons/pencil-square.svg" class="icon-buttons-style"
+                                        alt="pencil-square.svg">
+                                </button>
                             </div>
                         </div>
-                    </div> -->
+                    </ng-container>
 
-                    <!-- <div class="row col-lg-12 my-3">
-                        <div class="col-md-12">
-                            <button (click)="eliminarPublicacion()" class="btn btn-danger float-start">
-                                Eliminar publicación <img src="../../../../assets/icons/trash.svg" alt="trash.svg">
-                            </button>
-
-                            <button class="btn btn-primary float-end">Editar publicación</button>
+                    <ng-container
+                        *ngIf="this.idCurrentUser !== publication.UsuarioId && publication.procesoDePublicacion.toLowerCase() !== 'finalizada'">
+                        <div class="row my-4">
+                            <div class="col-12 my-1 d-flex justify-content-center">
+                                <button type="button" class="btn btn-primary float-end"
+                                    (click)="openOffer(publication)">
+                                    Ofertar
+                                </button>
+                            </div>
                         </div>
-                    </div> -->
-
-                    <div class="row my-4">
-                        <div class="col-md-6 text-center my-1">
-                            <button (click)="eliminarPublicacion()" class="btn btn-danger">
-                                Eliminar
-                                <img src="../../../../assets/icons/trash.svg" class="icon-buttons-style"
-                                    alt="trash.svg">
-                            </button>
-                        </div>
-
-                        <div class="col-md-6 text-center my-1">
-                            <button class="btn btn-primary">
-                                Editar
-                                <img src="../../../../assets/icons/pencil-square.svg" class="icon-buttons-style"
-                                    alt="pencil-square.svg">
-                            </button>
-                        </div>
-                    </div>
+                    </ng-container>
                 </div>
             </ng-template>
         </div>

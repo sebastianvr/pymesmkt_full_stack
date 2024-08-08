@@ -1,53 +1,51 @@
 const { Router } = require('express');
-const { check } = require('express-validator');
-
-const { compraPost, dataGraphGet, comprasGetById } = require('../controllers/compra.controller');
+const { check, query, param } = require('express-validator');
+const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
+
+const {
+    compraPost,
+    dataGraphGet,
+    comprasGetById,
+    getFileCompra
+} = require('../controllers/compra.controller');
 
 const router = Router();
 
-// Ruta para obtener data para graficar con d3
-router.get('/graph/', dataGraphGet);
-
-// Ruta para obtener todas las publicaciones creadas 
-// router.get('/created/:UsuarioId', ofertasCreadasGetById);
-
+router.get('/graph/', validarJWT, dataGraphGet);
 
 // Ruta para buscar todas las compras por id del usuario
 router.get('/usuario/:UsuarioId', [
+    validarJWT,
+    query('page').optional().isInt({ min: 1 }).
+        withMessage('page debe ser un número entero mayor o igual a 1'),
+    query('pageSize').optional().isInt({ min: 1, max: 100 }).
+        withMessage('pageSize debe ser un número entero entre 1 y 100'),
     check('UsuarioId', 'El id del usuario es obligatorio').not().isEmpty(),
     validarCampos,
+    query('empresa').optional().isString()
+    .withMessage('El campo "empresa" debe ser una cadena (string)'),
 ], comprasGetById);
 
-// Ruta para obtener todas las publicaciones de un usuario en especifico
-// router.get('/usuario/:idUsuario', publicacionesGet);
-
-
-// Creacion de una nueva compra
+// Creación de nueva compra
 router.post('/', [
+    validarJWT,
     check('PublicacionId', 'El id de la publicación es obligatorio').not().isEmpty(),
     validarCampos,
-
     check('UsuarioId', 'El del usuario es obligatorio').not().isEmpty(),
     validarCampos,
-
     check('OfertumId', 'El id de la oferta es obligatorio').not().isEmpty(),
     validarCampos,
-
     check('precio', 'El precio de la compra es obligatorio').not().isEmpty(),
     validarCampos,
-
     check('codAutorizacion', 'El codigo de autorizacion es obligatorio').not().isEmpty(),
     validarCampos,
-
 ], compraPost);
 
-// Eliminacion de una publicacion
-// router.delete('/:id', [
-//     param('id', 'El param id es obligatorio').not().isEmpty(),
-
-//     // validarJWT, 
-//     validarCampos
-// ], ofertaDelete);
+router.get('/file/:IdOferta', [
+    validarJWT,
+    param('IdOferta', 'El param id es obligatorio').not().isEmpty(),
+    validarCampos
+], getFileCompra);
 
 module.exports = router;

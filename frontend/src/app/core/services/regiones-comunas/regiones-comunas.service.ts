@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-interface RegionesComunas {
-  region: string
-  comunas: string[]
+interface IRegionsCommunes {
+  region: string;
+  comunas: string[];
 }
 
 @Injectable({
@@ -12,7 +12,7 @@ export class RegionesComunasService {
 
   constructor() { }
 
-  regionesYComunas: RegionesComunas[] = [
+  regionsAndCommunes: IRegionsCommunes[] = [
     {
       "region": "Arica y Parinacota",
       "comunas": ["Arica", "Camarones", "Putre", "General Lagos"]
@@ -78,28 +78,18 @@ export class RegionesComunasService {
       "comunas": ["Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "Santiago", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"]
     }
 
-  ]
+  ];
 
-  regiones: any[] = [];
+  regiones: string[] = [];
   comunas: any[] | undefined = [];
 
-  getRegiones() {
-    // mostrar solo las regiones en un arreglo
-    for (let index = 0; index < this.regionesYComunas.length; index++) {
-      this.regiones.push(this.regionesYComunas[index].region)
-    }
-
-    return this.regiones
+  public getRegions(): string[] {
+    return this.regionsAndCommunes.map(item => item.region);
   }
 
-  getComunas(regionSeleccionada: string) {
-    // console.log('regionSeleccionada', regionSeleccionada);
-    this.comunas = this.regionesYComunas.filter((data: any) =>
-      data.region === regionSeleccionada
-    )
-
-    // console.log('getComunas', this.comunas[0].comunas)
-    this.comunas = this.comunas[0].comunas
-    return this.comunas
+  public getComunas(regionSeleccionada: string) {
+    this.comunas = this.regionsAndCommunes.filter(item => item.region === regionSeleccionada);
+    this.comunas = this.comunas[0].comunas;
+    return this.comunas;
   }
 }

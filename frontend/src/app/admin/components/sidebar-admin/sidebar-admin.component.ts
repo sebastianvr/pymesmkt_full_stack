@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 
 @Component({
@@ -11,6 +11,8 @@ export class SidebarAdminComponent implements OnInit {
   display!: boolean;
   visibleSidebar: boolean = true;
   itemsPanelMenu: MenuItem[] = [];
+
+  @Input() nameUser!: string
 
   constructor() { }
 
@@ -50,16 +52,15 @@ export class SidebarAdminComponent implements OnInit {
           {
             label: 'Reclamos nuevos',
             icon: 'pi pi-fw pi-bookmark',
-            routerLink: '/admin/new-report',
+            routerLink: '/admin/new-reports',
           },
           {
-            label: 'Reclamos finalizados',
+            label: 'Reclamos archivados',
             icon: 'pi pi-fw pi-bookmark-fill',
+            routerLink: '/admin/finished-reports',
           },
         ]
       }
     ]
   }
-
-
 }

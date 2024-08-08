@@ -1,0 +1,198 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <button (click)="openSimulationModal(openModal)" class="btn btn-success" ngbTooltip="Simular">
+                <img src="../../../../assets/icons/boxes.svg" class="svg-white" alt="boxes.svg">
+            </button>
+        </div>
+    </div>
+</div>
+
+<ng-template #openModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title text-center w-100" id="modal-basic-title">Simulación</h4>
+            <button type="button" class="btn-close" aria-label="Close" [disabled]="isLoading"
+                (click)="modal.close()"></button>
+        </div>
+        <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="alert alert-info" role="alert">
+                        <p><strong>Simulación de la Base de Datos:</strong></p>
+                        <p>Esta funcionalidad crea una base de datos ficticia con la cantidad especificada de usuarios,
+                            publicaciones, ofertas, compras y reclamos.</p>
+                        <p class="text-decoration-underline">Para la creación de <strong>ofertas, compras y
+                                reclamos</strong>, existe una probabilidad del
+                            <strong>50%</strong> de que cada usuario realice estas acciones.
+                        </p>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">La simulación, se entregarán credenciales de acceso para
+                        todos los usuarios
+                        creados. La información resultante de la simulación es temporal y <strong>no habrá respaldo de
+                            estas credenciales una vez generadas</strong>.
+                    </div>
+
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Advertencia:</strong> Esta funcionalidad de simulación está diseñada exclusivamente para
+                        entornos de desarrollo. No debe utilizarse en entornos de producción.
+                    </div>
+                </div>
+
+
+                <form [formGroup]="simulationForm" (ngSubmit)="simulateDatabase()">
+                    <div class="row mb-2">
+                        <div class="col-md-6 mb-2">
+                            <div class="form-group">
+                                <label for="nroUsuarios">Número de <strong>Usuarios</strong>:</label>
+                                <input type="number" id="nroUsuarios" formControlName="nroUsuarios"
+                                    class="form-control">
+                                <div *ngIf="simulationForm.get('nroUsuarios')?.invalid && simulationForm.get('nroUsuarios')?.touched"
+                                    class="text-danger">
+                                    <small *ngIf="simulationForm.get('nroUsuarios')?.hasError('required')">Número de
+                                        Usuarios es obligatorio.</small>
+                                    <small *ngIf="simulationForm.get('nroUsuarios')?.hasError('min')">Número de Usuarios
+                                        debe ser al menos 10.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroUsuarios')?.hasError('max') && !simulationForm.get('nroUsuarios')?.hasError('min')">Número
+                                        de Usuarios no puede exceder 150.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroUsuarios')?.hasError('pattern') && !simulationForm.get('nroUsuarios')?.hasError('min') && !simulationForm.get('nroUsuarios')?.hasError('max')">Número
+                                        de Usuarios debe ser un número entero.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <div class="form-group">
+                                <label for="nroAdmins">Número de <strong>Administradores</strong>:</label>
+                                <input type="number" id="nroAdmins" formControlName="nroAdmins" class="form-control">
+                                <div *ngIf="simulationForm.get('nroAdmins')?.invalid && simulationForm.get('nroAdmins')?.touched"
+                                    class="text-danger">
+                                    <small *ngIf="simulationForm.get('nroAdmins')?.hasError('min')">Número de
+                                        Administradores debe ser al menos 0.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroAdmins')?.hasError('max') && !simulationForm.get('nroAdmins')?.hasError('min')">Número
+                                        de Administradores no puede exceder 20.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroAdmins')?.hasError('pattern') && !simulationForm.get('nroAdmins')?.hasError('min') && !simulationForm.get('nroAdmins')?.hasError('max')">Número
+                                        de Administradores debe ser un número entero.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-2">
+
+                    <div class="row mb-2">
+                        <div class="col-md-6 mb-2">
+                            <div class="form-group">
+                                <label for="nroPublications">Número de Publicaciones por Usuario:</label>
+                                <input type="number" id="nroPublications" formControlName="nroPublications"
+                                    class="form-control">
+                                <div *ngIf="simulationForm.get('nroPublications')?.invalid && simulationForm.get('nroPublications')?.touched"
+                                    class="text-danger">
+                                    <small *ngIf="simulationForm.get('nroPublications')?.hasError('min')">Número de
+                                        Publicaciones debe ser al menos 0.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroPublications')?.hasError('max') && !simulationForm.get('nroPublications')?.hasError('min')">Número
+                                        de Publicaciones no puede exceder 80.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroPublications')?.hasError('pattern') && !simulationForm.get('nroPublications')?.hasError('min') && !simulationForm.get('nroPublications')?.hasError('max')">Número
+                                        de Publicaciones debe ser un número entero.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <div class="form-group">
+                                <label for="nroOfertas">Número de Ofertas por Usuario:</label>
+                                <input type="number" id="nroOfertas" formControlName="nroOfertas" class="form-control">
+                                <div *ngIf="simulationForm.get('nroOfertas')?.invalid && simulationForm.get('nroOfertas')?.touched"
+                                    class="text-danger">
+                                    <small *ngIf="simulationForm.get('nroOfertas')?.hasError('min')">Número de Ofertas
+                                        debe ser al menos 0.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroOfertas')?.hasError('max') && !simulationForm.get('nroOfertas')?.hasError('min')">Número
+                                        de Ofertas no puede exceder 80.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroOfertas')?.hasError('pattern') && !simulationForm.get('nroOfertas')?.hasError('min') && !simulationForm.get('nroOfertas')?.hasError('max')">Número
+                                        de Ofertas debe ser un número entero.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-6 mb-2">
+                            <div class="form-group">
+                                <label for="nroCompras">Número de Compras por Usuario:</label>
+                                <input type="number" id="nroCompras" formControlName="nroCompras" class="form-control">
+                                <div *ngIf="simulationForm.get('nroCompras')?.invalid && simulationForm.get('nroCompras')?.touched"
+                                    class="text-danger">
+                                    <small *ngIf="simulationForm.get('nroCompras')?.hasError('min')">Número de Compras
+                                        debe ser al menos 0.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroCompras')?.hasError('max') && !simulationForm.get('nroCompras')?.hasError('min')">Número
+                                        de Compras no puede exceder 80.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroCompras')?.hasError('pattern') && !simulationForm.get('nroCompras')?.hasError('min') && !simulationForm.get('nroCompras')?.hasError('max')">Número
+                                        de Compras debe ser un número entero.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <div class="form-group">
+                                <label for="nroReclamos">Número de Reclamos por Usuario:</label>
+                                <input type="number" id="nroReclamos" formControlName="nroReclamos"
+                                    class="form-control">
+                                <div *ngIf="simulationForm.get('nroReclamos')?.invalid && simulationForm.get('nroReclamos')?.touched"
+                                    class="text-danger">
+                                    <small *ngIf="simulationForm.get('nroReclamos')?.hasError('min')">Número de Reclamos
+                                        debe ser al menos 0.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroReclamos')?.hasError('max') && !simulationForm.get('nroReclamos')?.hasError('min')">Número
+                                        de Reclamos no puede exceder 80.</small>
+                                    <small
+                                        *ngIf="simulationForm.get('nroReclamos')?.hasError('pattern') && !simulationForm.get('nroReclamos')?.hasError('min') && !simulationForm.get('nroReclamos')?.hasError('max')">Número
+                                        de Reclamos debe ser un número entero.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Debug -->
+                <!-- <div class="container">
+                    <pre><b>filterForm.value: </b>{{simulationForm.value | json}}</pre>
+                    <pre><b>filterForm.errors: </b>{{simulationForm.errors | json}}</pre>
+                </div> -->
+
+                <div class="row">
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Importante:</strong> Cada vez que se inicia una nueva simulación, toda la información
+                        que estuvo guardada será eliminada.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary mx-4" [disabled]="isLoading"
+            (click)="modal.close()">Cerrar</button>
+        <button type="button" class="btn btn-primary" [disabled]="isLoading || simulationForm.invalid"
+            (click)="simulateDatabase()">
+            <ng-container *ngIf="!isLoading">Simular</ng-container>
+            <ng-container *ngIf="isLoading">
+                Simulando...
+                <div class="spinner-border spinner-border-sm text-light" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </ng-container>
+        </button>
+    </div>
+</ng-template>

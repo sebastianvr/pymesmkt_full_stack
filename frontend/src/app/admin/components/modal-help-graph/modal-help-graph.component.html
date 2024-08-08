@@ -1,0 +1,58 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <button (click)="openHelpModal(helpModal)" class="btn btn-primary" ngbTooltip="Ayuda">
+                <img src="../../../../assets/icons/help.svg" class="svg-white" alt="help.svg">
+            </button>
+        </div>
+    </div>
+</div>
+
+<ng-template #helpModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title text-center w-100" id="modal-basic-title">Ayuda</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+            <div class="container-fluid">
+                <p>El mapa de colaboraciones es un <strong>grafo</strong> generado automáticamente a partir de las
+                    compras y ventas realizadas por las propias empresas.</p>
+                <p>Un grafo se compone de un conjunto de <strong>vértices</strong> y un conjunto de
+                    <strong>aristas</strong> (o enlaces) que conectan pares de vértices.</p>
+                <p>Cada nodo, representado por un círculo azul, simboliza una empresa, con el nombre de la empresa
+                    ubicado debajo.</p>
+                <p>Cada vértice tiene asociado un <strong>peso</strong>, un valor numérico que representa la cantidad de
+                    transacciones hechas de una empresa a otra.</p>
+                <p><strong>Funcionalidades disponibles:</strong></p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Zoom:</strong> Puede hacer zoom utilizando los botones ubicados
+                        en el extremo superior izquierdo del gráfico. También puede hacer zoom utilizando el rodillo del
+                        mouse o haciendo doble clic en el área del grafo.</li>
+                    <li class="list-group-item"><strong>Mover nodos:</strong> Para mover un nodo, selecciónelo con un
+                        clic y arrástrelo al lugar deseado.</li>
+                    <li class="list-group-item"><strong>Centrar grafo:</strong> Use el botón en el extremo superior
+                        derecho para centrar el grafo cuando sea necesario.</li>
+                    <li class="list-group-item"><strong>Información de nodos:</strong> Para ver un nodo específico junto
+                        con sus vecinos, pase el cursor sobre el nodo deseado. Esto resaltará el nodo seleccionado junto
+                        con sus nodos vecinos y las conexiones entre ellos. Los colores de las conexiones indican el
+                        tipo de transacción: verde para compras y azul para ventas.
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="mx-3">
+                                <hr class="border-top border-5 border-success">
+                                <strong>Compra</strong>
+                            </div>
+                            <div class="mx-3">
+                                <hr class="border-top border-5 border-primary">
+                                <strong>Venta</strong>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">Cerrar</button>
+        </div>
+    </div>
+</ng-template>

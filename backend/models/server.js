@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors');
 
 const db = require('../db/connection');
-const { storage } = require('../minio/connection');
+const { s3Client } = require('../s3/connection');
 require('./asociaciones');
 
 class Server {
@@ -18,18 +18,17 @@ class Server {
             pyme: '/api/pyme',
             signIn: '/api/sign-in',
             publicacion: '/api/publicacion',
-            colaboracion: '/api/colaboracion',
             oferta: '/api/oferta',
             reclamo: '/api/reclamo',
             pago: '/api/pago',
             compra: '/api/compra',
             calificacion: '/api/calificacion',
-            minio: '/api/minio/',
+            s3: '/api/s3/',
             seed: '/api/seed',
         };
 
         this.dbConnection();
-        this.minIOConnection();
+        this.s3Connection();
         this.middlewares();
         this.routes();
     }
@@ -44,20 +43,23 @@ class Server {
         }
     }
 
-    async minIOConnection() {
+    async s3Connection() {
         try {
-            this.minioClient = storage;
-            console.log('Service: MinIO connected');
+            this.s3Client = s3Client;
+            console.log('Service: AWS S3 connected');
         } catch (error) {
             throw new Error(error);
         }
     }
 
     middlewares() {
-        //CORS
-        this.app.use(cors());
+        this.app.use(cors({
+            origin : 'http://localhost:5700',
+        }));
+        
         // Lectura y parseo del body
         this.app.use(express.json());
+        
         //Directorio publico
         // this.app.use(express.static('public'));
     }
@@ -68,13 +70,12 @@ class Server {
         this.app.use(this.paths.auth, require('../routes/auth.routes'));
         this.app.use(this.paths.signIn, require('../routes/sign-in.routes'));
         this.app.use(this.paths.publicacion, require('../routes/publicacion.routes'));
-        this.app.use(this.paths.colaboracion, require('../routes/colaboracion.routes'));
         this.app.use(this.paths.oferta, require('../routes/oferta.routes'));
         this.app.use(this.paths.reclamo, require('../routes/reclamo.routes'));
         this.app.use(this.paths.pago, require('../routes/webpay-plus-mall.routes'));
         this.app.use(this.paths.compra, require('../routes/compra.routes'));
         this.app.use(this.paths.calificacion, require('../routes/calificacion.routes'));
-        this.app.use(this.paths.minio, require('../routes/minio.routes'));
+        this.app.use(this.paths.s3, require('../routes/s3.routes'));
         this.app.use(this.paths.seed, require('../routes/seed.routes'));
     }
 

@@ -3,364 +3,323 @@
 
         <div class="container">
             <div class="col-md-12 g-5 pt-4 text-center mb-5">
-                <img class="float-end mx-auto mb-3" src="../../../../assets/icons/cart-check.svg" alt="pen.svg"
+                <img class="float-end mx-auto mb-3" src="../../../../assets/icons/cart-check.svg" alt="cart-check.svg"
                     width="55">
-                <h2 class="fs-1 mb-1">Mis Compras</h2>
+                <h2 class="fs-1 mb-1"><strong>Compras</strong></h2>
             </div>
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 input-group input-group-sm mb-3 mx-3 ">
-                        <div class="input-group input-group-md">
-                            <input type="text" class="form-control" aria-label="Sizing example input"
-                                aria-describedby="inputGroup-sizing-lg" id="buscarOferta">
-                            <span class="input-group-text mr-3" id="inputGroup-sizing-lg">Buscar</span>
+            <!-- Buscador -->
+            <div class="col-md-12">
+                <div class="input-group mb-3">
+                    <form [formGroup]="filterForm" class="input-group mb-3">
+                        <select class="form-select customSelect text-center" id="searchOptionSelect"
+                            formControlName="searchOption">
+                            <option [value]="'empresa'">Empresa</option>
+                            <option [value]="'fecha'">Fecha</option>
+                        </select>
+
+                        <input type="text" class="form-control" formControlName="searchTerm"
+                            aria-label="Término de búsqueda" />
+                        <button style="border-top-right-radius: .375rem; border-bottom-right-radius: .375rem;"
+                            class="input-group-text btn btn-primary" id="basic-addon2"
+                            [disabled]="isEmptyPurchases && !isLoading && !noSearchMatch" (click)="sendForm()">
+                            Buscar
+                        </button>
+
+                        <div class="container">
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('required')"
+                                class="text-danger">Este campo es requerido.</div>
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('invalidDate')"
+                                class="text-danger">La fecha debe ser tipo DD-MM-YYYY.</div>
+                        </div>
+                    </form>
+
+                    <div class="row my-1">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Limpiar búsqueda" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary float-end">
+                                <img src="../../../../assets/icons/magic.svg" alt="magic.svg">
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Debug -->
+                    <!-- <div class="container">
+                        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+                        <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+                    </div> -->
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-12">
-
-                    <div class="col-12 text-center" *ngIf="!this.compras; else divCards">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">...</span>
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="col-md-12 mt-5 text-center" *ngIf="isLoading">
+                        <div class="spinner-border text-primary text-center my-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
 
-                    <ng-template #divCards>
-                        <div class="containerPublicacion d-flex justify-content-center mb-5"
-                            *ngFor="let item of this.compras; let i = index">
-                            <div class="card cardMain  shadow-sm rounded">
-                                <div class="card-header pt-2">
-                                    <h5 class="card-title fs-4 m-0"><a class="card-link">COMPRA A LA EMPRESA
-                                            {{item.Ofertum.Usuario.Pyme.nombrePyme | uppercase}}</a>
-                                    </h5>
-                                </div>
+                    <!-- Mostrar esta sección si no hay coincidencias en la búsqueda -->
+                    <ng-container *ngIf="noSearchMatch && !isLoading">
+                        <div class="col-md-12 text-center">
+                            <div class="container mt-5">
+                                <img src="../../../../assets/icons/empty.svg" alt="empty-users.svg" class="icon-image">
+                                <h3 class="my-3">No existen coincidencias de búsqueda. </h3>
 
-                                <div class="card-body">
-
-
-                                    <p class="fs-5 m-0 fw-bold">Detalles de la compra :</p>
-                                    <table class="tableResume table-hover table table-borderless">
-                                        <tbody>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Código de autorización</strong>
-                                                </td>
-                                                <td class="text-end">{{item.codAutorizacion}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Fecha de compra</strong>
-                                                </td>
-
-                                                <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy'}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Estado</strong>
-                                                </td>
-                                                <td class="text-end">AUTORIZADA</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Total pagado</strong>
-                                                </td>
-                                                <td class="text-end">{{item.precio | currency: 'CLP'}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <hr class="m-0 mb-3">
-                                    <!-- Detalle de la publicacion -->
-                                    <div class="container">
-                                        <ngb-accordion #acc="ngbAccordion">
-                                            <ngb-panel title="Detalles de la publicación ">
-                                                <ng-template ngbPanelContent>
-                                                    <div class="container">
-                                                        <div class="col-md-12 g-5 mt-4">
-                                                            <div class="container d-grid gap-2 text-center">
-                                                                <button [ngClass]="{
-                                                                            'alert-primary' : item.Publicacion.procesoDePublicacion.includes('INICIADA'), 
-                                                                            'alert-warning' : item.Publicacion.procesoDePublicacion.includes('EN PROCESO'),
-                                                                            'alert-success' : item.Publicacion.procesoDePublicacion.includes('FINALIZADA')
-                                                                        }"
-                                                                    class="alert alert-success alert-lg text-center"
-                                                                    type="button">Publicación
-                                                                    {{item.Publicacion.procesoDePublicacion |
-                                                                    lowercase}}
-                                                                </button>
-                                                            </div>
-
-                                                            <div class="container mt-3">
-                                                                <h3 class="text-center">{{item.Publicacion.titulo |
-                                                                    uppercase
-                                                                    }}</h3>
-                                                                <p class="descriptionCard">
-                                                                    {{item.Publicacion.descripcion}}
-                                                                </p>
-
-                                                                <table class="table table-hover">
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td>Precio propuesto</td>
-                                                                            <td>{{item.Publicacion.precioTotal |
-                                                                                currency :
-                                                                                'CLP'}}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>Cantidad</td>
-                                                                            <td>{{this.item.Publicacion.cantidadElementos}}
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr *ngIf="item.Publicacion.precioUnidad">
-                                                                            <td>Precio por unidad</td>
-                                                                            <td>{{item.Publicacion.precioUnidad |
-                                                                                currency :
-                                                                                'CLP'}}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>Garantía</td>
-                                                                            <td>{{item.Publicacion.garantia.toString() |
-                                                                                i18nSelect:item.Publicacion}}</td>
-                                                                        </tr>
-                                                                        <tr *ngIf="item.Publicacion.aniosGarantia">
-                                                                            <td>Años de garantía</td>
-                                                                            <td>{{item.Publicacion.aniosGarantia}}</td>
-                                                                        </tr>
-                                                                        <tr
-                                                                            *ngIf="item.Publicacion.fechaInicioServicio">
-                                                                            <td>Fecha inicio del servicio</td>
-                                                                            <td>{{item.Publicacion.fechaInicioServicio |
-                                                                                date
-                                                                                : 'dd MMMM
-                                                                                yyyy'}}</td>
-                                                                        </tr>
-                                                                        <tr *ngIf="item.Publicacion.fechaFinServicio">
-                                                                            <td>Fecha finalización del servicio </td>
-                                                                            <td>{{item.Publicacion.fechaFinServicio |
-                                                                                date :
-                                                                                'dd MMMM yyyy'}}
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr *ngIf="item.Publicacion.horasATrabajar">
-                                                                            <td>Cantidad de horas a trabajar </td>
-                                                                            <td>{{item.Publicacion.horasATrabajar}}</td>
-                                                                        </tr>
-                                                                        <tr *ngIf="item.Publicacion.modelo">
-                                                                            <td>Modelo</td>
-                                                                            <td>{{item.Publicacion.modelo}}</td>
-                                                                        </tr>
-                                                                        <tr *ngIf="item.Publicacion.color">
-                                                                            <td>Color</td>
-                                                                            <td>{{item.Publicacion.color | titlecase}}
-                                                                            </td>
-                                                                        </tr>
-
-                                                                    </tbody>
-                                                                </table>
-
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </ng-template>
-                                            </ngb-panel>
-                                        </ngb-accordion>
-                                    </div>
-
-                                    <hr class="m-0 my-3">
-
-                                    <p class="fs-5 m-0 fw-bold">Detalles de la empresa vendedora :</p>
-                                    <table class="tableResume table-hover table table-borderless">
-                                        <tbody>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Empresa</strong>
-                                                </td>
-                                                <td class="text-end">{{item.Ofertum.Usuario.Pyme.nombrePyme |
-                                                    titlecase}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Representante</strong>
-                                                </td>
-                                                <td class="text-end">{{item.Ofertum.Usuario.nombreUsuario | titlecase}}
-                                                    {{item.Ofertum.Usuario.apellidos | titlecase}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="start-*"><strong>Correo electrónico</strong>
-                                                </td>
-                                                <td class="text-end">{{item.Ofertum.Usuario.emailUsuario}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <div class="col-12">
-                                        <!-- Si existe una calificacion -->
-                                        <!-- <div class="col-12 text-center" *ngIf="!allReclamos; else allReclamosTemplate">
-                                            <div class="container mt-5">
-                            
-                                                <div class="spinner-border text-primary text-center my-3" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                             
-                                                <br>
-                                             
-                                            </div>
-                                        </div> -->
-
-                                        <!-- si CalificacionId = null entonces puede calificar -->
-                                        <button *ngIf="!item.CalificacionId" class="btn btn-primary float-end"
-                                            type="button" (click)="open(contentCalification)">Calificar vendedor
-                                        </button>
-
-                                        <ng-template #contentCalification let-modal>
-                                            <form [formGroup]="formularioCalificacion"
-                                                (ngSubmit)="enviarCalificacion(item.Ofertum.UsuarioId, item.id)">
-                                                <div class="modal-header">
-                                                    <h4 class="modal-title" id="modal-basic-title">Califica al vendedor
-                                                    </h4>
-                                                    <button type="button" class="btn-close" aria-label="Close"
-                                                        (click)="modal.dismiss('Cross click')">
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-
-                                                    <div class="col-12 mb-3">
-                                                        <label for="addresDescription" class="form-label fw-bold">Reseña
-                                                            <span class="text-muted text">(Opcional)</span></label>
-                                                        <textarea class="form-control"
-                                                            placeholder="Escribe una reseña sobre tu vendedor"
-                                                            id="addresDescription" formControlName="reseña"></textarea>
-                                                        <span *ngIf="campoInvalidoCalificacion('reseña')"
-                                                            class="form-text text-danger">
-                                                            La reseña es obligatoria.
-                                                        </span>
-                                                    </div>
-
-                                                    <!-- <ng-template #t let-fill="fill">
-                                                        <i class="bi-star-fill">
-                                                            <i *ngIf="fill > 0" class="bi-heart-star filled"
-                                                                [style.width.%]="fill">
-                                                            </i>
-                                                        </i>
-                                                    </ng-template>
-
-                                                    <ngb-rating formArrayName="calificacion" [starTemplate]="t"
-                                                        [readonly]="false" [max]="5"
-                                                        (click)="changeStars()">
-                                                    </ngb-rating> -->
-
-                                                    <!-- <div class="form-group">
-                                                        <ngb-rating [max]="5" formControlName="calificacion">
-                                                        </ngb-rating>
-                                                    </div> -->
-
-                                                    <!-- COMO HACER QUE EL USUARIO QUE COMPRÓ SOLO PUEDA CALIFICAR UNA Y SOLO UNA SOLA VEZ  -->
-                                                    <!--  -->
-                                                    <div class="col-12 mb-3">
-                                                        <div class="container px-0 text-center">
-                                                            <label for="ratio"
-                                                                class="form-label fw-bold mb-0">Calificación final
-                                                            </label>
-                                                        </div>
-                                                        <div class="container px-0 d-flex justify-content-center">
-                                                            <ngb-rating formControlName="calificacion" id="ratio"
-                                                                [max]="5">
-                                                                <ng-template let-fill="fill" let-index="index">
-                                                                    <i class="bi-star{{fill === 100 ? '-fill' : ''}}"
-                                                                        [class.filled]="fill === 100">
-                                                                    </i>
-                                                                </ng-template>
-                                                            </ngb-rating>
-                                                            <span *ngIf="campoInvalidoCalificacion('calificacion')"
-                                                                class="form-text text-danger">
-                                                                La calificación es obligatoria.
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Formulario FORMATO JSON -->
-                                                    <!-- <span>formularioCalificacion.value | json</span>
-                                                    <pre>{{formularioCalificacion.value | json}}</pre> -->
-
-
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary float-start"
-                                                        [disabled]="formularioCalificacion.invalid">Enviar</button>
-                                                </div>
-                                            </form>
-                                        </ng-template>
-                                    </div>
-                                </div>
-
-                                <div class="card-footer">
-                                    <button class="btn btn-danger float-start" type="button"
-                                        (click)="open(content)">Reportar problema
+                                <div class="col-lg-12">
+                                    <button ngbTooltip="Ir atrás" (click)="clearFilter()"
+                                        class="btn btn-sm btn-primary text-center">
+                                        <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg"
+                                            class="icon-button-style">
                                     </button>
-
-                                    <ng-template #content let-modal>
-                                        <form [formGroup]="formularioReporte"
-                                            (ngSubmit)="enviarReporte(item.Ofertum.UsuarioId , item.PublicacionId)">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-basic-title">Escribe tu reclamo</h4>
-                                                <button type="button" class="btn-close" aria-label="Close"
-                                                    (click)="modal.dismiss('Cross click')">
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="col-12 mb-3">
-                                                    <label for="address2" class="form-label fw-bold">Titulo</label>
-                                                    <input type="text" class="form-control" id="address2"
-                                                        formControlName="titulo">
-                                                    <span *ngIf="campoInvalidoReporte('titulo')"
-                                                        class="form-text text-danger">
-                                                        El titulo es obligatorio.
-                                                    </span>
-                                                </div>
-
-                                                <div class="col-12 mb-3">
-                                                    <label for="addresDescription"
-                                                        class="form-label fw-bold">Descripción</label>
-                                                    <textarea class="form-control"
-                                                        placeholder="Redacta el problema que ha ocurrido."
-                                                        id="addresDescription" formControlName="descripcion"></textarea>
-                                                    <span *ngIf="campoInvalidoReporte('descripcion')"
-                                                        class="form-text text-danger">
-                                                        La descripcion es obligatoria.
-                                                    </span>
-                                                </div>
-
-                                                <!-- <hr class="mt-4"> -->
-
-                                                <div class="container p-0">
-                                                    <div class="mb-3 col-md-12">
-                                                        <label for="files[]" class="mb-2 fw-bold">Añadir un archivo
-                                                            adjunto</label>
-                                                        <p-fileUpload mode="advanced" name="files[]"
-                                                            [showCancelButton]="false" [showUploadButton]="false"
-                                                            url="./upload.php" (onUpload)="onUpload($event)"
-                                                            [multiple]="true" accept="" [maxFileSize]="1000000">
-                                                            <ng-template pTemplate="content">
-                                                                <ul *ngIf="uploadedFiles.length">
-                                                                    <li *ngFor="let file of uploadedFiles">{{file.name}}
-                                                                        - {{file.size}} bytes</li>
-                                                                </ul>
-                                                            </ng-template>
-                                                        </p-fileUpload>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="submit" class="btn btn-primary float-start"
-                                                    [disabled]="formularioReporte.invalid">Enviar</button>
-                                            </div>
-                                        </form>
-                                    </ng-template>
                                 </div>
                             </div>
-                            <br>
                         </div>
-                    </ng-template>
+                    </ng-container>
 
+                    <!-- Mostrar esta sección si no hay compras -->
+                    <ng-container *ngIf="isEmptyPurchases && !isLoading && !noSearchMatch">
+                        <div class="col-md-12 text-center">
+                            <div class="container mt-5">
+                                <img src="../../../../assets/icons/cart-check.svg" alt="cart-check.svg"
+                                    class="icon-image">
+                                <h3 class="my-3">No tienes compras aún.</h3>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Card Compras -->
+                    <ng-container *ngIf="!isEmptyPurchases && !isLoading  && !noSearchMatch">
+                        <div class="row container mx-4">
+                            <!-- Paginación -->
+                            <div *ngIf="totalPages > 1" class="row">
+                                <div class="d-flex float-start justify-content-center">
+                                    <div class="row">
+                                        <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                            (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                            [rotate]="true" [boundaryLinks]="true">
+                                        </ngb-pagination>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="my-1" *ngFor="let item of this.purchases; let i = index">
+                                <div class="card">
+                                    <div class="card-header pt-2">
+                                        <h5 class="float-start card-title fs-4 m-0"><a>{{'Comprobante de compra'}}</a>
+                                        </h5>
+                                        <h6 class="float-end alert alert-success d-inline-block mb-0 px-2 py-1"
+                                            role="alert">
+                                            Compra exitosa</h6>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <table class="tableResume table-hover table table-borderless">
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="2" class="start-* fs-5 m-0"><strong>Código de
+                                                            autorización :</strong>
+                                                    </td>
+                                                    <td class="text-end">{{item.codAutorizacion}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" class="start-*"><strong>Fecha de compra</strong>
+                                                    </td>
+
+                                                    <td class="text-end">{{item.createdAt | date : 'dd MMMM yyyy' :
+                                                        '+0000'}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" class="start-*"><strong>Estado</strong>
+                                                    </td>
+                                                    <td class="text-end">AUTORIZADA</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" class="start-*"><strong>Total pagado</strong>
+                                                    </td>
+                                                    <td class="text-end">{{item.precio | currency: 'CLP'}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <hr class="m-0 my-3">
+
+                                        <p class="fs-5 m-0 fw-bold">Empresa vendedora :</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-borderless tableResume">
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="2" class="start-*"><strong>Nombre</strong>
+                                                        </td>
+                                                        <td class="text-end">{{item.Ofertum.Usuario.Pyme.nombrePyme |
+                                                            titlecase}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="start-*"><strong>Representante</strong>
+                                                        </td>
+                                                        <td class="text-end">{{item.Ofertum.Usuario.nombreUsuario |
+                                                            titlecase}}
+                                                            {{item.Ofertum.Usuario.apellidos | titlecase}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="start-*"><strong>Correo
+                                                                electrónico</strong>
+                                                        </td>
+                                                        <td class="text-end">{{item.Ofertum.Usuario.emailUsuario}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <!-- Detalle de la publicacion -->
+                                        <div class="container">
+                                            <ngb-accordion #acc="ngbAccordion">
+                                                <ngb-panel title="Detalles de la publicación ">
+                                                    <ng-template ngbPanelContent>
+                                                        <div class="container">
+                                                            <div class="col-md-12 g-5 mt-4">
+                                                                <div class="container d-grid gap-2 text-center">
+                                                                    <button [ngClass]="{
+                                                                                'alert-primary' : item.Publicacion.procesoDePublicacion.includes('INICIADA'), 
+                                                                                'alert-warning' : item.Publicacion.procesoDePublicacion.includes('EN PROCESO'),
+                                                                                'alert-success' : item.Publicacion.procesoDePublicacion.includes('FINALIZADA')
+                                                                            }"
+                                                                        class="alert alert-success alert-lg text-center"
+                                                                        type="button">Publicación
+                                                                        {{item.Publicacion.procesoDePublicacion |
+                                                                        lowercase}}
+                                                                    </button>
+                                                                </div>
+
+                                                                <div class="container mt-3">
+                                                                    <h3 class="text-center">{{item.Publicacion.titulo |
+                                                                        uppercase
+                                                                        }}</h3>
+                                                                    <p class="descriptionCard">
+                                                                        {{item.Publicacion.descripcion}}
+                                                                    </p>
+
+                                                                    <table class="table table-hover">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>Precio propuesto</td>
+                                                                                <td>{{item.Publicacion.precioTotal |
+                                                                                    currency :
+                                                                                    'CLP'}}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Cantidad</td>
+                                                                                <td>{{this.item.Publicacion.cantidadElementos}}
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr *ngIf="item.Publicacion.precioUnidad">
+                                                                                <td>Precio por unidad</td>
+                                                                                <td>{{item.Publicacion.precioUnidad |
+                                                                                    currency :
+                                                                                    'CLP'}}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Garantía</td>
+                                                                                <td>{{item.Publicacion.garantia.toString()
+                                                                                    |
+                                                                                    i18nSelect:item.Publicacion}}</td>
+                                                                            </tr>
+                                                                            <tr *ngIf="item.Publicacion.aniosGarantia">
+                                                                                <td>Años de garantía</td>
+                                                                                <td>{{item.Publicacion.aniosGarantia}}
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr
+                                                                                *ngIf="item.Publicacion.fechaInicioServicio">
+                                                                                <td>Fecha inicio del servicio</td>
+                                                                                <td>{{item.Publicacion.fechaInicioServicio
+                                                                                    |
+                                                                                    date: 'dd MMMM yyyy'}}
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr
+                                                                                *ngIf="item.Publicacion.fechaFinServicio">
+                                                                                <td>Fecha finalización del servicio
+                                                                                </td>
+                                                                                <td>{{item.Publicacion.fechaFinServicio
+                                                                                    |
+                                                                                    date : 'dd MMMM yyyy'}}
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr *ngIf="item.Publicacion.horasATrabajar">
+                                                                                <td>Cantidad de horas a trabajar </td>
+                                                                                <td>{{item.Publicacion.horasATrabajar}}
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr *ngIf="item.Publicacion.modelo">
+                                                                                <td>Modelo</td>
+                                                                                <td>{{item.Publicacion.modelo}}</td>
+                                                                            </tr>
+                                                                            <tr *ngIf="item.Publicacion.color">
+                                                                                <td>Color</td>
+                                                                                <td>{{item.Publicacion.color |
+                                                                                    titlecase}}
+                                                                                </td>
+                                                                            </tr>
+
+                                                                        </tbody>
+                                                                    </table>
+
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </ng-template>
+                                                </ngb-panel>
+                                            </ngb-accordion>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-footer">
+                                        <div class="col-lg-12">
+
+                                            <button *ngIf="!item.CalificacionId"
+                                                class="btn btn-primary float-end d-flex align-items-center"
+                                                type="button" (click)="openQualifySeller(item, i)">
+                                                Calificar colaboración
+                                                <img src="../../../../assets/icons/star.svg" alt="star.svg"
+                                                    class="ms-2 star-icon" style="filter: invert(100%);">
+                                            </button>
+
+                                            <div *ngIf="item.CalificacionId" class="py-1 mb-0 alert alert-success float-end"
+                                                role="alert">
+                                                <span>Calificación enviada ✓</span>
+                                            </div>
+                                        </div>
+
+                                        <button *ngIf="!item.Reclamo" class="btn btn-danger float-start" type="button"
+                                            (click)="openReportProblemModal(item, i)">Reportar problema
+                                            <img src="../../../../assets/icons/thumb-down.svg" alt="thumb-down.svg"
+                                                class="ms-2 star-icon" style="filter: invert(100%);">
+                                        </button>
+                                        <div *ngIf="item.Reclamo" class="py-1 my-0 alert alert-warning float-start"
+                                            role="alert">
+                                            <span>Tu reclamo está en revisión</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <br>
+                            </div>
+
+                            <!-- Paginación -->
+                            <div *ngIf="totalPages > 1" class="row">
+                                <div class="d-flex float-start justify-content-center">
+                                    <div class="row">
+                                        <ngb-pagination [collectionSize]="total" [pageSize]="pageSize"
+                                            (pageChange)="onPageChange($event)" [(page)]="currentPage" [maxSize]="3"
+                                            [rotate]="true" [boundaryLinks]="true">
+                                        </ngb-pagination>
+                                    </div>
+                                </div>¡
+                            </div>
+                        </div>
+                    </ng-container>
                 </div>
             </div>
         </div>

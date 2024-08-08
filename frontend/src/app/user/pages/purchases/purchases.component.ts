@@ -1,14 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { PublicacionService } from '../../../core/services/publicacion/publicacion.service';
-import { ModalDismissReasons, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { PrimeNGConfig, MessageService } from 'primeng/api';
-import { CompraService } from '../../../core/services/compra/compra.service';
-import { ReclamoService } from '../../../core/services/reclamo/reclamo.service';
-import Swal from 'sweetalert2';
-import { CalificacionService } from '../../../core/services/calificacion/calificacion.service';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PrimeNGConfig } from 'primeng/api';
+
+import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { CompraService } from 'src/app/core/services/compra/compra.service';
+import { ReportProblemFormComponent } from './components/report-problem-form/report-problem-form.component';
+import { VendorQualificationFormComponent } from './components/vendor-qualification-form/vendor-qualification-form.component';
 
 @Component({
   selector: 'app-purchases',
@@ -16,188 +14,209 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./purchases.component.css']
 })
 export class PurchasesComponent implements OnInit {
+  purchases: any;
 
-  usuario: any
-  cards: any
-  uploadedFiles: any[] = []
+  page: number = 1;
+  pageSize: number = 5;
+  isLoading!: boolean;
+  total: any;
+  currentPage!: number;
+  totalPages!: number;
+  isEmptyPurchases!: boolean;
+  idUser: string;
 
-  compras: any
+  initQuery = {
+    pageSize: this.pageSize,
+    page: this.page
+  };
 
-  modalReference!: NgbModalRef
-  closeResult = '';
+  noSearchMatch!: boolean;
 
-
-  suscription!: Subscription;
+  filterForm!: FormGroup;
 
   constructor(
-    private fb: FormBuilder,
     private primengConfig: PrimeNGConfig,
-    private messageService: MessageService,
     private modalService: NgbModal,
     private authService: AuthService,
-    private publicacionService: PublicacionService,
     private compraService: CompraService,
-    private reclamoService: ReclamoService,
-    private calificacionService: CalificacionService
+    private formBuilder: FormBuilder,
   ) {
-
-    // Reseteo el formulario 
-    this.formularioReporte.reset({
-      titulo: 'Tuve un problema con mis productos ',
-      descripcion: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam sit quidem molestiae. Magnam sit quidem molestiae. Magnam sit quidem molestiae.',
-      archivos: ['archivo.zip', []],
-    });
-
-    this.formularioCalificacion.reset({
-      // reseña: [null, [Validators.required]],
-      calificacion: [0, [Validators.required]],
-    })
+    this.idUser = this.authService.usuario.id;
   }
 
   ngOnInit(): void {
     this.primengConfig.ripple = true;
-
-    this.getCompras();
-    // this.suscription = this.compraService.refresh$.subscribe(() => {
-    //   this.getCompras();
-    // })
+    this.buildForm();
+    this.getUserPurchases(this.initQuery);
   }
 
-  getCompras() {
-    this.compraService.getAllComprasById(this.authService.usuario.id, 0, 10)
-      .subscribe((res) => {
-        this.compras = res.content
-        console.log('this.compras: ', this.compras)
-      })
-  }
-
-  formularioReporte: FormGroup = this.fb.group({
-    titulo: [null, [Validators.required]],
-    descripcion: [null, [Validators.required]],
-    archivos: [null, []],
-  })
-
-  formularioCalificacion: FormGroup = this.fb.group({
-    reseña: [null, [Validators.required]],
-    calificacion: [null, [Validators.required, Validators.min(1), Validators.max(5)]],
-  })
-
-  onUpload(event: any) {
-    console.log('asdasdasd', this.uploadedFiles)
-    console.log('event', event)
-
-    for (let file of event.files) {
-      this.uploadedFiles.push(file);
-    }
-
-    this.messageService.add({ severity: 'info', summary: 'File Uploaded', detail: '' });
-  }
-
-  open(content: any) {
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title', centered: true }).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-
-      //Al quitar el modal, reseteo los formularios
-      this.formularioCalificacion.reset()
-      this.formularioReporte.reset()
+  private buildForm() {
+    this.filterForm = this.formBuilder.group({
+      searchTerm: [null, [Validators.required]],
+      searchOption: ['empresa', Validators.required],
     });
 
+    this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
+      const searchTermControl = this.filterForm.get('searchTerm');
 
-  }
+      searchTermControl?.clearValidators();
 
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
-  }
-
-  enviarReporte(usuarioId: string, publicacionId: string) {
-    // console.log('this.uploadedFiles ', this.uploadedFiles)
-    // console.log(this.formularioReporte.value)
-
-    // enviar a la base de datos el reclamo
-    const nuevoReclamo = {
-      titulo: this.formularioReporte.get('titulo')?.value,
-      mensaje: this.formularioReporte.get('descripcion')?.value,
-      documento: this.formularioReporte.get('archivos')?.value,
-      PublicacionId: publicacionId,
-      // id del usuario que RECIBIRÁ el reclamo
-      UsuarioId: usuarioId
-    }
-
-    console.log(nuevoReclamo)
-
-    this.reclamoService.postReclamo(nuevoReclamo).subscribe(console.log).unsubscribe();
-
-
-    // cerrar ventana emergente 
-    this.modalService.dismissAll()
-
-    // mostrar mensaje Swal de exito
-    Swal.fire({
-      position: 'center',
-      icon: 'success',
-      title: 'Tu reclamo ha sido enviado!',
-      showConfirmButton: false,
-      timer: 4000
-    }).then((result) => {
-      if (result) {
-
+      if (option === 'fecha') {
+        searchTermControl?.setValidators([Validators.required, this.validateDate]);
+      } else if (option === 'empresa') {
+        searchTermControl?.setValidators(Validators.required);
       }
-    })
+
+      searchTermControl?.reset();
+      searchTermControl?.updateValueAndValidity();
+    });
   }
 
-  enviarCalificacion(UsuarioId: string, CompraId: string) {
+  private getUserPurchases(filters: any) {
+    this.isLoading = true;
+    this.compraService.getAllComprasById(this.authService.usuario.id, filters)
+      .subscribe((res) => {
+        // console.log({ filters });
+        // console.log({ res });
+        this.isLoading = false;
 
-    // Capturar de los datos 
-    const nuevaCalificacion = {
-      reseña: this.formularioCalificacion.get('reseña')?.value,
-      puntaje: this.formularioCalificacion.get('calificacion')?.value,
+        if (res.noSearchMatch) {
+          this.noSearchMatch = true;
+          this.isEmptyPurchases = true;
+        } else {
+          const {
+            compras,
+            total,
+            currentPage,
+            pageSize,
+            totalPages,
+          } = res;
 
-      // Usuario que recibe la calificacion
-      UsuarioId,
-      // Compra que recibe la calificacion
-      CompraId
+          if (compras.length === 0) {
+            this.isEmptyPurchases = true;
+          } else {
+            this.isEmptyPurchases = false;
+            this.total = total;
+            this.currentPage = currentPage;
+            this.pageSize = pageSize;
+            this.totalPages = totalPages;
+            this.purchases = compras;
+            this.noSearchMatch = false;
+          }
+        }
+
+        this.isLoading = false;
+      });
+  }
+
+  public onPageChange(newPage: number) {
+    const query = {
+      page: newPage,
+      pageSize: this.pageSize,
+    };
+
+    this.getUserPurchases(query);
+  }
+
+  public clearFilter() {
+    const query = {
+      page: 1,
+      pageSize: 20,
+    };
+    this.getUserPurchases(query);
+
+    const searchTermControl = this.filterForm.get('searchTerm');
+    searchTermControl?.setValue(null);
+    searchTermControl?.reset();
+  }
+
+  public sendForm() {
+    // console.log('sendForm()');
+    if (this.filterForm.invalid) {
+      this.filterForm.markAllAsTouched();
+      return;
     }
 
-    console.log('nuevaCalificacion ', nuevaCalificacion)
-    this.calificacionService.postCalificacion(nuevaCalificacion).subscribe(console.log)
+    const formValues = this.filterForm.value;
+    const query = {
+      [formValues.searchOption]: formValues.searchTerm,
+      page: this.page,
+      pageSize: this.pageSize,
+    };
 
-    // cerrar ventana emergente 
-    this.modalService.dismissAll()
+    // console.log({ query });
+    this.getUserPurchases(query);
+  }
 
-    // mostrar mensaje Swal de exito
-    Swal.fire({
-      position: 'center',
-      icon: 'success',
-      title: 'Tu reseña ha sido guardada!',
-      showConfirmButton: false,
-      timer: 3000
-    }).then((result) => {
-      if (result) {
+  private validateDate(control: AbstractControl): { [key: string]: boolean } | null {
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
 
+    if (dateRegex.test(control.value)) {
+      const parts = control.value.split('-');
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+
+      // Verificar si el día, mes y año son válidos
+      if (
+        day >= 1 &&
+        day <= 31 &&
+        month >= 1 &&
+        month <= 12 &&
+        year >= 1900 && // Ajustar el rango de años según necesidades
+        year <= 2099 // Ajustar el rango de años según necesidades
+      ) {
+        return null; // Fecha válida
       }
-    })
+    }
+
+    return { invalidDate: true };
   }
 
-  // ngOnDestroy(): void {
-  //   this.suscription.unsubscribe();
-  //   console.log('this.suscription.unsubscribe success')
-  // }
+  public async openReportProblemModal(report: any, index: number) {
+    const modalRef = this.modalService.open(
+      ReportProblemFormComponent,
+      {
+        centered: true,
+        size: 'xl',
+        backdrop: 'static'
+      });
+    modalRef.componentInstance.report = report;
 
-  campoInvalidoReporte(campo: string) {
-    return this.formularioReporte.get(campo)?.errors
-      && this.formularioReporte.get(campo)?.touched
+    try {
+      const resultReport = await modalRef.result;
+      if (resultReport) {
+        console.log({ resultReport });
+        this.purchases[index].Reclamo = { id: report };
+      }
+    } catch (error) {
+      if (error !== 'Cross click' && error !== 1) {
+        console.error('Error inesperado:', error);
+      }
+    }
   }
 
-  campoInvalidoCalificacion(campo: string) {
-    return this.formularioCalificacion.get(campo)?.errors
-      && this.formularioCalificacion.get(campo)?.touched
+  public async openQualifySeller(purchase: any, index: number) {
+    const modalRef = this.modalService.open(
+      VendorQualificationFormComponent,
+      {
+        centered: true,
+        backdrop: 'static',
+        size: 'xl',
+      });
+    modalRef.componentInstance.purchase = purchase;
+
+    try {
+
+      const calificationId = await modalRef.result;
+      if (calificationId) {
+        this.purchases[index].CalificacionId = calificationId;
+      }
+
+    } catch (error) {
+      if (error !== 'Cross click' && error !== 1) {
+        console.error('Error inesperado:', error);
+      }
+    }
   }
 }

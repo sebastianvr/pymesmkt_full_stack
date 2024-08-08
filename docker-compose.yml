@@ -5,7 +5,7 @@ services:
     restart: always
     image: mysql:8
     env_file:
-      - ./config/db.env
+      - ./config/.db.env
     environment:
       - TZ=America/Santiago
     ports:
@@ -15,34 +15,18 @@ services:
     networks:
       - red_privada
 
-  minio:
-    restart: always
-    image: quay.io/minio/minio
-    command: server /data --console-address ":9001"
-    env_file:
-      - ./config/minio.env  
-    volumes:
-      - minio_data:/data
-    ports:
-      - 9000:9000
-      - 9001:9001
-    networks:
-      - red_privada
-
   api:
     restart: always
     depends_on:
       - db 
-      - minio
     build: ./backend
     env_file:
-      - ./config/api.env
+      - ./config/.api.env
     ports:
       - '8081:8080'
+    command: npm start
     volumes:
       - ./backend:/api
-    environment:
-      VIRTUAL_HOST: api.pymesmkt.informatica.uv.cl
     networks:
       - red_privada
       - red_proxy
@@ -52,19 +36,16 @@ services:
     depends_on:
       - api
     ports:
-      - 80:4200
+      - '5700:4200'
     build: ./frontend
     volumes:
       - ./frontend:/web
-    environment:
-      VIRTUAL_HOST: pymesmkt.informatica.uv.cl
     networks:
       - red_privada
       - red_proxy
-    
+
 volumes:
   data:
-  minio_data:
 
 networks:                  # Definir redes
   red_proxy:               # Nombre de una red

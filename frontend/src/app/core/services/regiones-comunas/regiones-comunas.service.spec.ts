@@ -15,7 +15,7 @@ describe('RegionesComunasService', () => {
   });
 
   test('Debe mostrar todas las regiones', () => {
-    expect(Array.isArray(service.getRegiones())).toBe(true)
+    expect(Array.isArray(service.getRegions())).toBe(true)
     // console.log(service.getRegiones()) 
     // expect(service.getRegiones()).toHaveLength(16);
     // expect(service.getRegiones())

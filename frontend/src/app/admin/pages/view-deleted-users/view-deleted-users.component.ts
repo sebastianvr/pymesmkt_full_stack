@@ -1,74 +1,130 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { UsuarioService } from '../../../core/services/usuario/usuario.service';
-import Swal from 'sweetalert2';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UsuarioService } from 'src/app/core/services/usuario/usuario.service';
 
 @Component({
   selector: 'app-view-deleted-users',
   templateUrl: './view-deleted-users.component.html',
   styleUrls: ['./view-deleted-users.component.css']
 })
-export class ViewDeletedUsersComponent implements OnInit, OnDestroy {
+export class ViewDeletedUsersComponent implements OnInit {
+  pageSize: number = 10;
+  page: number = 1;
 
-  searchText: string = '';
-  allUsuariosDeleted: any;
+  initQuery = {
+    pageSize: this.pageSize,
+    page: this.page
+  };
 
-  suscription!: Subscription
+  currentPage!: number;
+  total!: number;
+  totalPages!: number;
+
+  isLoading: boolean = false;
+  filterForm!: FormGroup;
+  noSearchMatch!: boolean;
+  isEmptyUsers!: boolean;
+  usuarios: any;
 
   constructor(
-    private usuarioService: UsuarioService
+    private formBuilder: FormBuilder,
+    private usuarioService: UsuarioService,
   ) { }
 
   ngOnInit(): void {
-    this.getAll();
-
-    this.suscription = this.usuarioService.refresh.subscribe(() => {
-      this.getAll();
-    })
+    this.buildForm();
+    this.getUsersByFilters(this.initQuery);
   }
 
-  ngOnDestroy(): void {
-    this.suscription.unsubscribe();
-    console.log('observable cerrado')
-  }
+  private buildForm() {
+    this.filterForm = this.formBuilder.group({
+      searchTerm: [null, [Validators.required]],
+      searchOption: ['nombre', Validators.required],
+    });
 
+    this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
+      const searchTermControl = this.filterForm.get('searchTerm');
 
-  getAll() {
-    this.usuarioService.getAllUsuariosDeleted(0, 10).subscribe((data) => {
-      this.allUsuariosDeleted = data.content
-      console.log('this.allUsuariosDeleted', this.allUsuariosDeleted)
-    })
-  }
+      searchTermControl?.clearValidators();
 
-  activarUsuario(usuario: any) {
-    const swalWithBootstrapButtons = Swal.mixin({
-      customClass: {
-        confirmButton: 'btn btn-success mx-3',
-        cancelButton: 'btn btn-danger mx-3'
-      },
-      buttonsStyling: false
-    })
-
-    swalWithBootstrapButtons.fire({
-      title: '¿Estás seguro de reintegrar este usuario?',
-      icon: 'warning',
-      iconColor: 'red',
-      showCancelButton: true,
-      confirmButtonText: 'Reintegrar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true
-    }).then((result) => {
-      if (result.isConfirmed) {
-        swalWithBootstrapButtons.fire(
-          'Reintegrado!',
-          'Este usuario ha sido reintegrado al sistema.',
-          'success'
-        )
-        this.usuarioService.activarUsuario(usuario).subscribe((data) => {
-          console.log(data)
-        })
-        // this.router.navigate(['/user/see-publications'])
+      if (option === 'email') {
+        searchTermControl?.setValidators(Validators.required);
+      } else if (option === 'nombre') {
+        searchTermControl?.setValidators(Validators.required);
       }
-    })
+
+      searchTermControl?.reset();
+      searchTermControl?.updateValueAndValidity();
+    });
+  }
+  
+  private getUsersByFilters(filters: any) {
+    this.isLoading = true;
+    // console.log({ filters });
+    this.usuarioService.getAllUsuariosDeleted(filters).subscribe(res => {
+      // console.log({ res });
+      this.isLoading = false;
+
+      if (res.noSearchMatch) {
+        this.noSearchMatch = true;
+        this.isEmptyUsers = true;
+      } else {
+        const {
+          usuarios,
+          total,
+          currentPage,
+          pageSize,
+          totalPages,
+        } = res;
+
+        if (usuarios.length === 0) {
+          this.isEmptyUsers = true;
+        } else {
+          this.isEmptyUsers = false;
+          this.total = total;
+          this.currentPage = currentPage;
+          this.pageSize = pageSize;
+          this.totalPages = totalPages;
+          this.usuarios = usuarios;
+          this.noSearchMatch = false;
+        }
+      }
+
+      this.isLoading = false;
+    });
+  }
+  
+  public onPageChange(newPage: number) {
+    const query = {
+      page: newPage,
+      pageSize: this.pageSize,
+    };
+
+    this.getUsersByFilters(query);
+  }
+
+  public sendForm() {
+    // console.log('sendForm()');
+    if (this.filterForm.invalid) {
+      this.filterForm.markAllAsTouched();
+      return;
+    }
+
+    const formValues = this.filterForm.value;
+    const query = {
+      [formValues.searchOption]: formValues.searchTerm,
+      ...this.initQuery
+    };
+
+    // console.log({ query });
+    this.getUsersByFilters(query);
+  }
+
+  public clearFilter() {
+    this.getUsersByFilters(this.initQuery);
+
+    const searchTermControl = this.filterForm.get('searchTerm');
+    searchTermControl?.setValue(null);
+    searchTermControl?.reset();
   }
 }

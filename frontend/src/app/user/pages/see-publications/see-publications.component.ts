@@ -10,11 +10,16 @@ import { PublicacionService } from 'src/app/core/services/publicacion/publicacio
   styleUrls: ['./see-publications.component.css']
 })
 export class SeePublicationsComponent implements OnInit {
-  idUser: any;
+  idUser: string;
   allCards!: any[];
 
-  pageSize: number = 20;
+  pageSize: number = 10;
   page: number = 1;
+
+  initQuery = {
+    pageSize: this.pageSize,
+    page: this.page
+  };
 
   isLoading: boolean = false;
   publicaciones: any;
@@ -22,6 +27,7 @@ export class SeePublicationsComponent implements OnInit {
   currentPage!: number;
   totalPages!: number;
   isEmptyPublications!: boolean;
+  noSearchMatch!: boolean;
 
   filterForm!: FormGroup;
 
@@ -35,7 +41,7 @@ export class SeePublicationsComponent implements OnInit {
 
   public ngOnInit(): void {
     this.buildForm();
-    this.getPublicationsById(this.idUser);
+    this.getPublicationsById(this.initQuery);
   }
 
   private buildForm() {
@@ -62,12 +68,13 @@ export class SeePublicationsComponent implements OnInit {
 
   private getPublicationsById(filters: any) {
     this.isLoading = true;
-    console.log({ filters });
-    this.publicacionService.getAllPublicacionById(this.idUser, filters).subscribe(data => {
-      console.log({ data });
+    // console.log({ filters });
+    this.publicacionService.getAllPublicacionById(this.idUser, filters).subscribe(res => {
+      // console.log({ res });
       this.isLoading = false;
 
-      if (data.publicaciones.length === 0) {
+      if (res.noSearchMatch) {
+        this.noSearchMatch = true;
         this.isEmptyPublications = true;
       } else {
         const {
@@ -76,21 +83,26 @@ export class SeePublicationsComponent implements OnInit {
           currentPage,
           pageSize,
           totalPages,
-        } = data;
+        } = res;
 
-        this.total = total;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.totalPages = totalPages;
-        this.publicaciones = publicaciones;
-        this.isEmptyPublications = false;
-
-        console.log(this.publicaciones);
+        if (publicaciones.length === 0) {
+          this.isEmptyPublications = true;
+        } else {
+          this.isEmptyPublications = false;
+          this.total = total;
+          this.currentPage = currentPage;
+          this.pageSize = pageSize;
+          this.totalPages = totalPages;
+          this.publicaciones = publicaciones;
+          this.noSearchMatch = false;
+          // console.log(this.publicaciones);
+        }
       }
 
       this.isLoading = false;
     });
   }
+
 
   public onPageChange(newPage: number) {
     const query = {
@@ -102,7 +114,7 @@ export class SeePublicationsComponent implements OnInit {
   }
 
   public sendForm() {
-    console.log('sendForm()');
+    // console.log('sendForm()');
     if (this.filterForm.invalid) {
       this.filterForm.markAllAsTouched();
       return;
@@ -111,11 +123,10 @@ export class SeePublicationsComponent implements OnInit {
     const formValues = this.filterForm.value;
     const query = {
       [formValues.searchOption]: formValues.searchTerm,
-      page: this.page,
-      pageSize: this.pageSize,
+      ...this.initQuery
     };
 
-    console.log({ query });
+    // console.log({ query });
     this.getPublicationsById(query);
   }
 
@@ -145,14 +156,10 @@ export class SeePublicationsComponent implements OnInit {
   }
 
   public clearFilter() {
-    const query = {
-      page: 1,
-      pageSize: 20,
-    };
-    this.getPublicationsById(query);
+    this.getPublicationsById(this.initQuery);
 
     const searchTermControl = this.filterForm.get('searchTerm');
     searchTermControl?.setValue(null);
-    searchTermControl?.reset(); 
+    searchTermControl?.reset();
   }
 }

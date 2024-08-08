@@ -1,42 +1,24 @@
-.containerPublicacion {
-    max-width: 1000px;
-    margin: auto;
+.card {
+    /* Transición suave para la sombra */
+    transition: box-shadow 0.3s;
 }
 
-.cardMain {
-    min-width: 600px;
+.card:hover {
+    /* Sombras al pasar el mouse sobre la tarjeta */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-i {
-    font-size: 1.5rem;
-    padding-right: 0.1rem;
-    color: #b0c4de;
+.customSelect {
+    max-width: 120px;
 }
 
-.filled {
-    color: #1e90ff;
-}
-.low {
-    color: #deb0b0;
-}
-.filled.low {
-    color: #ff1e1e;
+/* Image for empty publications */
+.icon-image {
+    width: 30%;
+    height: auto;
+    max-width: 100px;
 }
 
-
-
-/* i {
-    position: relative;
-    display: inline-block;
-    font-size: 2.5rem;
-    padding-right: 0.1rem;
-    color: #d3d3d3;
+.icon-button-style {
+    filter: invert(100%);
 }
-
-.filled {
-    color: red;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-} */

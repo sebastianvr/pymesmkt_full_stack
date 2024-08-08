@@ -18,30 +18,16 @@
                     <label for="descriptionPublication" class="form-label">Mensaje</label>
                     <textarea pInputTextarea class="form-control" formControlName="mensaje"
                         id="descriptionPublication"></textarea>
-                    <span *ngIf="campoInvalido('mensaje')" class="form-text text-danger">
-                        El mensaje es obligatorio.
-                    </span>
-                </div>
-                <div class="col-lg-12 mb-3">
-                    <label class="form-label" for="img" class="form-label">
-                        Subir un archivo
-                        <span class="text-muted">(Opcional)</span>
-                    </label>
-                    <input type="file" class="form-control" id="imagen" formControlName="archivo"
-                        (change)="onFileInputChange($event)">
-                    <!-- <span *ngIf="campoInvalido('imagen', 'infoPropietario') && 
-                      formulario.get('infoPropietario.imagen')?.hasError('invalidExtension')" class="form-text text-danger">
-                      La extesión del archivo no es válida.
-                    </span>
-                    <span *ngIf="campoInvalido('imagen', 'infoPropietario') &&
-                      formulario.get('infoPropietario.imagen')?.hasError('maxSizeExceeded')" class="form-text text-danger">
-                      El tamaño del archivo excede el límite de 2 MB.
-                    </span>
-                    <span
-                      *ngIf="campoInvalido('imagen', 'infoPropietario') && formulario.get('infoPropietario.imagen')?.hasError('invalidFileCount')"
-                      class="form-text text-danger">
-                      Si va a subir una imágen, debe seleccionar un solo archivo.
-                    </span> -->
+                    <div *ngIf="messageControl?.invalid && (messageControl?.dirty || messageControl?.touched)"
+                        class="text-danger">
+                        <small *ngIf="messageControl?.errors?.['required']">El mensaje es obligatorio.</small>
+                        <small *ngIf="messageControl?.errors?.['maxlength']">El mensaje no puede exceder los
+                            {{maxMessageCharacters}} caracteres.</small>
+                    </div>
+                    <div class="float-end" *ngIf="remainingMessageCharacters >= 0">
+                        <small class="text-success">{{ remainingMessageCharacters }} caracteres
+                            restantes</small>
+                    </div>
                 </div>
                 <div class="col-lg-12 mb-3">
                     <label for="maximumPrice" class="form-label d-block">Precio de oferta</label>
@@ -51,9 +37,20 @@
                             formControlName="precioOferta">
                         </p-inputNumber>
                     </div>
-                    <span *ngIf="campoInvalido('precioOferta')" class="form-text d-block text-danger">
+                    <span *ngIf="invalidFormFile('precioOferta')" class="form-text d-block text-danger">
                         El precio es obligatorio.
                     </span>
+                </div>
+                <!-- Subir archivos -->
+                <div class="col-lg-12 mb-3">
+                    <div class="my-3 col-md-12">
+                        <label for="files[]" class="mb-2 ">Adjuntar archivos (máximo 2 archivos, máximo 15
+                            MB total)</label>
+                        <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
+                            [showUploadButton]="false" (onSelect)="onUpload($event)" [multiple]="true"
+                            accept=".jpg,.jpeg,.png,.pdf,.zip" [maxFileSize]="15000000" [fileLimit]="2">
+                        </p-fileUpload>
+                    </div>
                 </div>
             </div>
 
@@ -66,8 +63,15 @@
 
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss('Cross click')">Cerrar</button>
-            <button type="submit" class="btn btn-primary " data-bs-dismiss="modal" [disabled]="offerForm.invalid">
-                Enviar oferta
+            <button data-bs-dismiss="modal" type="submit" class="btn btn-primary"
+                [disabled]="offerForm.invalid || isOpLoading" (click)="sendOffer()">
+                <ng-container *ngIf="!isOpLoading">Enviar</ng-container>
+                <ng-container *ngIf="isOpLoading">
+                    Enviando...
+                    <div class="spinner-border spinner-border-sm text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </ng-container>
             </button>
         </div>
     </div>

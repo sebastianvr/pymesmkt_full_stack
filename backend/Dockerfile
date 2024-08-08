@@ -10,10 +10,4 @@ COPY package-lock.json ./
 # Install the application dependencies
 RUN npm install
 COPY . .
-# EXPOSE 8080
-
-# DEV MODE
-# CMD ["npm", "run", "dev"]
-
-# PROD MODE
-CMD ["npm", "start"]
+EXPOSE 8080

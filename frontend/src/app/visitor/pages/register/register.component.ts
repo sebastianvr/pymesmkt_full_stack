@@ -5,7 +5,7 @@ import { catchError, concatMap, of } from 'rxjs';
 import Swal from 'sweetalert2';
 
 import { AuthService } from 'src/app/core/services/auth/auth.service';
-import { MinioFilesService } from 'src/app/core/services/files/minio-files.service';
+import { S3FilesService } from 'src/app/core/services/files/s3-files.service';
 import { RegionesComunasService } from 'src/app/core/services/regiones-comunas/regiones-comunas.service';
 import { RunValidatorService } from 'src/app/core/validations/run-validator/run-validator.service';
 import { RutValidatorService } from 'src/app/core/validations/rut-validator/rut-validator.service';
@@ -49,11 +49,11 @@ export class RegisterComponent implements OnInit {
     private emailValidator: EmailValidatorService,
     private regionesComunas: RegionesComunasService,
     private authService: AuthService,
-    private minioFilesService: MinioFilesService,
+    private s3FilesService: S3FilesService,
     private modalService: NgbModal,
   ) {
-    this.regionesEmpresa = this.regionesComunas.getRegiones();
-    this.regionesPropietario = this.regionesComunas.getRegiones();
+    this.regionesEmpresa = this.regionesComunas.getRegions();
+    this.regionesPropietario = this.regionesComunas.getRegions();
     this.formulario = this.buildForm();
 
     /* Debug - set mock of new user */
@@ -193,7 +193,7 @@ export class RegisterComponent implements OnInit {
     const imageFile = this.selectedFile;
 
     if (imageFile) {
-      this.minioFilesService
+      this.s3FilesService
         .uploadImage(imageFile)
         .pipe(
           concatMap((imagePath) => {

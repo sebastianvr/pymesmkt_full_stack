@@ -15,55 +15,104 @@
             </div>
 
             <ng-template #userProfile>
-                <form>
+
+                <form [formGroup]="userForm">
                     <!-- Información del propietario -->
-                    <div class="row">
+                    <div class="row" formGroupName="infoPropietario">
                         <h3 class="fs-2">Información del propietario</h3>
 
                         <div class="col-lg-8">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="firstName" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="firstName"
-                                        value="{{user.nombreUsuario}}" disabled>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="lastName" class="form-label">Apellidos</label>
-                                    <input type="text" class="form-control" id="lastName" value="{{user.apellidos}}"
-                                        disabled>
+                            <div *ngIf="this.loadingInfoPropietario; else templateInfoPropietario"
+                                class="container-fluid mt-5 text-center">
+                                <div class="spinner-border text-primary my-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
                                 </div>
                             </div>
 
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <label for="myDNI" class="form-label">RUN (DNI)</label>
-                                    <input type="text" class="form-control" id="myDNI" value="{{user.run}}" disabled>
+                            <ng-template #templateInfoPropietario>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="firstName" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="firstName" formControlName="nombre">
+                                        <span *ngIf="campoInvalido('nombre', 'infoPropietario')"
+                                            class="form-text text-danger">
+                                            El nombre es obligatorio.
+                                        </span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label">Apellidos</label>
+                                        <input type="text" class="form-control" id="lastName"
+                                            formControlName="apellidos">
+                                        <span *ngIf="campoInvalido('apellidos', 'infoPropietario')"
+                                            class="form-text text-danger">
+                                            Los apellidos son obligatorios.
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label for="email" class="form-label">Correo electrónico</label>
-                                    <input type="email" class="form-control" id="email" value="{{user.emailUsuario}}"
-                                        disabled>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <label for="myDNI" class="form-label">RUN (DNI)</label>
+                                        <input type="text" class="form-control" id="myDNI" formControlName="run">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Correo electrónico</label>
+                                        <input type="email" class="form-control" id="email" formControlName="email">
+                                        <!-- <span *ngIf="campoInvalido('correoPropietario', 'infoPropietario')"
+                                            class="form-text text-danger">
+                                            El correo es inválido o ya existe.
+                                        </span> -->
+                                    </div>
                                 </div>
+                            </ng-template>
+
+                            <div class="container px-0">
+                                <button (click)="toggleEditMode('infoPropietario')"
+                                    class="btn btn-sm btn-primary float-start my-3 ml-2">
+                                    {{this.editMode.infoPropietario? 'Editar' :'Cancelar' }}
+                                </button>
+                                <button *ngIf="!loadingInfoPropietario && !this.editMode.infoPropietario"
+                                    (click)="updateUser('infoPropietario')"
+                                    [disabled]="userForm.get('infoPropietario')?.invalid"
+                                    class="btn btn-sm btn-primary float-start my-3 mx-2">
+                                    Guardar
+                                </button>
                             </div>
                         </div>
 
                         <div class="col-lg-4">
                             <div class="text-center">
-                                <div class="container">
-                                    <ng-container *ngIf="user.imagen; else defaultImage">
-                                        <img src="{{ user.imagen }}" class="imgProfile img-fluid" alt="camera.jpg"
-                                            style="max-height: 130px;">
-                                    </ng-container>
-                                    <ng-template #defaultImage>
-                                        <img src="../../../assets/icons/people-circle.svg" class="imgProfile img-fluid"
-                                            alt="people-circle.svg" style="max-height: 130px;">
-                                    </ng-template>
+                                <div class="container d-flex justify-content-center align-items-center">
+                                    <!-- Contenedor de la imagen -->
+                                    <div class="image-container">
+                                        <ng-container *ngIf="user.imagen; else defaultImage">
+                                            <img [src]="user.imagen" class="imgProfile" alt="camera.jpg"
+                                                loading="eager">
+                                        </ng-container>
+                                        <ng-template #defaultImage>
+                                            <img src="../../../assets/icons/people-circle.svg" class="imgProfile"
+                                                alt="people-circle.svg">
+                                        </ng-template>
+                                    </div>
                                 </div>
                                 <div class="mt-2">
-                                    <p-fileUpload mode="basic" name="demo[]" accept="image/*" [auto]="true"
-                                        chooseLabel="Subir imágen"></p-fileUpload>
+                                    <label class="custom-file-label custom-file-upload" for="formFile">Subir imagen
+                                        <input class="custom-file-input" type="file" id="formFile"
+                                            (change)="onFileSelected($event)">
+                                    </label>
+                                    <div
+                                        *ngIf="userForm.get('infoPropietario.imagen')?.dirty && userForm.get('infoPropietario.imagen')?.errors">
+                                        <span *ngIf="userForm.get('infoPropietario.imagen')?.errors?.['invalidType']"
+                                            class="text-danger">
+                                            La extensión del archivo debe ser tipo imagen
+                                        </span>
+                                        <span *ngIf="userForm.get('infoPropietario.imagen')?.errors?.['invalidSize']"
+                                            class="text-danger">
+                                            El archivo es demasiado grande (máximo 5MB)
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -72,145 +121,302 @@
                     <hr>
 
                     <!-- Localidad y direcciones del propietario -->
-                    <div class="row">
+                    <div class="row" formGroupName="infoLocalidadPropietario">
                         <h3 class="fs-2">Localidad y direcciones del propietario</h3>
 
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label for="country" class="form-label">Región</label>
-                                <select class="form-select" id="country" disabled>
-                                    <option>{{user.region}}</option>
-                                </select>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <label for="state" class="form-label">Comuna</label>
-                                <select class="form-select" id="state" disabled>
-                                    <option>{{user.comuna}}</option>
-                                </select>
+                        <div *ngIf="this.loadingInfoLocalidadPropietario; else templateInfoLocalidadPropietario"
+                            class="container-fluid mt-5 text-center">
+                            <div class="spinner-border text-primary my-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
+                        <ng-template #templateInfoLocalidadPropietario>
 
-                        <div class="row">
-                            <div class="col-lg-12 mt-2">
-                                <label for="address" class="form-label">Dirección</label>
-                                <input type="text" class="form-control" id="address" value="{{user.dir1Propietario}}"
-                                    disabled>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label for="country" class="form-label">Región</label>
+                                    <select class="form-select" id="country" formControlName="opRegion"
+                                        (change)="onRegionChange($event, 'infoLocalidadPropietario.opCommune')">
+                                        <ng-container *ngIf="!user.region">
+                                            <option disabled selected value="null">Seleccione una región</option>
+                                            <ng-container *ngFor="let region of regiones">
+                                                <option [value]="region">{{ region }}</option>
+                                            </ng-container>
+                                        </ng-container>
+
+                                        <ng-container *ngIf="user.region">
+                                            <option selected [value]="user.region">{{user.region}}</option>
+                                            <ng-container *ngFor="let region of regiones">
+                                                <option *ngIf="region !== user.region" [value]="region">{{ region }}
+                                                </option>
+                                            </ng-container>
+                                        </ng-container>
+                                    </select>
+                                    <span *ngIf="campoInvalido('opRegion', 'infoLocalidadPropietario')"
+                                        class="form-text text-danger">
+                                        Seleccione una región.
+                                    </span>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="state" class="form-label">Comuna</label>
+                                    <select class="form-select" id="country" formControlName="opCommune">
+                                        <ng-container *ngIf="!user.comuna">
+                                            <option disabled selected value="null">Seleccione una comuna</option>
+                                            <ng-container *ngFor="let comuna of selectedRegionCommunes">
+                                                <option [value]="comuna">{{ comuna }} </option>
+                                            </ng-container>
+                                        </ng-container>
+
+                                        <ng-container *ngIf="user.comuna">
+                                            <option selected [value]="user.comuna">{{user.comuna}}</option>
+                                            <ng-container *ngFor="let comuna of selectedRegionCommunes">
+                                                <option *ngIf="comuna !== user.comuna" [value]="comuna">{{ comuna }}
+                                                </option>
+                                            </ng-container>
+                                        </ng-container>
+                                    </select>
+                                    <span *ngIf="campoInvalido('opCommune', 'infoLocalidadPropietario')"
+                                        class="form-text text-danger">
+                                        Seleccione una comuna.
+                                    </span>
+                                </div>
                             </div>
 
-                            <div class="col-lg-12 mt-2">
-                                <label for="address2" class="form-label">Dirección #2<span
-                                        class="text-muted">(Opcional)</span></label>
-                                <input type="text" class="form-control" id="address2" value="{{user.dir2Propietario}}"
-                                    disabled>
+                            <div class="row">
+                                <div class="col-lg-12 mt-2">
+                                    <label for="address" class="form-label">Dirección</label>
+                                    <input type="text" class="form-control" id="address"
+                                        formControlName="direccionPropietario">
+                                    <span *ngIf="campoInvalido('direccionPropietario', 'infoLocalidadPropietario')"
+                                        class="form-text text-danger">
+                                        La dirección es obligatoria.
+                                    </span>
+                                </div>
+
+                                <div class="col-lg-12 mt-2">
+                                    <label for="address2" class="form-label">Dirección #2<span
+                                            class="text-muted">(Opcional)</span></label>
+                                    <input type="text" class="form-control" id="address2"
+                                        formControlName="direccionPropietario2">
+                                </div>
+
+                                <div class="col-lg-12 mt-2">
+                                    <label for="addresDescription" class="form-label">
+                                        Descripción <span class="text-muted">(Opcional)</span>
+                                    </label>
+                                    <textarea class="form-control" id="addresDescription"
+                                        formControlName="descripcion">{{user.descripcion}}</textarea>
+                                </div>
                             </div>
 
-                            <div class="col-lg-12 mt-2">
-                                <label for="addresDescription" class="form-label">
-                                    Descripción <span class="text-muted">(Opcional)</span>
-                                </label>
-                                <textarea class="form-control" disabled
-                                    id="addresDescription">{{user.descripcion}}</textarea>
+                            <div class="container">
+                                <button (click)="toggleEditMode('infoLocalidadPropietario')"
+                                    class="btn btn-sm btn-primary float-start my-3 ml-2">
+                                    {{this.editMode.infoLocalidadPropietario? 'Editar' :'Cancelar' }}
+                                </button>
+                                <button
+                                    *ngIf="!loadingInfoLocalidadPropietario && !this.editMode.infoLocalidadPropietario"
+                                    (click)="updateUser('infoLocalidadPropietario')"
+                                    [disabled]="userForm.get('infoLocalidadPropietario')?.invalid || !userForm.get('infoLocalidadPropietario')?.touched"
+                                    class="btn btn-sm btn-primary float-start my-3 mx-2">
+                                    Guardar
+                                </button>
                             </div>
-                        </div>
-
+                        </ng-template>
                     </div>
 
                     <hr>
 
                     <!-- Información de la empresa -->
-                    <div class="row">
+                    <div class="row" formGroupName="infoEmpresa">
                         <h3 class="fs-2">Información de la empresa</h3>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="nameCompany" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="nameCompany"
-                                    value="{{user.Pyme.nombrePyme}}" disabled>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="myRUT" class="form-label">RUT</label>
-                                <input type="text" class="form-control" id="myRUT" value="{{user.Pyme.rut}}" disabled>
+                        <div *ngIf="this.loadingInfoEmpresa; else templateInfoEmpresa"
+                            class="container-fluid mt-5 text-center">
+                            <div class="spinner-border text-primary my-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
 
-                        <div class="row mt-2">
-                            <div class="col-md-6">
-                                <label for="typeCompany" class="form-label">Tipo de empresa</label>
-                                <select class="form-select" id="typeCompany" disabled>
-                                    <option>{{user.Pyme.tipoEmpresa}}</option>
-                                </select>
+                        <ng-template #templateInfoEmpresa>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="nameCompany" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="nameCompany"
+                                        formControlName="nombreEmpresa">
+                                    <span *ngIf="campoInvalido('nombreEmpresa', 'infoEmpresa')"
+                                        class="form-text text-danger">
+                                        El nombre es obligatorio.
+                                    </span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="myRUT" class="form-label">RUT</label>
+                                    <input type="text" class="form-control" id="myRUT" formControlName="rut">
+                                </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="lineOfBusiness" class="form-label">Rubro</label>
-                                <select class="form-select" id="lineOfBusiness" disabled>
-                                    <option>{{user.Pyme.rubro}}</option>
-                                </select>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label for="typeCompany" class="form-label">Tipo de empresa</label>
+                                    <select class="form-select" id="typeCompany" formControlName="tipoEmpresa">
+                                        <ng-container *ngIf="!user.Pyme.tipoEmpresa">
+                                            <option disabled selected value="null">Seleccione una región</option>
+                                            <ng-container *ngFor="let op of opLineOfBussines">
+                                                <option [value]="op">{{ op }}</option>
+                                            </ng-container>
+                                        </ng-container>
+
+                                        <ng-container *ngIf="user.Pyme.tipoEmpresa">
+                                            <option selected [value]="user.Pyme.tipoEmpresa">{{user.Pyme.tipoEmpresa}}
+                                            </option>
+                                            <ng-container *ngFor="let op of opLineOfBussines">
+                                                <option *ngIf="op !== user.Pyme.tipoEmpresa" [value]="op">{{ op }}
+                                                </option>
+                                            </ng-container>
+                                        </ng-container>
+                                    </select>
+                                    <span *ngIf="campoInvalido('tipoEmpresa', 'infoEmpresa')"
+                                        class="form-text text-danger">
+                                        El tipo de empresa es obligatorio.
+                                    </span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="lineOfBusiness" class="form-label">Rubro</label>
+                                    <input class="form-control" id="lineOfBusiness" formControlName="rubro">
+                                    <span *ngIf="campoInvalido('rubro', 'infoEmpresa')" class="form-text text-danger">
+                                        El rubro es obligatorio.
+                                    </span>
+                                </div>
                             </div>
-                        </div>
+
+                            <div class="container">
+                                <button (click)="toggleEditMode('infoEmpresa')"
+                                    class="btn btn-sm btn-primary float-start my-3 ml-2">
+                                    {{this.editMode.infoEmpresa? 'Editar' :'Cancelar' }}
+                                </button>
+                                <button *ngIf="!loadingInfoEmpresa && !this.editMode.infoEmpresa"
+                                    (click)="updateUser('infoEmpresa')"
+                                    [disabled]="userForm.get('infoEmpresa')?.invalid || !userForm.get('infoEmpresa')?.touched"
+                                    class="btn btn-sm btn-primary float-start my-3 mx-2">
+                                    Guardar
+                                </button>
+                            </div>
+                        </ng-template>
                     </div>
 
                     <hr>
 
                     <!-- Localidad y dirección de la empresa -->
-                    <div class="row">
+                    <div class="row" formGroupName="infoLocalidadEmpresa">
                         <h3 class="fs-2">Localidad y dirección de la empresa</h3>
 
-                        <div class="row">
-                            <div class="col-lg-12 form-check form-switch my-3">
-                                <input class="form-check-input" type="checkbox" role="switch"
-                                    id="flexSwitchCheckChecked" disabled>
-                                <label class="form-check-label" for="flexSwitchCheckChecked">Utilizar dirección
-                                    personal</label>
+                        <div *ngIf="this.loadingInfoLocalidadEmpresa; else templateInfoLocalidadEmpresa"
+                            class="container-fluid mt-5 text-center">
+                            <div class="spinner-border text-primary my-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label for="countryCompany" class="form-label">Región</label>
-                                <select class="form-select" id="countryCompany" disabled>
-                                    <option>{{user.Pyme.regionEmpresa}}</option>
-                                </select>
+                        <ng-template #templateInfoLocalidadEmpresa>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label for="countryCompany" class="form-label">Región</label>
+                                    <!-- <select class="form-select" id="countryCompany" formControlName="regionEmpresa">
+                                        
+                                    </select> -->
+                                    <select class="form-select" id="country" formControlName="regionEmpresa"
+                                        (change)="onRegionChange($event, 'infoLocalidadEmpresa.communeEmpresa')">
+                                        <ng-container *ngIf="!user.region">
+                                            <option disabled selected value="null">Seleccione una región</option>
+                                            <ng-container *ngFor="let region of regiones">
+                                                <option [value]="region">{{ region }}</option>
+                                            </ng-container>
+                                        </ng-container>
+
+                                        <ng-container *ngIf="user.region">
+                                            <option selected [value]="user.region">{{user.region}}</option>
+                                            <ng-container *ngFor="let region of regiones">
+                                                <option *ngIf="region !== user.region" [value]="region">{{ region }}
+                                                </option>
+                                            </ng-container>
+                                        </ng-container>
+                                    </select>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="communeCompany" class="form-label">Comuna</label>
+                                    <select class="form-select" id="country" formControlName="communeEmpresa">
+                                        <ng-container *ngIf="!user.Pyme.comunaEmpresa">
+                                            <option disabled selected value="null">Seleccione una comuna</option>
+                                            <ng-container *ngFor="let comuna of selectedRegionCommunes">
+                                                <option [value]="comuna">{{ comuna }} </option>
+                                            </ng-container>
+                                        </ng-container>
+
+                                        <ng-container *ngIf="user.Pyme.comunaEmpresa">
+                                            <option selected [value]="user.Pyme.comunaEmpresa">
+                                                {{user.Pyme.comunaEmpresa}}</option>
+                                            <ng-container *ngFor="let comuna of selectedRegionCommunes">
+                                                <option *ngIf="comuna !== user.Pyme.comunaEmpresa" [value]="comuna">{{
+                                                    comuna }}
+                                                </option>
+                                            </ng-container>
+                                        </ng-container>
+                                    </select>
+                                    <span *ngIf="campoInvalido('communeEmpresa', 'infoLocalidadEmpresa')"
+                                        class="form-text text-danger">
+                                        Seleccione una comuna.
+                                    </span>
+                                </div>
                             </div>
 
-                            <div class="col-lg-6">
-                                <label for="communeCompany" class="form-label">Comuna</label>
-                                <select class="form-select" id="communeCompany" disabled>
-                                    <option>{{user.Pyme.comunaEmpresa}}</option>
-                                </select>
-                            </div>
-                        </div>
+                            <div class="row">
+                                <div class="col-lg-12 mt-2">
+                                    <label for="addressCompany" class="form-label">Dirección</label>
+                                    <input type="text" class="form-control" id="addressCompany"
+                                        formControlName="direccionEmpresa">
+                                    <span *ngIf="campoInvalido('direccionEmpresa', 'infoLocalidadEmpresa')"
+                                        class="form-text text-danger">
+                                        La dirección de la empresa es obligatoria.
+                                    </span>
+                                </div>
 
-                        <div class="row">
-                            <div class="col-lg-12 mt-2">
-                                <label for="addressCompany" class="form-label">Dirección </label>
-                                <input type="text" class="form-control" id="addressCompany"
-                                    value="{{user.Pyme.dirEmpresa}}" disabled>
+                                <div class="col-lg-12 mt-2">
+                                    <label for="addresDescriptionCompany" class="form-label">Descripción
+                                        <span class="text-muted">(Opcional)</span>
+                                    </label>
+                                    <textarea class="form-control" formControlName="descripcionEmpresa"
+                                        id="addresDescriptionCompany">{{user.Pyme.descripcionEmpresa || ''}}</textarea>
+                                </div>
                             </div>
 
-                            <div class="col-lg-12 mt-2">
-                                <label for="addresDescriptionCompany" class="form-label">Descripción
-                                    <span class="text-muted">(Opcional)</span>
-                                </label>
-                                <textarea class="form-control" id="addresDescriptionCompany"
-                                    disabled>{{user.Pyme.descripcionEmpresa}}</textarea>
+                            <div class="container">
+                                <button (click)="toggleEditMode('infoLocalidadEmpresa')"
+                                    class="btn btn-sm btn-primary float-start my-3 ml-2">
+                                    {{this.editMode.infoLocalidadEmpresa? 'Editar' :'Cancelar' }}
+                                </button>
+                                <button *ngIf="!loadingInfoLocalidadEmpresa && !this.editMode.infoLocalidadEmpresa"
+                                    (click)="updateUser('infoLocalidadEmpresa')"
+                                    [disabled]="userForm.get('infoLocalidadEmpresa')?.invalid || !userForm.get('infoLocalidadEmpresa')?.touched"
+                                    class="btn btn-sm btn-primary float-start my-3 mx-2">
+                                    Guardar
+                                </button>
                             </div>
-                        </div>
+                        </ng-template>
                     </div>
 
-                    <div class="row">
-                        <div class="container">
-                            <button class="btn btn-primary float-end my-3">
-                                Editar información
-                            </button>
-                        </div>
-                    </div>
                 </form>
+
+                <!-- Debug Mode -->
+                <div class="container">
+                    <pre><b>formulario.value: </b> {{userForm.value | json }}</pre>
+                    <pre><b>formulario.errors: </b> {{userForm.errors | json }}</pre>
+                </div>
+
             </ng-template>
         </div>
-
-
     </div>
 </div>

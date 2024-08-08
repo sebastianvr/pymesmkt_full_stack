@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { param } = require('express-validator');
+const { validarJWT } = require('../middlewares/validar-jwt');
 const { pymesGet,
     pymeGet,
     pymePost,
@@ -10,18 +11,19 @@ const { validarCampos } = require('../middlewares/validar-campos');
 
 const router = Router();
 
-router.get('/', pymesGet);
+router.get('/', validarJWT, pymesGet);
 
 router.get('/:UsuarioId', [
+    validarJWT,
     param('UsuarioId', 'El id es obligatorio').not().isEmpty(),
     validarCampos
 ], pymeGet);
 
-router.post('/', pymePost);
+router.post('/', validarJWT, pymePost);
 
-router.put('/:id', pymePut);
+router.put('/:id', validarJWT, pymePut);
 
-router.delete('/:id', pymeDelete);
+router.delete('/:id', validarJWT, pymeDelete);
 
 router.get('/rut/:rut', [
     param('rut', 'El rut es obligatorio').not().isEmpty(),

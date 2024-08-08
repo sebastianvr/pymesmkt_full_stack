@@ -41,8 +41,7 @@ export class FilterPublicationComponent implements OnInit {
     const filters = this.buildFilters(formValues);
     const cleanedFilters = this.cleanFilters(filters);
 
-    console.log({ cleanedFilters });
-
+    // console.log({ cleanedFilters });
     this.formSubmitted.emit(cleanedFilters);
   }
 
@@ -77,5 +76,9 @@ export class FilterPublicationComponent implements OnInit {
       }
     }
     return filters;
+  }
+
+  public clearForm(){
+    return this.buildForm();
   }
 }

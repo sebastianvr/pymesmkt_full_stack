@@ -1,113 +1,48 @@
-import { Component, OnInit } from '@angular/core';
-import { PublicacionService } from 'src/app/core/services/publicacion/publicacion.service';
+import { Component, ViewChild } from '@angular/core';
+import { SearchPublicationComponent } from '../../components/search-publication/search-publication.component';
+import { PostCardPymeComponent } from '../../components/post-card-pyme/post-card-pyme.component';
+import { FilterPublicationComponent } from '../../components/filter-publication/filter-publication.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
+  filters: any;
+  @ViewChild(SearchPublicationComponent)
+  searchPublicationComponent!: SearchPublicationComponent;
 
-  publicaciones: any;
-  currentPage!: number;
+  @ViewChild(PostCardPymeComponent)
+  postCardPymeComponent!: PostCardPymeComponent;
 
-  // Paginación
-  page: number = 1;
-  pageSize: number = 20;
-  total!: number;
-  totalPages!: number;
+  @ViewChild(FilterPublicationComponent)
+  filterPublicationComponent!: FilterPublicationComponent;
 
-  isLoading: boolean = true;
+  constructor() { }
 
-  currentFilter: any;
-
-  constructor(
-    private publicacionService: PublicacionService,
-  ) { }
-
-  ngOnInit(): void {
-    const query = {
-      page: this.page,
-      pageSize: this.pageSize,
-    };
-
-    this.getQueryPublications(query);
+  // Actualiza los filtros y pasa los nuevos filtros al componente hijo
+  public onFormFilter0Submitted(filters: any) {
+    this.filters = filters;
   }
 
-  getQueryPublications(filters: any) {
-    this.isLoading = true;
-    this.publicacionService.getQueryPublications(filters)
-      .subscribe(data => {
-        // console.log({ data });
-
-        const {
-          publicaciones,
-          total,
-          currentPage,
-          pageSize,
-          totalPages,
-        } = data;
-
-        this.publicaciones = publicaciones;
-        this.total = total;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.totalPages = totalPages;
-
-        this.isLoading = false;
-
-        // console.log('this.publicaciones', this.publicaciones);
-        // console.log('this.total', this.total);
-        // console.log('this.currentPage', this.currentPage);
-        // console.log('this.pageSize', this.pageSize);
-        // console.log('this.totalPages', this.totalPages);
-        // console.log('this.isLoading', this.isLoading);
-      });
+  // Actualiza los filtros y pasa los nuevos filtros al componente hijo
+  public onFormFilter1Submitted(filters: any) {
+    this.filters = filters;
   }
 
-  onFormFilter0Submitted(filters: any) {
-    // console.log('onFormFilter0Submitted()');
-    // console.log({ filters });
-    this.currentFilter = filters;
-
-
-    this.getQueryPublications(filters);
-  }
-
-  onFormFilter1Submitted(filters: any) {
-    // console.log('onFormFilter1Submitted()');
-    // console.log({ filters });
-    this.currentFilter = filters;
-
-    this.getQueryPublications(filters);
-  }
-
-  onPageChange(newPage: number) {
-    if (this.currentFilter) {
-      const query = {
-        page: newPage,
-        pageSize: this.pageSize,
-        // Agrega los filtros del formulario actual a la consulta
-        ...this.currentFilter,
-      };
-
-      this.getQueryPublications(query);
-    } else {
-      // Si no hay filtro actual, simplemente cambia de página sin filtros adicionales.
-      const query = {
-        page: newPage,
-        pageSize: this.pageSize,
-      };
-      this.getQueryPublications(query);
-    }
-  }
-
-  clearFilter() {
-    this.currentFilter = null;
+  clearFilters() {
+    this.filters = null;
+    this.searchPublicationComponent.clearForm();
+    this.filterPublicationComponent.clearForm();
     const query = {
       page: 1,
-      pageSize: 20,
+      pageSize: 10,
     };
-    this.getQueryPublications(query);
+    this.postCardPymeComponent.getQueryPublications(query);
+  }
+
+  handleClearFiltersEvent() {
+    this.clearFilters();
   }
 }

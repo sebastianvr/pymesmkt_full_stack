@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { UsuarioService } from 'src/app/core/services/usuario/usuario.service';
 
 @Component({
   selector: 'app-navbar-pyme',
@@ -8,21 +9,28 @@ import { AuthService } from '../../../core/services/auth/auth.service';
   styleUrls: ['./navbar-pyme.component.css']
 })
 export class NavbarPymeComponent implements OnInit {
-
-  nombreUsuario: string = this.authService.usuario.nombreUsuario;
+  userName: string = this.authService.usuario.nombreUsuario;
+  userImageUrl: string | null = null;
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private usuarioService: UsuarioService,
   ) { }
 
-
   ngOnInit(): void {
-    console.log(this.nombreUsuario)
+    this.loadUserImage();
   }
 
-  logOut() {
-    this.authService.logOut()
-    this.router.navigate(['visitor'])
+  public logOut() {
+    this.authService.logOut();
+    this.router.navigate(['visitor']);
   }
+
+  private loadUserImage(): void {
+    this.usuarioService.getUsuario(this.authService.usuario.id).subscribe((response: any) => {
+      this.userImageUrl = response.imagen || null;
+    });
+  }
+
 }

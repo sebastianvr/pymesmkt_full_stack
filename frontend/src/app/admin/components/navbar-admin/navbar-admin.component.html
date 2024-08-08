@@ -1,35 +1,33 @@
-<header class="p-3 mb-3 border-bottom">
+<header class="p-3 border-bottom">
     <div class="container">
         <div class="row">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-
-                <app-sidebar-admin></app-sidebar-admin>
-
-                <p class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-                    <strong class="mx-4">Pymes Marketplace</strong>
-                </p>
-
-                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                </ul>
-
-
-                <div class="dropdown">
-                    <div class="d-inline ">
-                        <h4 class="d-inline text fs-5 ml-2">Administrador {{nombreUsuario | titlecase }}</h4>
-
+            <div class="col-12 d-flex align-items-center justify-content-between">
+                <!-- Contenido a la izquierda -->
+                <div class="d-flex align-items-center">
+                    <div class="mx-3">
+                        <app-sidebar-admin nameUser="{{nombreUsuario}}"></app-sidebar-admin>
                     </div>
-                    <div class="d-inline mx-3"></div>
+                    <a routerLink="/admin/view-graph"
+                        class="navbar-brand text-dark text-decoration-none hide-on-small-screen">
+                        <img class="mx-2" src="../../../../assets/icons/factory.svg" alt="factory.svg">
+                        <strong class="smaller-text">Pymes Marketplace</strong>
+                    </a>
+                </div>
+
+                <!-- Contenido a la derecha -->
+                <div class="dropdown">
                     <a class="d-inline link-dark text-decoration-none dropdown-toggle" id="dropdownUser1"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="../../../../assets/icons/people-circle.svg" alt="Foto usuario" width="32" height="32"
                             class="rounded-circle">
                     </a>
+
                     <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                        <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+                        <li><a class="dropdown-item">Mi Perfil</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="/visitor-home">Cerrar sesión</a></li>
+                        <li><a class="dropdown-item" (click)="logOut()">Cerrar sesión</a></li>
                     </ul>
                 </div>
             </div>

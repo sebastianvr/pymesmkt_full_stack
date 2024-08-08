@@ -1,16 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-offers-received',
   templateUrl: './offers-received.component.html',
   styleUrls: ['./offers-received.component.css']
 })
-export class OffersReceivedComponent implements OnInit, OnDestroy {
+export class OffersReceivedComponent implements OnInit {
 
   idUser: string = this.authService.usuario.id;
 
@@ -23,54 +24,84 @@ export class OffersReceivedComponent implements OnInit, OnDestroy {
   total: any;
   currentPage!: number;
   totalPages!: number;
-
+  noSearchMatch!: boolean;
   closeResult: string = '';
 
+  filterForm!: FormGroup;
+  @ViewChild('downloadLink') downloadLink!: ElementRef;
+  isLoadingFile!: boolean;
   constructor(
     private router: Router,
     private ofertaService: OfertaService,
     private authService: AuthService,
     private modalService: NgbModal,
+    private formBuilder: FormBuilder,
   ) {
   }
 
   ngOnInit(): void {
+    this.buildForm();
     this.getOfertasById(this.idUser);
   }
 
-  ngOnDestroy(): void {
+  private buildForm() {
+    this.filterForm = this.formBuilder.group({
+      searchTerm: [null, [Validators.required]],
+      searchOption: ['titulo', Validators.required],
+    });
+
+    this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
+      const searchTermControl = this.filterForm.get('searchTerm');
+
+      searchTermControl?.clearValidators();
+
+      if (option === 'fecha') {
+        searchTermControl?.setValidators([Validators.required, this.validateDate]);
+      } else if (option === 'titulo') {
+        searchTermControl?.setValidators(Validators.required);
+      } else if (option === 'pyme') {
+        searchTermControl?.setValidators(Validators.required);
+      }
+
+      searchTermControl?.reset();
+      searchTermControl?.updateValueAndValidity();
+    });
   }
 
   private getOfertasById(filters: any) {
     this.isLoading = true;
-    console.log({ filters });
-    this.ofertaService.getOfertasById(this.idUser, filters).subscribe((data) => {
-      console.log({ data });
-      this.isLoading = false;
 
-      if (data.rows.length === 0) {
-        this.isEmptyOffersReceived = true;
-      } else {
-        const {
-          rows,
-          total,
-          currentPage,
-          pageSize,
-          totalPages,
-        } = data;
+    this.ofertaService.getOfertasRecibidas(this.idUser, filters)
+      .subscribe((data) => {
+        this.isLoading = false;
 
-        this.total = total;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.totalPages = totalPages;
-        this.ofertas = rows;
-        this.isEmptyOffersReceived = false;
+        if (data.noSearchMatch) {
+          this.noSearchMatch = true;
+          this.isEmptyOffersReceived = false;
+        } else {
+          const {
+            ofertas,
+            total,
+            currentPage,
+            pageSize,
+            totalPages,
+          } = data;
 
-        console.log(this.ofertas);
-      }
-
-      this.isLoading = false;
-    });
+          if (ofertas.length === 0) {
+            this.isEmptyOffersReceived = true;
+            this.noSearchMatch = false;
+          } else {
+            this.isEmptyOffersReceived = false;
+            this.total = total;
+            this.currentPage = currentPage;
+            this.pageSize = pageSize;
+            this.totalPages = totalPages;
+            this.ofertas = ofertas;
+            this.noSearchMatch = false;
+          }
+        }
+        this.isLoading = false;
+      });
   }
 
   eliminarOferta(idOferta: string) {
@@ -94,7 +125,7 @@ export class OffersReceivedComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         this.ofertaService.deleteOferta(idOferta).subscribe((data) => {
-          console.log(data);
+          // console.log(data);
         });
 
         swalWithBootstrapButtons.fire(
@@ -123,37 +154,69 @@ export class OffersReceivedComponent implements OnInit, OnDestroy {
     });
   }
 
-  open(content: any) {
-    this.modalService.open(content,
-      {
-        ariaLabelledBy: 'modal-basic-title',
-        centered: true,
-      }).result.then((result) => {
-        this.closeResult = `Closed with: ${result}`;
-      }, (reason) => {
-        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-      });
-  }
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
-  }
-
   public clearFilter() {
     const query = {
+      idUser: this.idUser,
       page: 1,
       pageSize: 20,
     };
-    // this.getPublicationsById(query);
+    this.getOfertasById(query);
 
-    // const searchTermControl = this.filterForm.get('searchTerm');
-    // searchTermControl?.setValue(null);
-    // searchTermControl?.reset(); 
+    const searchTermControl = this.filterForm.get('searchTerm');
+    searchTermControl?.setValue(null);
+    searchTermControl?.reset();
   }
+
+  private validateDate(control: AbstractControl): { [key: string]: boolean } | null {
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+
+    if (dateRegex.test(control.value)) {
+      const parts = control.value.split('-');
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+
+      // Verificar si el día, mes y año son válidos
+      if (
+        day >= 1 &&
+        day <= 31 &&
+        month >= 1 &&
+        month <= 12 &&
+        year >= 1900 && // Ajusta el rango de años según tus necesidades
+        year <= 2099 // Ajusta el rango de años según tus necesidades
+      ) {
+        return null; // Fecha válida
+      }
+    }
+
+    return { invalidDate: true };
+  }
+
+  public sendForm() {
+    if (this.filterForm.invalid) {
+      this.filterForm.markAllAsTouched();
+      return;
+    }
+
+    const formValues = this.filterForm.value;
+    const query = {
+      [formValues.searchOption]: formValues.searchTerm,
+      page: this.page,
+      pageSize: this.pageSize,
+    };
+
+    this.getOfertasById(query);
+  }
+
+  public downloadFile(idOffer: string) {
+    this.isLoadingFile = true;
+    this.ofertaService.getUrlOffer(idOffer).subscribe((data: any) => {
+      const link: HTMLAnchorElement = this.downloadLink.nativeElement;
+      link.href = data.oferta.archivo;
+      link.download = '';
+      link.click();
+      this.isLoadingFile = false;
+    });
+  }
+
 }

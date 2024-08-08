@@ -10,53 +10,64 @@ import { tap } from 'rxjs/operators';
 export class UsuarioService {
 
   private url: string = environment.baseUrl
-  private refreshUsuarios = new Subject<void>()
-
+  private refreshUsuarios = new Subject<void>();
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
   ) { }
 
   get refresh() {
-    return this.refreshUsuarios
+    return this.refreshUsuarios;
   }
 
   getUsuario(id: string): Observable<any> {
     return this.http.get<any>(`${this.url}/api/usuario/${id}`);
   }
 
-  getAllUsuarios(page: number = 0, size: number = 0): Observable<any> {
-    return this.http.get<any>(`${this.url}/api/usuario/?pageSize=${size}&page=${page}`);
+  getAllUsersById(filters: any): Observable<any> {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/usuario?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
   }
 
-  getAllUsuariosSuspended(page: number = 0, size: number = 0) {
-    return this.http.get<any>(`${this.url}/api/usuario/suspended/?pageSize=${size}&page=${page}`);
+  getAllUsuariosSuspended(filters: any) {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/usuario/suspended/?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
   }
 
-  getAllUsuariosDeleted(page: number = 0, size: number = 0) {
-    return this.http.get<any>(`${this.url}/api/usuario/deleted/?size=${size}&page=${page}`);
+  getAllUsuariosDeleted(filters: any) {
+    const queryParams = { ...filters };
+    const queryString = Object.keys(queryParams)
+      .map(key => `${key}=${encodeURIComponent(queryParams[key])}`)
+      .join('&');
+
+    const urlWithQuery = `${this.url}/api/usuario/deleted/?${queryString}`;
+    return this.http.get<any>(urlWithQuery);
+  }
+
+  updateUser(id: string, userUpdate: any) {
+    return this.http.put<any>(`${this.url}/api/usuario/${id}`, userUpdate);
   }
 
   suspenderUsuario(id: any) {
-    return this.http.put<any>(`${this.url}/api/usuario/suspend/${id}`, {})
-      .pipe(
-        tap(() => {
-          this.refresh.next();
-        }),
-      );
+    return this.http.put<any>(`${this.url}/api/usuario/suspend/${id}`, {});
   }
 
   deleteUsuario(id: any) {
-    return this.http.delete<any>(`${this.url}/api/usuario/delete/${id}`, {})
-    .pipe(
-      tap(() => {
-        this.refresh.next();
-      }),
-    );
+    return this.http.delete<any>(`${this.url}/api/usuario/delete/${id}`, {});
   }
 
-  activarUsuario(usuario: any) {
-    return this.http.put<any>(`${this.url}/api/usuario/activate/${usuario.id}`, usuario)
+  activarUsuario(id: string) {
+    return this.http.put<any>(`${this.url}/api/usuario/activate/${id}`, id)
       .pipe(
         tap(() => {
           this.refresh.next();

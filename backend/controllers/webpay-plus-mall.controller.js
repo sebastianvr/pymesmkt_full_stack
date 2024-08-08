@@ -5,12 +5,11 @@ const asyncHandler = require("../helpers/async_handler");
 
 
 exports.create = asyncHandler(async function (request, response, next) {
+    console.log('[transbank] create()');
 
     const { amount, returnUrl } = request.query
-
-    console.log('amount', amount)
-    console.log('returnUrl', returnUrl)
-
+    // console.log('amount', amount)
+    // console.log('returnUrl', returnUrl)
 
     let buyOrder = "O-" + Math.floor(Math.random() * 10000) + 1;
     let sessionId = "S-" + Math.floor(Math.random() * 10000) + 1;
@@ -35,27 +34,32 @@ exports.create = asyncHandler(async function (request, response, next) {
     // console.log('process.env.WPPM_CC : ', process.env.WPPM_CC)
     // console.log('details : ', details)
 
-    const createResponse = await (new WebpayPlus.MallTransaction()).create(
-        buyOrder,
-        sessionId,
-        returnUrl,
-        details
-    );
-
-    // console.log('createResponse', createResponse)
-
-    let token = createResponse.token;
-    let url = createResponse.url;
-
-    response.status(200).json({
-        ok: true,
-        token,
-        url
-    })
+    try {
+        const createResponse = await (new WebpayPlus.MallTransaction()).create(
+            buyOrder,
+            sessionId,
+            returnUrl,
+            details
+        );
+    
+        // console.log('createResponse', createResponse)
+    
+        let token = createResponse.token;
+        let url = createResponse.url;
+    
+        response.status(200).json({
+            ok: true,
+            token,
+            url
+        })
+        
+    } catch (error) {
+        console.error(error);
+    }
 });
 
-
 exports.commit = asyncHandler(async function (request, response, next) {
+    console.log('[transbank] commit()');
 
     //Flujos:
     //1. Flujo normal (OK): solo llega token_ws
@@ -117,8 +121,9 @@ exports.commit = asyncHandler(async function (request, response, next) {
 });
 
 exports.status = asyncHandler(async function (request, response, next) {
-    let token = request.body.token;
+    console.log('[transbank] status()');
 
+    let token = request.body.token;
     const statusResponse = await (new WebpayPlus.MallTransaction()).status(token);
 
     let viewData = {
@@ -137,6 +142,8 @@ exports.status = asyncHandler(async function (request, response, next) {
 });
 
 exports.refund = asyncHandler(async function (request, response, next) {
+    console.log('[transbank] refund()');
+
     let { token, amount } = request.body;
     let buyOrder = request.body.buy_order;
     let commerceCode = request.body.commerce_code;

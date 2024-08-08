@@ -1,7 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { catchError } from 'rxjs/operators';
 import * as d3 from 'd3';
-import { GraphService } from '../../../core/services/graph/graph.service';
-import { zoom, ZoomBehavior, ZoomTransform } from 'd3-zoom';
+import { ZoomBehavior, ZoomTransform } from 'd3-zoom';
+import { GraphService } from 'src/app/core/services/graph/graph.service';
 
 @Component({
   selector: 'app-view-graph',
@@ -9,42 +10,70 @@ import { zoom, ZoomBehavior, ZoomTransform } from 'd3-zoom';
   styleUrls: ['./view-graph.component.css']
 })
 export class ViewGraphComponent implements OnInit {
-
-  allData: any = {}
-  zoom!: ZoomBehavior<Element, unknown>;
+  nodes: any[] = [];
+  links: any[] = [];
   svg: any;
-  div: any = document.querySelector("#divGraph");
 
-  nodes = [
-    { index: 0, name: 'El Molino De Oro' },
-    { index: 1, name: 'El Nogal' },
-    { index: 2, name: 'Doña Carmen' },
-    { index: 3, name: 'Dulce Tentación' },
-    { index: 4, name: 'La Baguette' },
-    { index: 5, name: 'Pastelería El Gato' },
-  ];
+  // TODO : cambiar querySelector. 
+  div: Element | null = document.querySelector("#divGraph");
+  zoom!: ZoomBehavior<Element, unknown>;
+  showExample: boolean = false;
+  @ViewChild('zoomRange') zoomRange!: ElementRef;
 
-  links = [
-    { source: this.nodes[0], target: this.nodes[1], type: 1 },
-    { source: this.nodes[0], target: this.nodes[2], type: 3 },
-    { source: this.nodes[1], target: this.nodes[3], type: 4 },
-    { source: this.nodes[1], target: this.nodes[4], type: 2 },
-  ];
+  isEmptyGraph: boolean = false;
+  isLoading: boolean = false;
+  zoomLevel: number = 1;
 
   constructor(private graphService: GraphService) { }
 
   ngOnInit(): void {
-    this.graphService.getDataGraph().subscribe((data) => {
-      this.allData = data;
-      console.log('this.allData', this.allData);
-    });
+    if (this.showExample) {
+      // console.log('first');
+      // this.showExampleGraph();
+      // this.isEmptyGraph = false;
+      // this.initializeGraph();
+      return;
+    }
 
-    this.initializeGraph()
+    this.loadDataGraph();
   }
 
-  initializeGraph(): void {
-    const width: any = screen.width
-    const height: any = screen.height
+  private loadDataGraph(): void {
+    this.isLoading = true;
+    this.graphService.getDataGraph()
+      .pipe(
+        catchError((error) => {
+          console.error(error);
+          this.isLoading = false;
+          return error;
+        })
+      )
+      .subscribe((data) => {
+        this.handleGraphData(data);
+        this.isLoading = false;
+      });
+  }
+
+  private handleGraphData(data: any): void {
+    const { nodes, links } = data;
+
+    if (nodes.length === 0 && links.length === 0) {
+      // console.log('Los nodos y los enlaces están vacíos.');
+      this.isEmptyGraph = true;
+      return;
+    }
+
+    this.isEmptyGraph = false;
+    this.links = links;
+    this.nodes = nodes;
+    // console.log({ data })
+    this.initializeGraph();
+  }
+
+  private initializeGraph() {
+    // console.log('initializeGraph()');
+    const width: number = screen.width;
+    const height: number = screen.height;
 
     const simulation = d3.forceSimulation(this.nodes)
       .force('link', d3.forceLink(this.links).id((d: any) => d.id))
@@ -53,11 +82,13 @@ export class ViewGraphComponent implements OnInit {
       .force("y", d3.forceY());
 
     const svg = d3.select('#divGraph').append('svg')
+      .attr("width", "100%")
+      .attr("height", "100%")
       .attr("viewBox", [-width / 2, -(height - 500) / 2, width, height - 500])
       .style("font", "12px sans-serif");
 
     this.zoom = d3.zoom()
-      .scaleExtent([0.5, 5]) // Define los límites de escala del zoom
+      .scaleExtent([1, 30]) // Define los límites de escala del zoom
       .on('zoom', this.zoomed.bind(this)); // Llama a la función zoomed cuando se realiza el zoom
 
     // Obtén el elemento SVG
@@ -69,7 +100,7 @@ export class ViewGraphComponent implements OnInit {
     svg.append("svg:defs").selectAll("marker")
       .data(['arrow'])
       .enter().append("svg:marker")
-      .attr("id", String)
+      .attr("id", (d: string) => d)
       .attr("viewBox", "0 -5 10 10")
       .attr("refX", 10)
       .attr("refY", -0.5)
@@ -88,7 +119,8 @@ export class ViewGraphComponent implements OnInit {
       .join("path")
       .attr("id", (d: any) => `${d.source.name}x${d.target.name}`)
       .attr("stroke", "black")
-      .attr("marker-end", "url(#arrow)")
+      .attr("marker-end", "url(#arrow)") // Asegura que el marcador se aplique inicialmente
+
 
     const linkLabel = svg
       .selectAll(".link-label")
@@ -96,7 +128,7 @@ export class ViewGraphComponent implements OnInit {
       .enter()
       .append("text")
       .attr("class", "link-label")
-      .attr("dy", -4)
+      .attr("dy", -2)
       .attr("text-anchor", "middle")
       .append("textPath")
       .attr("startOffset", "50%")
@@ -118,6 +150,8 @@ export class ViewGraphComponent implements OnInit {
       .attr("r", 4)
       .style('fill', "#0d6efd")
       .style('cursor', 'pointer')
+      .on('mouseover', (e, d) => handleMouseOver(d))
+      .on('mouseout', (e, d) => handleMouseOut(d))
       .call(
         d3.drag<SVGCircleElement, any>()
           .on('start', (e, d) => dragstarted(e, d))
@@ -126,8 +160,8 @@ export class ViewGraphComponent implements OnInit {
       );
 
     const labelsCircles = node.append('text')
-      .attr("x", 0)
-      .attr("y", "1em")
+      .attr("dy", "1.1em")  // Ajusta la posición vertical del texto
+      .style("text-anchor", "middle")  // Centra el texto horizontalmente
       .text((d: any) => d.name)
       .clone(true).lower()
       .attr("fill", "none")
@@ -159,10 +193,59 @@ export class ViewGraphComponent implements OnInit {
       d.fx = null;
       d.fy = null;
     };
+
+    const handleMouseOver = (d: any) => {
+      // Reducir la opacidad de todos los elementos
+      d3.selectAll('circle, path, text').style('opacity', 0.1);
+
+      // Crear un conjunto para almacenar los IDs de los nodos y enlaces relacionados
+      const relatedNodeIds = new Set();
+      const relatedLinkIds = new Set();
+
+      // Agregar el nodo actual y sus conexiones
+      relatedNodeIds.add(d.id);
+
+      this.links.forEach(link => {
+        if (link.source && link.target) { // Verificar que source y target estén definidos
+          if (link.source.id === d.id) {
+            relatedNodeIds.add(link.target.id);
+            relatedLinkIds.add(`${link.source.id}-${link.target.id}`);
+          } else if (link.target.id === d.id) {
+            relatedNodeIds.add(link.source.id);
+            relatedLinkIds.add(`${link.source.id}-${link.target.id}`);
+          }
+        }
+      });
+
+      // Ajustar la opacidad y propiedades de los elementos relacionados
+      d3.selectAll('circle, text')
+        .filter((node: any) => relatedNodeIds.has(node.id))
+        .style('opacity', 1);
+
+      d3.selectAll('path')
+        .filter((link: any) => {
+          if (link.source && link.target) { // Verificar que source y target estén definidos
+            const linkId = `${link.source.id}-${link.target.id}`;
+            return relatedLinkIds.has(linkId);
+          } else {
+            return false; // Si no están definidos, no incluir el enlace
+          }
+        })
+        .style('opacity', 1)
+        .attr('stroke', (link: any) => link.source.id === d.id ? 'blue' : 'green') // Colorear los enlaces
+        .attr('marker-end', (link: any) => {
+          return link.source.id === d.id ? 'url(#arrow-out)' : 'url(#arrow-in)';
+        });
+    };
+
+    const handleMouseOut = (d: any) => {
+      d3.selectAll('circle').style('opacity', 1);
+      d3.selectAll('path').style('opacity', 1).attr('stroke', 'black').attr('marker-end', 'url(#arrow)');
+      d3.selectAll('text').style('opacity', 1);
+    };
   }
 
-
-  linkArc(d: any) {
+  private linkArc(d: any) {
     const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
     return `
       M${d.source.x},${d.source.y}
@@ -170,37 +253,70 @@ export class ViewGraphComponent implements OnInit {
     `;
   }
 
-  zoomed(event: any) {
-    const transform: ZoomTransform = event.transform;
-    // Aplica la transformación al elemento SVG
+  public zoomed({ transform }: { transform: ZoomTransform }) {
     this.svg.attr('transform', transform);
   }
 
-  zoomIn(): void {
-    this.zoom.scaleBy(this.svg, 1.2); // Aumenta la escala del zoom en 1.2 veces
+  public zoomIn() {
+    this.zoomLevel = Math.min(this.zoomLevel + 2, 30);
+    this.svg.transition().call(this.zoom.scaleTo, this.zoomLevel);
+    this.zoomRange.nativeElement.value = this.zoomLevel;
   }
 
-  zoomOut(): void {
-    this.zoom.scaleBy(this.svg, 0.8); // Reduce la escala del zoom en 0.8 veces
+  public zoomOut() {
+    this.zoomLevel = Math.max(this.zoomLevel - 2, 1);
+    this.svg.transition().call(this.zoom.scaleTo, this.zoomLevel);
+    this.zoomRange.nativeElement.value = this.zoomLevel;
   }
 
-  centerGraph(): void {
+  public onZoomChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const newZoomLevel = +input.value;
+    this.svg.transition().call(this.zoom.scaleTo, newZoomLevel);
+  }
+
+  public centerGraph() {
     const svgElement = this.svg.node();
-    const svgWidth = +svgElement.getAttribute("width");
-    const svgHeight = +svgElement.getAttribute("height");
 
-    // Calcula el centro del gráfico
-    const centerX = svgWidth / 2;
-    const centerY = svgHeight / 2;
+    if (!svgElement) return;
 
-    // Realiza la transición para centrar el gráfico
+    // Obteniendo tamaño del contenedor del SVG
+    const bbox = svgElement.getBBox();
+    const centerX = -bbox.x - bbox.width / 2;
+    const centerY = -bbox.y - bbox.height / 2;
+
+    // Transición para centrar el gráfico
     this.svg
       .transition()
       .duration(750) // Duración de la transición en milisegundos
       .call(
         this.zoom.transform,
-        d3.zoomIdentity.translate(centerX, centerY)
+        d3.zoomIdentity.translate(centerX, centerY).scale(1)
       );
   }
 
+  private showExampleGraph() {
+    this.nodes = [
+      { id: 'ab', name: "Cornellá de Llobregat" },
+      { id: 'ac', name: "Domínguez Hermanos" },
+      { id: 'ad', name: "Godínez e Hijos" },
+      { id: 'af', name: "Rojas S.l." },
+    ];
+
+    this.links = [
+      { source: this.nodes[0].id, target: this.nodes[1].id, type: 1 },
+      { source: this.nodes[0].id, target: this.nodes[2].id, type: 3 },
+    ];
+  }
+
+  public refresh() {
+    // Eliminar antiguo svg
+    d3.select('#divGraph svg').remove();
+    this.loadDataGraph();
+  }
+
+  public showDemo() {
+    this.showExample = true;
+    this.ngOnInit();
+  }
 }

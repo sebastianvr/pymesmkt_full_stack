@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OfertaService } from 'src/app/core/services/oferta/oferta.service';
@@ -25,6 +25,8 @@ export class OffersMadeComponent implements OnInit {
   totalPages!: number;
 
   filterForm! : FormGroup;
+  @ViewChild('downloadLink') downloadLink!: ElementRef;
+  isLoadingFile! : boolean;
 
   // Custom Pipe 
   garantiaMapa = {
@@ -47,7 +49,7 @@ export class OffersMadeComponent implements OnInit {
   private buildForm() {
     this.filterForm = this.formBuilder.group({
       searchTerm: [null, [Validators.required]],
-      searchOption: ['fecha', Validators.required],
+      searchOption: ['pyme', Validators.required],
     });
 
     this.filterForm.get('searchOption')?.valueChanges.subscribe((option) => {
@@ -55,7 +57,9 @@ export class OffersMadeComponent implements OnInit {
 
       searchTermControl?.clearValidators();
 
-      if (option === 'fecha') {
+      if (option === 'pyme') {
+        searchTermControl?.setValidators(Validators.required);
+      } else if (option === 'fecha') {
         searchTermControl?.setValidators([Validators.required, this.validateDate]);
       } else if (option === 'mensaje') {
         searchTermControl?.setValidators(Validators.required);
@@ -66,18 +70,10 @@ export class OffersMadeComponent implements OnInit {
     });
   }
 
-  // getOfertas() {
-  //   this.ofertaService.getOfertasRealizadas(this.idUser).subscribe((data) => {
-  //     this.ofertas = data.content;
-  //     console.log('getOfertasRealizadas: ', data);
-  //     console.log('this.ofertas: ', this.ofertas);
-  //   });
-  // }
-
   private getOfertasById(filters: any) {
     this.isLoading = true;
     console.log({ filters });
-    this.ofertaService.getOfertasById(this.idUser, filters).subscribe((data) => {
+    this.ofertaService.getOfertasRealizadas(this.idUser, filters).subscribe((data) => {
       console.log({ data });
       this.isLoading = false;
 
@@ -129,6 +125,7 @@ export class OffersMadeComponent implements OnInit {
       if (result.isConfirmed) {
         this.ofertaService.deleteOferta(idOferta).subscribe((data) => {
           console.log(data);
+          this.ofertas = this.ofertas.filter((oferta: any) => oferta.id !== idOferta);
         });
 
         swalWithBootstrapButtons.fire(
@@ -148,9 +145,13 @@ export class OffersMadeComponent implements OnInit {
 
     this.getOfertasById(query);
 
-    // const searchTermControl = this.filterForm.get('searchTerm');
-    // searchTermControl?.setValue(null);
-    // searchTermControl?.reset(); 
+    const searchTermControl = this.filterForm.get('searchTerm');
+    searchTermControl?.setErrors(null); 
+    searchTermControl?.reset(); 
+    
+    const searchOption = this.filterForm.get('searchOption');
+    searchOption?.setErrors(null); 
+      
   }
 
   private validateDate(control: AbstractControl): { [key: string]: boolean } | null {
@@ -194,5 +195,18 @@ export class OffersMadeComponent implements OnInit {
 
     console.log({ query });
     this.getOfertasById(query);
+  }
+
+  public downloadFile(idOffer : string) {
+    console.log({idOffer})
+    this.isLoadingFile = true;
+    this.ofertaService.getUrlOffer(idOffer).subscribe((data :any) =>{
+      console.log({data})
+      const link: HTMLAnchorElement = this.downloadLink.nativeElement;
+      link.href = data.oferta.archivo;
+      link.download = '';
+      link.click();
+      this.isLoadingFile = false;
+    });
   }
 }

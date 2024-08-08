@@ -9,6 +9,7 @@ const db = new Sequelize(
         dialect: 'mysql',
         port: process.env.DB_PORT,
         logging: console.log,
+        timezone: '-03:00', // Configuración de la zona horaria de Chile
     }
 );
 

@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
+import { PanelMenu } from 'primeng/panelmenu';
 
 @Component({
     selector: 'app-sidebar-user',
@@ -10,7 +11,6 @@ import { PrimeNGConfig } from 'primeng/api';
 export class SidebarUserComponent implements OnInit {
 
     display!: boolean;
-    visibleMenu: boolean = true;
     itemsPanelMenu: MenuItem[] = [];
 
     @Input() nameUser!: string
@@ -48,7 +48,7 @@ export class SidebarUserComponent implements OnInit {
             },
             {
                 label: 'Ofertas',
-                icon: 'pi pi-fw pi-dollar',
+                icon: 'pi pi-fw pi-wallet',
                 items: [
                     {
                         label: 'Ofertas recibidas',
@@ -69,14 +69,17 @@ export class SidebarUserComponent implements OnInit {
             },
             {
                 label: 'Ventas',
-                icon: 'pi pi-fw pi-wallet',
+                icon: 'pi pi-fw pi-dollar',
                 routerLink: '/user/sales',
             },
         ]
     }
 
-    hideMenu() {
-        this.visibleMenu = false;
-    }
-
+    // closeSidebar() {
+    //     const offcanvas: HTMLElement | null = document.querySelector('#offcanvasExample');
+    //     if (offcanvas) {
+    //         offcanvas.classList.remove('show'); // cierra el sidebar
+    //         // this.panelMenu.hide(); // oculta el menú desplegable (si está abierto)
+    //     }
+    // }
 }

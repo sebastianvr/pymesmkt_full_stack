@@ -13,13 +13,15 @@
                     <form [formGroup]="filterForm" class="input-group mb-3">
                         <select class="form-select customSelect text-center" id="searchOptionSelect"
                             formControlName="searchOption">
-                            <option [value]="'fecha'">Fecha</option>
                             <option [value]="'mensaje'">Mensaje</option>
+                            <option [value]="'fecha'">Fecha</option>
+                            <option [value]="'pyme'">Empresa</option>
                         </select>
 
                         <input type="text" class="form-control" formControlName="searchTerm"
                             aria-label="Término de búsqueda" />
-                        <button class="input-group-text btn btn-primary" id="basic-addon2" (click)="sendForm()">
+                        <button style="border-top-right-radius: .375rem; border-bottom-right-radius: .375rem;"
+                            class="input-group-text btn btn-primary" id="basic-addon2" (click)="sendForm()">
                             Buscar
                         </button>
 
@@ -57,7 +59,8 @@
             <div class="col-md-12 text-center" *ngIf="isEmptyOffersReceived && !isLoading">
                 <div class="container mt-5">
                     <img src="../../../../assets/icons/offer-icon.svg" alt="offer-icon.svg" class="icon-image">
-                    <h3 class="my-3">No tienes ofertas realizadas aún.</h3>
+                    <h3 *ngIf="!ofertas" class="my-3">No tienes ofertas realizadas aún.</h3>
+                    <h3 *ngIf="ofertas" class="my-3">No se encontraron coincidencias.</h3>
 
                     <ng-container *ngIf="ofertas">
                         <div class="col-lg-12">
@@ -76,43 +79,74 @@
                     <div class="card">
                         <div class="card-header">
                             <span class="text-muted float-end fst-italic" pTooltip="Fecha de creación">
-                                {{oferta.createdAt | date : 'dd MMMM yyyy'}}
+                                {{oferta.createdAt | date : 'dd MMMM yyyy' : '+0000'}}
                             </span>
                             <h3 class="fs-4 m-0">
                                 <span pTooltip="Nombre de la empresa" data-placement="top">
-                                    Oferta ⇒ {{oferta.Publicacion.Usuario.Pyme.nombrePyme | uppercase}}
+                                    Empresa ⇒ {{oferta.Publicacion.Usuario.Pyme.nombrePyme | uppercase}}
                                 </span>
                             </h3>
                         </div>
 
                         <div class="card-body">
-                            <p class="messageCard fs-5">{{oferta.mensaje}}</p>
-                            <div class="my-2">
-                                <h4 class="fs-5">
-                                    <strong>
-                                        Precio : {{oferta.precioOferta | currency : 'CLP'}}
-                                    </strong>
-                                </h4>
-                            </div>
+                            <div class="container">
+                                <p class="fs-6 my-2">
+                                    <span class="mb-2 text-muted fst-italic">Mensaje :</span><br>
+                                    {{oferta.mensaje}}
+                                </p>
 
-                            <div class="container col-lg-12 my-3">
-                                <div class="col-md-12">
-                                    <button (click)="eliminarOferta(oferta.id)"
-                                        class="btn btn-danger btn-sm float-start">
-                                        Eliminar
-                                    </button>
-                                </div>
-                                <div class="col-md-12">
-                                    <button class="btn btn-primary btn-sm float-end">Editar</button>
+                                <div class="my-3">
+                                    <div
+                                        class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                                        <ng-container *ngIf="oferta.archivo">
+                                            <div class="mb-3 mb-sm-0">
+                                                <h3 class="fs-6"><strong>Archivos adjuntos</strong></h3>
+                                                <button [disabled]="isLoadingFile" class="btn btn-success btn-sm"
+                                                    type="button" (click)="downloadFile(oferta.id)">
+                                                    <ng-container *ngIf="!isLoadingFile">Descargar
+                                                        <img class="icon-button-style"
+                                                            src="../../../../assets/icons/download.svg"
+                                                            alt="download.svg">
+                                                    </ng-container>
+                                                    <ng-container *ngIf="isLoadingFile">
+                                                        Descargando...
+                                                        <div class="spinner-border spinner-border-sm text-light"
+                                                            role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </ng-container>
+                                                </button>
+                                                <a #downloadLink style="display: none;"></a>
+                                            </div>
+                                        </ng-container>
+                                        <p class="fs-6 mb-3 mt-3 mt-sm-0">
+                                            <strong class="alert-info alert p-2">
+                                                Precio de oferta: {{oferta.precioOferta | currency : 'CLP'}}
+                                            </strong>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-footer">
                             <ngb-accordion #acc="ngbAccordion">
                                 <ngb-panel title="Detalles de la publicación ">
                                     <ng-template ngbPanelContent>
-                                        <div class="row col-lg-12 mx-3">
-                                            <h3 class="text-center">
+                                        <div class="row mx-3 mt-3">
+                                            <div class="container">
+                                                <h6 class="alert alert-success py-1 float-start"
+                                                    ngbTooltip="ID de la publicación">
+                                                    {{oferta.PublicacionId}}
+                                                </h6>
+
+                                                <a pTooltip="Ir a la publicación" class="float-end"
+                                                    [routerLink]="['/user/publication-detail/', oferta.PublicacionId]">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd"
+                                                            d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm5.854 8.803a.5.5 0 1 1-.708-.707L9.243 6H6.475a.5.5 0 1 1 0-1h3.975a.5.5 0 0 1 .5.5v3.975a.5.5 0 1 1-1 0V6.707z" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                            <h3 class="text-start">
                                                 {{oferta.Publicacion.titulo | uppercase}}
                                             </h3>
                                             <p class="descriptionCard">
@@ -157,8 +191,8 @@
                                                     <tr *ngIf="oferta.Publicacion.fechaFinServicio">
                                                         <td><strong>Fecha finalización del servicio</strong>
                                                         </td>
-                                                        <td>{{oferta.Publicacion.fechaFinServicio | date :
-                                                            'dd MMMM yyyy'}}
+                                                        <td>{{oferta.Publicacion.fechaFinServicio | date : 'dd MMMM
+                                                            yyyy' : '+0000'}}
                                                         </td>
                                                     </tr>
                                                     <tr *ngIf="oferta.Publicacion.horasATrabajar">
@@ -179,6 +213,11 @@
                                     </ng-template>
                                 </ngb-panel>
                             </ngb-accordion>
+                        </div>
+                        <div class="card-footer">
+                            <button (click)="eliminarOferta(oferta.id)" class="btn btn-danger btn-sm float-start">
+                                Eliminar
+                            </button>
                         </div>
                     </div>
                 </div>

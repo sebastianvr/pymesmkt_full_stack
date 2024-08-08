@@ -8,111 +8,225 @@
                 <h2 class="fs-1 mb-1"><strong>Ofertas Recibidas</strong></h2>
             </div>
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 input-group input-group-sm mb-3 mx-3 ">
-                        <div class="input-group input-group-md">
-                            <input type="text" class="form-control" aria-label="Sizing example input"
-                                aria-describedby="inputGroup-sizing-lg" id="buscarOferta">
-                            <span class="input-group-text mr-3" id="inputGroup-sizing-lg">Buscar</span>
+            <div class="col-md-12">
+                <div class="input-group mb-3">
+                    <form [formGroup]="filterForm" class="input-group mb-3">
+                        <select class="form-select customSelect text-center" id="searchOptionSelect"
+                            formControlName="searchOption">
+                            <option [value]="'titulo'">Título</option>
+                            <option [value]="'fecha'">Fecha</option>
+                            <option [value]="'pyme'">Empresa</option>
+                        </select>
+
+                        <input type="text" class="form-control" formControlName="searchTerm"
+                            aria-label="Término de búsqueda" />
+                        <button style="border-top-right-radius: .375rem; border-bottom-right-radius: .375rem;"
+                            class="input-group-text btn btn-primary" id="basic-addon2" (click)="sendForm()">
+                            Buscar
+                        </button>
+
+                        <div class="container">
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('required')"
+                                class="text-danger">Este campo es requerido.</div>
+                            <div *ngIf="filterForm.get('searchTerm')?.touched && filterForm.get('searchTerm')?.hasError('invalidDate')"
+                                class="text-danger">La fecha debe ser tipo DD-MM-YYYY.</div>
+                        </div>
+                    </form>
+
+                    <div class="row my-1">
+                        <div class="col-lg-12">
+                            <button ngbTooltip="Limpiar búsqueda" (click)="clearFilter()"
+                                class="btn btn-sm btn-primary float-end">
+                                <img src="../../../../assets/icons/magic.svg" alt="magic.svg">
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Debug -->
+                    <!-- <div class="container">
+                        <pre><b>filterForm.value: </b>{{filterForm.value | json}}</pre>
+                        <pre><b>filterForm.errors: </b>{{filterForm.errors | json}}</pre>
+                    </div> -->
                 </div>
             </div>
 
-            <div class="col-md-12 mt-5 text-center" *ngIf="isLoading">
-                <div class="spinner-border text-primary text-center my-3" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="col-md-12 mt-5 text-center" *ngIf="isLoading">
+                        <div class="spinner-border text-primary text-center my-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
 
-            <div class="col-md-12 text-center" *ngIf="isEmptyOffersReceived && !isLoading">
-                <div class="container mt-5">
-                    <img src="../../../../assets/icons/offer-icon.svg" alt="offer-icon.svg" class="icon-image">
-                    <h3 class="my-3">No tienes ofertas recibidas aún.</h3>
+                    <!-- Mostrar esta sección si no hay coincidencias en la búsqueda -->
+                    <ng-container *ngIf="noSearchMatch && !isLoading">
+                        <div class="col-md-12 text-center">
+                            <div class="container mt-5">
+                                <img src="../../../../assets/icons/empty.svg" alt="empty-users.svg" class="icon-image">
+                                <h3 class="my-3">No existen coincidencias de búsqueda. </h3>
 
-                    <ng-container *ngIf="ofertas">
-                        <div class="col-lg-12">
-                            <button ngbTooltip="Ir atrás" (click)="clearFilter()"
-                                class="btn btn-sm btn-primary text-center">
-                                <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg"
-                                    class="icon-button-style">
-                            </button>
+                                <div class="col-lg-12">
+                                    <button ngbTooltip="Ir atrás" (click)="clearFilter()"
+                                        class="btn btn-sm btn-primary text-center">
+                                        <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg"
+                                            class="icon-button-style">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Mostrar esta sección si no hay ventas -->
+                    <ng-container *ngIf="isEmptyOffersReceived && !isLoading && !noSearchMatch">
+                        <div class="container mt-5 text-center">
+                            <img src="../../../../assets/icons/offer-icon.svg" alt="offer-icon.svg" class="icon-image">
+                            <h3 class="my-3">No tienes ofertas recibidas aún.</h3>
+
+                            <ng-container *ngIf="ofertas">
+                                <div class="col-lg-12">
+                                    <button ngbTooltip="Ir atrás" (click)="clearFilter()"
+                                        class="btn btn-sm btn-primary text-center">
+                                        <img src="../../../../assets/icons/backspace.svg" alt="backspace.svg"
+                                            class="icon-button-style">
+                                    </button>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="!isEmptyOffersReceived && !isLoading  && !noSearchMatch">
+                        <div *ngFor="let oferta of ofertas" class="containerPublicacion py-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="text-muted float-end fst-italic">
+                                        {{oferta.publicacion.createdAt | date : 'dd MMMM yyyy' : '+0000'}}
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mx-1">
+                                        <h3 class="fs-5 mt-3">
+                                            {{oferta.publicacion.titulo | uppercase}}
+                                            <a pTooltip="Ir a mi publicación" class="float-end"
+                                                [routerLink]="['/user/publication-detail/', oferta.publicacion.id]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd"
+                                                        d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm5.854 8.803a.5.5 0 1 1-.708-.707L9.243 6H6.475a.5.5 0 1 1 0-1h3.975a.5.5 0 0 1 .5.5v3.975a.5.5 0 1 1-1 0V6.707z" />
+                                                </svg>
+                                            </a>
+                                        </h3>
+
+                                        <div class="col-md-12">
+                                            <p class="fs-6">{{oferta.publicacion.descripcion}}</p>
+                                            <p class="float-end d-flex fs-6 fw-bold alert alert-info py-2 px-1 mb-0"
+                                                style="max-width: fit-content;">
+                                                Costo del {{oferta.publicacion.productoOServicio | lowercase}}:
+                                                {{oferta.publicacion.precioTotal | currency : 'CLP'}}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="container">
+                                        <h5 class="fs-5">Empresas ofertantes :</h5>
+                                        <ngb-accordion *ngFor="let oferta of oferta.ofertas" #acc="ngbAccordion">
+                                            <ngb-panel title="{{oferta.Usuario.Pyme.nombrePyme}}">
+                                                <ng-template ngbPanelContent>
+                                                    <div class="row">
+                                                        <span class="text-muted text-end fst-italic">{{oferta.createdAt
+                                                            |
+                                                            date : 'dd MMMM yyyy' : '+0000'}}
+                                                        </span>
+                                                    </div>
+                                                    <p class="fs-6 mt-2">
+                                                        <span class="text-muted fst-italic">Mensaje :</span><br>
+                                                        {{oferta.mensaje}}
+                                                    </p>
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <ng-container *ngIf="oferta.archivo">
+                                                            <div class="mb-3 mb-sm-0">
+                                                                <h3 class="fs-6"><strong>Archivos adjuntos</strong></h3>
+                                                                <button [disabled]="isLoadingFile"
+                                                                    class="btn btn-success btn-sm mt-1" type="button"
+                                                                    (click)="downloadFile(oferta.id)">
+                                                                    <ng-container *ngIf="!isLoadingFile">Descargar
+                                                                        <img class="icon-button-style"
+                                                                            src="../../../../assets/icons/download.svg"
+                                                                            alt="download.svg">
+                                                                    </ng-container>
+                                                                    <ng-container *ngIf="isLoadingFile">
+                                                                        Descargando...
+                                                                        <div class="spinner-border spinner-border-sm text-light"
+                                                                            role="status">
+                                                                            <span
+                                                                                class="visually-hidden">Loading...</span>
+                                                                        </div>
+                                                                    </ng-container>
+                                                                </button>
+                                                                <a #downloadLink style="display: none;"></a>
+                                                            </div>
+                                                        </ng-container>
+                                                        <p
+                                                            class="d-flex float-end fs-6 alert alert-info p-1 px-2 mb-0 fw-bold">
+                                                            Precio ofrecido:
+                                                            {{oferta.precioOferta | currency : 'CLP'}}
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="mt-3">
+                                                        <span class="text-muted text-start fst-italic">Información de
+                                                            contacto:</span>
+                                                        <div class="d-flex justify-content-between">
+                                                            <div class="table-responsive p-1 m-1 alert alert-info">
+                                                                <table class="table table-borderless mb-0">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td class="fw-bold text-start">Representante
+                                                                                de la empresa
+                                                                            </td>
+                                                                            <td class="text-end">{{
+                                                                                oferta.Usuario.nombreUsuario}}
+                                                                                {{oferta.Usuario.apellidos}}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="fw-bold text-start">Correo
+                                                                                electrónico</td>
+                                                                            <td class="text-end">{{
+                                                                                oferta.Usuario.emailUsuario }}</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row pt-2">
+                                                        <div class="col-md-12">
+                                                            <div class="btn-group float-end" role="group"
+                                                                aria-label="Basic example">
+                                                                <button type="button"
+                                                                    (click)="eliminarOferta(oferta.id)"
+                                                                    class="btn btn-danger">Rechazar oferta
+                                                                </button>
+
+                                                                <button type="button"
+                                                                    [routerLink]="['/user/offer-detail', oferta.id]"
+                                                                    class="btn btn-primary">Ver detalles
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+                                            </ngb-panel>
+                                        </ngb-accordion>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer"></div>
+                            </div>
                         </div>
                     </ng-container>
                 </div>
             </div>
-
-            <ng-container *ngIf="!isEmptyOffersReceived && !isLoading">
-                <div class="containerPublicacion py-4" *ngFor="let oferta of ofertas">
-                    <div class="card">
-                        <div class="card-body">
-                            <span class="text-muted float-end fst-italic">
-                                {{oferta.createdAt | date : 'dd MMMM yyyy'}}
-                            </span>
-                            <h3 class="fs-5 underline-link">
-                                {{oferta.Publicacion.titulo | uppercase}}
-                            </h3>
-                            <p class="m-0">Costo de mi(s) {{'producto' || 'servicio'}}(s):
-                                <strong>
-                                    {{oferta.Publicacion.precioTotal | currency : 'CLP'}}
-                                </strong>
-                            </p>
-                        </div>
-
-                        <div class="card-footer">
-                            <span class="py-2">Empresas ofertantes: </span>
-                            <ngb-accordion #acc="ngbAccordion" *ngFor="let oferta of oferta.Oferta">
-                                <ngb-panel title="{{oferta.Usuario.Pyme.nombrePyme}}">
-                                    <ng-template ngbPanelContent>
-                                        <div class="row my-1">
-                                            <span class="text-muted text-end fst-italic">Creada el
-                                                {{oferta.createdAt | date : 'dd MMMM yyyy'}}
-                                            </span>
-                                        </div>
-                                        <p class=descriptionCard>
-                                            {{oferta.mensaje}}
-                                        </p>
-                                        <div class="containerPrecio my-2">
-                                            <h4 class="fs-4">Precio : {{oferta.precioOferta| currency : 'CLP'}}</h4>
-                                        </div>
-                                        <hr>
-                                        <div class="row mt-3">
-                                            <span class="text-muted text-start fst-italic">Contacto :</span>
-                                        </div>
-                                        <table class="table table-hover">
-                                            <tbody class="text-center">
-                                                <tr>
-                                                    <td class="fw-bold">Dueño de la empresa</td>
-                                                    <td>{{ oferta.Usuario.nombreUsuario}} {{oferta.Usuario.apellidos}}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="fw-bold">Email</td>
-                                                    <td>{{ oferta.Usuario.emailUsuario }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <div class="row py-2">
-                                            <div class="col-12">
-
-                                                <button type="button" (click)="eliminarOferta(oferta.id)"
-                                                    class="btn btn-danger float-start">Rechazar oferta
-                                                </button>
-
-                                                <button type="button" [routerLink]="['/user/offer-detail', oferta.id]"
-                                                    class="btn btn-primary float-end">Ir al detalle
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </ng-template>
-                                </ngb-panel>
-                            </ngb-accordion>
-                        </div>
-                    </div>
-                </div>
-            </ng-container>
         </div>
-
     </div>
 </div>

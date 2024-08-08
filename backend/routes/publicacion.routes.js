@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { check, param, query } = require('express-validator');
+const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
-
 const {
     publicacionPost,
     publicacionesGetAll,
@@ -12,12 +12,11 @@ const {
     publicacionesCompradas,
     publicacionesFilterQuery
 } = require('../controllers/publicacion.controller');
-const { uid } = require('uid');
 
 
 const router = Router();
 
-router.get('/', publicacionesGetAll);
+router.get('/', validarJWT, publicacionesGetAll);
 
 router.get(
     '/query',
@@ -51,10 +50,11 @@ router.get(
     publicacionesFilterQuery
 );
 
-router.get('/:id', publicacionGet);
+router.get('/:id', validarJWT, publicacionGet);
 
 router.get('/usuario/:idUsuario',
     [
+        validarJWT,
         param('idUsuario')
             .notEmpty().withMessage('El parámetro idUsuario es obligatorio')
             .custom((value) => {
@@ -85,10 +85,11 @@ router.get('/usuario/:idUsuario',
     publicacionesGet
 );
 
-// Ruta para obtener todas las publicaciones de un usuario en especifico
-router.get('/usuario/paid/:idUsuario', publicacionesCompradas);
+// Obtener todas las publicaciones de un usuario en especifico
+router.get('/usuario/paid/:idUsuario', validarJWT, publicacionesCompradas);
 
 router.post('/', [
+    validarJWT,
     check('titulo', 'El titulo es obligatorio').not().isEmpty(),
     validarCampos,
     check('descripcion', 'La descripcion es obligatoria').not().isEmpty(),
@@ -96,18 +97,16 @@ router.post('/', [
 ], publicacionPost);
 
 router.delete('/:id', [
+    validarJWT,
     param('id', 'El param id es obligatorio').not().isEmpty(),
-    // validarJWT, 
     validarCampos
 ], publicacionDelete);
 
-// cambia el estado de la publicacion a procesoDePublicacion :  FINALIZADA
+// Cambia el estado de la publicación -> procesoDePublicacion :  FINALIZADA
 router.put('/aceptar/:id', [
+    validarJWT,
     param('id', 'El param id es obligatorio').not().isEmpty(),
     validarCampos
 ], publicacionPagada);
-
-
-
 
 module.exports = router;

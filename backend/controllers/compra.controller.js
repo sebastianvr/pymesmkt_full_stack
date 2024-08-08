@@ -1,225 +1,72 @@
-const { uid } = require('uid');
+const db = require('../db/connection');
 const { response, request } = require('express');
+const { validationResult } = require('express-validator');
+const { Sequelize } = require('sequelize');
+const { uid } = require('uid');
 
 const Compra = require('../models/compra');
 const Usuario = require('../models/usuario');
 const Publicacion = require('../models/publicacion');
 const Oferta = require('../models/oferta');
 const Pyme = require('../models/pyme');
-const Calificacion = require('../models/calificacion');
-
-
-
-const dataGraphGet = async (req = request, res = response) => {
-
-    try {
-        const colaboraciones = await Compra.findAll({
-            where: { estado: true },
-            attributes: [
-                'id',
-                // [Compra.fn('COUNT', Compra.col('hats')), 'n_hats']
-            ],
-            include: [
-                {
-                    model: Usuario,
-                    where: { estado: true },
-                    attributes: ['id'],
-                    include: [{
-                        model: Pyme, 
-                        where: { estado: true }, 
-                        attributes: ['id', 'nombrePyme']
-                    }]
-                },
-                {
-                    model: Oferta,
-                    where: { estado: true },
-                    attributes: ['id'],
-                    include: [{
-                        model: Usuario,
-                        where: { estado: true },
-                        attributes: ['id'],
-                        include: [{
-                            model: Pyme,
-                            where: { estado: true },
-                            attributes: ['id', 'nombrePyme']
-                        }]
-                    }],
-                    order: [['nombrePyme', 'DESC']],
-                }
-            ],
-        })
-
-        // console.log('colaboraciones', colaboraciones)
-
-        // Obtengo todos los nodos, formateando la data
-        const nodes = getNodes(colaboraciones);
-
-        // Obtengo todos los links, formateando la data
-        const links = getLinks(colaboraciones);
-
-        return res.status(200).json({
-            ok: true,
-            nodes,
-            links
-        });
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            error,
-            msg: 'Error en dataGraphGet()',
-        });
-    }
-}
-
-
-/**
- * 
- *  Identificar todos los NODOS existentes
-        Formato  
-            nodes : [
-                id : 1,
-                name : EmpresaName
-            ]
-
-            Donde : 
-                id :  identificador unico del nodo
-                name :  nombre de la empresa
- * @param {*} compras
- * @returns 
- * Arreglo con todos los nodos ordenados Alfabeticamente descendentemente
- */
-function getNodes(compras) {
-
-    /**
-        * Añado un tipo de dato diccionario usando Set para guardar 
-        * SOLO ELEMENTOS QUE NO SE REPITEN
-     */
-    let nodes = new Set();
-
-    // Iteracion y obtencion de todos los nodos
-    compras.forEach((compra, index) => {
-        /** 
-         *  DESESTRUCTURACION DEL OBJETO Y RENOMBRE PARA 
-         *      nombrePyme  = comprador
-         *      Pyme        = vendedor
-        */
-        const {
-            Usuario: {
-                Pyme: { nombrePyme: comprador }
-            },
-            Ofertum: {
-                Usuario: { Pyme: { nombrePyme: vendedor } }
-            }
-        } = compra
-
-        // Añado todos los participantes al diccionario nodes
-        nodes.add(comprador.toLowerCase().trim());
-        nodes.add(vendedor.toLowerCase().trim());
-    });
-
-    
-    // console.log('nodes', nodes)
-    nodes = Array.from(nodes)
-    
-    // Transformo el diccionario a arreglo
-    const newNodes = []
-    for (let index = 0; index < nodes.length; index++) {
-        newNodes.push({
-            id: nodes[index]
-        })
-    }
-
-    return newNodes
-}
-
-/**
- *  
- *   Identificar todas las RELACIONES existentes
-           Formato de salida  
-               links : [
-                   source : 1,
-                   target : 4,
-                   type : # 
-               ]
-            
-            Donde : 
-               souce :  nodo con id 1
-               target :  nodo con id 4
-               target :  número de veces que se repite la relación
- * @param {*} compras
- * @returns 
- * Arreglo con todos los links
- */
-function getLinks(compras) { 
-
-    let links = [];
-    let data = [];
-
-    // Limpiar la informacion
-    compras.forEach((compra, index) => {
-        /** 
-         *  DESESTRUCTURACION DEL OBJETO Y RENOMBRE PARA 
-         *      nombrePyme  = comprador
-         *      Pyme        = vendedor
-        */
-        const {
-            Usuario: {
-                Pyme: { nombrePyme: comprador }
-            },
-            Ofertum: {
-                Usuario: { Pyme: { nombrePyme: vendedor } }
-            }
-        } = compra
-
-        data.push(`${comprador.toLowerCase().trim()}-${vendedor.toLowerCase().trim()}`)
-    });
-
-    let contador = 1;
-    for (let index = 0; index < data.length; index++) {
-
-        if (data[index] === data[index + 1]) {
-            contador++
-        } else {
-            links.push({
-                source: data[index].split('-').shift(),
-                target: data[index].split('-').pop(),
-                type: contador
-            })
-            contador = 1;
-        }
-    }
-    return links
-}
+const Reclamo = require('../models/reclamo');
 
 const comprasGetById = async (req = request, res = response) => {
+    console.log('[compra] comprasGetById()');
 
     const { UsuarioId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
 
-    const { page, size } = req.query;
-    const pageAsNumber = Number.parseInt(page);
-    const sizeAsNumber = Number.parseInt(size);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
 
+    const baseFilter = {
+        UsuarioId,
+        estado: true
+    };
+
+    const additionalFilters = {};
+
+    // Condición para filtrar por el nombre de la empresa vendedora
+    if (req.query.empresa) {
+        additionalFilters['$Ofertum.Usuario.Pyme.nombrePyme$'] = {
+            [Sequelize.Op.like]: `%${req.query.empresa.toLowerCase()}%`,
+        };
+    }
+
+    if (req.query.fecha) {
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (dateRegex.test(req.query.fecha)) {
+            const fechaParts = req.query.fecha.split('-');
+            const day = parseInt(fechaParts[0], 10);
+            const month = parseInt(fechaParts[1], 10);
+            const year = parseInt(fechaParts[2], 10);
+
+            additionalFilters.createdAt = {
+                [Sequelize.Op.and]: [
+                    Sequelize.where(Sequelize.fn('DAY', Sequelize.col('Compra.createdAt')), day),
+                    Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('Compra.createdAt')), month),
+                    Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('Compra.createdAt')), year),
+                ]
+            };
+        }
+    }
+
+    const filter = {
+        ...baseFilter,
+        ...additionalFilters
+    };
+
+    // console.log({ filter });
     try {
-        let page = 0;
-        if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
-
-        let size = 10
-        if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0 && sizeAsNumber < 10) {
-            size = sizeAsNumber;
-        }
-
         const compras = await Compra.findAndCountAll({
-            limit: size,
-            offset: page * size,
+            where: filter,
+            limit: pageSize,
+            offset: (page - 1) * pageSize,
             order: [['createdAt', 'DESC'],],
-            where: {
-                UsuarioId,
-                estado: true,
-            },
             include: [
                 {
                     model: Publicacion,
@@ -232,7 +79,6 @@ const comprasGetById = async (req = request, res = response) => {
                     // Usuario dueño de la publicacion
                     model: Usuario,
                     where: { estado: true },
-                    // attributes : ['id', 'nombreUsuario'],
                     include: [{
                         model: Pyme,
                         where: { estado: true },
@@ -248,96 +94,311 @@ const comprasGetById = async (req = request, res = response) => {
                         // Usuario dueño de la oferta
                         model: Usuario,
                         where: { estado: true },
-                        // attributes : ['id', 'nombreUsuario'],
                         include: [{
                             model: Pyme,
                             where: { estado: true },
                         }]
                     }]
-
                 },
+                {
+                    model: Reclamo,
+                    where: {
+                        estado: true,
+                    },
+                    attributes: ['id'],
+                    required: false // Hacer que la asociación con Reclamo sea opcional
+                }
             ]
-        })
+        });
 
-        // console.log(compras)
-        // console.log('comprasGetById()', compras)
-        if (compras.count === 0) {
-            return res.status(200).json({
-                ok: true,
-                compras,
-                msg: 'No existen compras de este usuario'
-            })
-        }
+        // console.log('compras.rows', compras.rows);
+        if (!compras.rows.length) {
+            if (Object.keys(additionalFilters).length > 0) {
+                return res.status(200).json({
+                    message: 'No se encontraron coincidencias para los filtros aplicados.',
+                    noSearchMatch: true,
+                    compras: []
+                });
+            } else {
+                return res.status(200).json({
+                    message: 'No se encontraron compras.',
+                    compras: [],
+                });
+            }
+        };
 
-        if (compras.count > 0) {
-            return res.status(200).json({
-                ok: true,
-                totalPages: Math.ceil(compras.count / size),
-                content: compras.rows,
-            });
-        }
+        return res.status(200).json({
+            ok: true,
+            total: compras.count,
+            totalPages: Math.ceil(compras.count / pageSize),
+            currentPage: page,
+            pageSize,
+            compras: compras.rows,
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
+            msg: 'Error en el servidor, comprasGetById()',
             msg: error
-        })
+        });
     }
 }
 
 const compraPost = async (req = request, res = response) => {
+    console.log('[compra] compraPost()');
 
-    const { precio, codAutorizacion, PublicacionId, UsuarioId, OfertumId } = req.body
-    const myId = uid(15);
-
-    nuevaCompra = {
-        id: myId,
+    const {
         precio,
         codAutorizacion,
-        // Id de la publicación
         PublicacionId,
-        //Id del usuario dueño de la compra
         UsuarioId,
-        //Id de la oferta pagada
-        OfertumId
+        OfertumId,
+    } = req.body;
+
+    newPurchase = {
+        id: uid(15),
+        precio,
+        codAutorizacion,
+        PublicacionId,
+        UsuarioId,
+        OfertumId,
+    };
+
+
+    try {
+        const transaction = await db.transaction();
+
+        // comprobar si existe una compra para la misma publicacion 
+        const existPublication = await Compra.findOne(
+            { where: { PublicacionId }, transaction }
+        );
+
+        if (existPublication) {
+            await transaction.rollback();
+            return res.status(400).json({
+                ok: false,
+                msg: 'Esta publicación ya fue pagada.',
+            });
+        }
+
+        // Crear nueva compra
+        await Compra.create(newPurchase, { transaction });
+
+        // Actualizar el campo procesoDeOferta en la tabla Oferta
+        await Oferta.update(
+            { procesoDeOferta: 'FINALIZADA' },
+            { where: { id: OfertumId }, transaction }
+        );
+
+        // Confirmar la transacción
+        await transaction.commit();
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Nueva compra creada',
+        });
+
+    } catch (error) {
+        await transaction.rollback();
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, compraPost()',
+            error
+        });
+    }
+}
+
+const dataGraphGet = async (req = request, res = response) => {
+    console.log("[compra] dataGraphGet()");
+
+    try {
+        const colaboraciones = await
+            Compra.findAll({
+                where: { estado: true },
+                attributes: ['id'],
+                include: [
+                    {
+                        model: Usuario,
+                        where: { estado: true },
+                        attributes: ['id'],
+                        include: [{
+                            model: Pyme,
+                            where: { estado: true },
+                            attributes: ['id', 'nombrePyme']
+                        }]
+                    },
+                    {
+                        model: Oferta,
+                        where: { estado: true },
+                        attributes: ['id'],
+                        include: [{
+                            model: Usuario,
+                            where: { estado: true },
+                            attributes: ['id'],
+                            include: [{
+                                model: Pyme,
+                                where: { estado: true },
+                                attributes: ['id', 'nombrePyme']
+                            }]
+                        }],
+                        order: [['nombrePyme', 'DESC']],
+                    }
+                ],
+            });
+
+        const nodes = await getNodes();
+        const links = getLinks(colaboraciones);
+
+        return res.status(200).json({
+            ok: true,
+            nodes,
+            links
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor, dataGraphGet()',
+            error
+        });
+    }
+}
+
+const getNodes = async () => {
+    // console.log('getNodes()');
+    const pymesFound = await Usuario.findAll({
+        where: { estado: true, rol: 'CLIENT-USER' },
+        attributes: ['id'],
+        include: {
+            model: Pyme,
+            where: { estado: true },
+            attributes: ['id', 'nombrePyme']
+        },
+    });
+
+    let nodes = new Set();
+    // console.log({ nodes });
+    pymesFound.forEach((node) => {
+        const {
+            id,
+            Pyme: {
+                nombrePyme,
+            }
+        } = node;
+
+        const titleCaseNombrePyme = toTitleCase(nombrePyme);
+
+        nodes.add({
+            id,
+            name: titleCaseNombrePyme.trim(),
+        });
+    });
+
+    nodes = Array.from(nodes);
+
+    // Transforma el diccionario a arreglo
+    const newNodes = [];
+    for (let index = 0; index < nodes.length; index++) {
+        newNodes.push(nodes[index]);
+    }
+
+    // console.log({ newNodes });
+    return newNodes;
+}
+
+const getLinks = (compras) => {
+    // console.log('getLinks()');
+    let links = [];
+    let linkMap = new Map();
+
+    // Mapping and cleaning data
+    compras.forEach((compra) => {
+        const compradorId = compra.Usuario.id;
+        const vendedorId = compra.Ofertum.Usuario.id;
+
+        // console.log({ compradorId, vendedorId });
+
+        // Create a unique key for the pair of users
+        const linkKey = `${compradorId}-${vendedorId}`;
+
+        if (linkMap.has(linkKey)) {
+            // If the link already exists, increment the type value
+            linkMap.get(linkKey).type += 1;
+        } else {
+            // If the link does not exist, create a new entry with type 1
+            const link = {
+                source: vendedorId,
+                target: compradorId,
+                type: 1
+            };
+            linkMap.set(linkKey, link);
+            links.push(link);
+        }
+    });
+
+    return links;
+};
+
+const toTitleCase = (str) => {
+    return str.replace(
+        /\w\S*/g,
+        (txt) => {
+            return txt.length > 1 ?
+                txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase() :
+                txt.toLowerCase();
+        }
+    );
+};
+
+const getFileCompra = async (req = request, res = response) => {
+    console.log('[oferta] fileOferta()');
+    const { IdOferta } = req.params;
+
+    if (!IdOferta) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'El id es obligatorio',
+        });
     }
 
     try {
+        const oferta = await Oferta.findByPk(IdOferta, {
+            attributes: ['archivo']
+        });
 
-        // comprobar si existe una compra para la misma publicacion 
-        const existePublicacion = await Compra.findOne({ where: { PublicacionId } });
-        // console.log(publicacion)
-        if (!existePublicacion) {
-            await Compra.create(nuevaCompra);
-
-            return res.status(200).json({
-                ok: true,
-                msg: 'Nueva compra creada'
-            })
-        } else {
-
+        if (!oferta) {
             return res.status(400).json({
                 ok: false,
-                msg: 'No se puede comprar una publicacion que ya fue pagada anteriormente.',
-            })
+                msg: 'No existe oferta con este id',
+            });
         }
 
+        if (oferta.archivo) {
+            const url = await getOfferFile(oferta.archivo);
+            oferta.archivo = url;
+        }
+
+        return res.status(200).json({
+            ok: true,
+            oferta,
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
+        console.error(error);
+        return res.status(500).json({
             ok: false,
-            msg: 'Error en compraPost()',
-            msg: error
-        })
+            msg: 'Error en el servidor,  fileOferta()',
+            error,
+        });
     }
-
 }
-
 
 module.exports = {
     compraPost,
     dataGraphGet,
-    comprasGetById
+    comprasGetById,
+    getFileCompra
 };

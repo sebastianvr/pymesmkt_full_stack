@@ -8,21 +8,18 @@ import { AuthService } from 'src/app/core/services/auth/auth.service';
   styleUrls: ['./navbar-admin.component.css']
 })
 export class NavbarAdminComponent implements OnInit {
-
-
-  nombreUsuario = this.authService.usuario.nombreUsuario
+  nombreUsuario = this.authService.usuario.nombreUsuario;
 
   constructor(
-    private router : Router,
-    private authService : AuthService
+    private router: Router,
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
   }
 
   logOut() {
-    this.authService.logOut()
-    this.router.navigate(['visitor'])
+    this.authService.logOut();
+    this.router.navigate(['visitor']);
   }
-
 }
