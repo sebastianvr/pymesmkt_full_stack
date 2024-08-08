@@ -46,7 +46,6 @@ services:
 
 volumes:
   data:
-  minio_data:
 
 networks:                  # Definir redes
   red_proxy:               # Nombre de una red
