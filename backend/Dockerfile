@@ -11,9 +11,3 @@ COPY package-lock.json ./
 RUN npm install
 COPY . .
 EXPOSE 8080
-
-# DEV MODE
-# CMD ["npm", "run", "dev"]
-
-# PROD MODE
-# CMD ["npm", "start"]

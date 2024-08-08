@@ -5,7 +5,7 @@ services:
     restart: always
     image: mysql:8
     env_file:
-      - ./config/db.env
+      - ./config/.db.env
     environment:
       - TZ=America/Santiago
     ports:
@@ -21,10 +21,10 @@ services:
       - db 
     build: ./backend
     env_file:
-      - ./config/api.env
+      - ./config/.api.env
     ports:
       - '8081:8080'
-    command: npm run dev
+    command: npm start
     volumes:
       - ./backend:/api
     networks:
