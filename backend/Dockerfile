@@ -5,9 +5,12 @@ WORKDIR /api
 
 # Copies the application files to the image.
 COPY package*.json ./
-COPY package-lock.json ./
+
 
 # Install the application dependencies
-RUN npm install
+RUN npm install --production
 COPY . .
 EXPOSE 8080
+
+# Comando para iniciar la aplicación
+CMD ["npm", "start"]
