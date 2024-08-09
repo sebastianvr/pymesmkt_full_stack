@@ -8,9 +8,6 @@ COPY package*.json ./
 
 
 # Install the application dependencies
-RUN npm install --production
+RUN npm install
 COPY . .
 EXPOSE 8080
-
-# Comando para iniciar la aplicación
-CMD ["npm", "start"]
