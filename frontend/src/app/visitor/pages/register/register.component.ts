@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, concatMap, of } from 'rxjs';
 import Swal from 'sweetalert2';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { S3FilesService } from 'src/app/core/services/files/s3-files.service';
@@ -11,8 +12,8 @@ import { RunValidatorService } from 'src/app/core/validations/run-validator/run-
 import { RutValidatorService } from 'src/app/core/validations/rut-validator/rut-validator.service';
 import { PassValidatorService } from 'src/app/core/validations/pass-validator/pass-validator.service';
 import { EmailValidatorService } from 'src/app/core/validations/email-validator/email-validator.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TermsAndConditionsComponent } from '../../components/terms-and-conditions/terms-and-conditions.component';
+
 
 @Component({
   selector: 'app-register',
@@ -39,6 +40,7 @@ export class RegisterComponent implements OnInit {
   private allowedFilesExtention: string[] = ['jpg', 'jpeg', 'png', 'svg'];
 
   closeResult = '';
+  imagePreview: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -57,7 +59,7 @@ export class RegisterComponent implements OnInit {
     this.formulario = this.buildForm();
 
     /* Debug - set mock of new user */
-    // this.setUser();
+    this.setUser();
   }
 
   ngOnInit(): void {
@@ -197,9 +199,11 @@ export class RegisterComponent implements OnInit {
         .uploadImage(imageFile)
         .pipe(
           concatMap((imagePath) => {
+            console.log({imagePath});
             nuevoUsuario.imagen = imagePath.filePath;
             return this.authService.registerUser(nuevoUsuario).pipe(
-              catchError(() => {
+              catchError((error) => {
+                console.error(error);
                 return of(false);
               })
             );
@@ -236,33 +240,48 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  public onFileInputChange(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    const files = inputElement.files as FileList;
-    const imagenControl = this.formulario.get('infoPropietario.imagen');
+  public onFileSelected(event: Event) {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files ? fileInput.files[0] : null;
 
-    if (files && files.length === 1 && imagenControl) {
-      const file = files[0] as File;
+    if (file) {
+      const fileControl = this.formulario.get('infoPropietario.imagen');
+      if (!fileControl) {
+        return;
+      }
 
-      // Validar la extensión del archivo
+      fileControl.setValue(file);
+      fileControl.markAsDirty();
+      fileControl.markAsTouched();
+
+      // Verificar si el control tiene errores antes de continuar
+      if (fileControl.errors) {
+        return;
+      }
+
       const fileName = file.name || '';
       const fileExt = fileName.split('.').pop()?.toLowerCase() as string;
       if (!this.allowedFilesExtention.includes(fileExt)) {
-        imagenControl.setErrors({ invalidExtension: true });
+        fileControl.setErrors({ invalidExtension: true });
         return;
       }
 
       // Validar el tamaño máximo (2 MB)
       if (file.size <= this.fileSize) {
         this.selectedFile = file;
-        imagenControl.setErrors(null);
+        fileControl.setErrors(null);
       } else {
-        imagenControl.setErrors({ maxSizeExceeded: true });
+        fileControl.setErrors({ maxSizeExceeded: true });
       }
-    }
 
-    if (files.length > 1 && imagenControl) {
-      imagenControl.setErrors({ invalidFileCount: true });
+      // Crear una URL de objeto para la previsualización
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+
+      this.selectedFile = file;
     }
   }
 
@@ -325,13 +344,13 @@ export class RegisterComponent implements OnInit {
   public copiarCampos() {
     const infoLocalidadEmpresa = this.formulario.get('infoLocalidadEmpresa');
     const infoLocalidadPropietario = this.formulario.get('infoLocalidadPropietario');
-    
+
     if (!infoLocalidadEmpresa || !infoLocalidadPropietario) {
       return;
     }
-    
+
     const copiar = infoLocalidadEmpresa.get('usarDireccionPersonal')?.value;
-    
+
     if (!copiar) {
       const patchValues = {
         regionEmpresa: infoLocalidadPropietario.get('opRegion')?.value,
@@ -339,7 +358,7 @@ export class RegisterComponent implements OnInit {
         direccionEmpresa: infoLocalidadPropietario.get('direccionPropietario')?.value,
         descripcionEmpresa: infoLocalidadPropietario.get('descripcion')?.value
       };
-    
+
       infoLocalidadEmpresa.patchValue(patchValues);
     } else {
       infoLocalidadEmpresa.patchValue({
@@ -350,7 +369,7 @@ export class RegisterComponent implements OnInit {
       });
     }
   }
-  
+
   private setUser() {
     this.formulario.reset({
       infoPropietario: {
@@ -385,16 +404,19 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  public openTermsAndConditionsModal() {
-    this.modalService
-      .open(TermsAndConditionsComponent, {size : 'lg'})
-      .result.then(
-        (result) => {
-          console.log({ result });
-        },
-        (reason) => {
-          console.log({ reason });
-        }
-      );
+  public async openTermsAndConditionsModal() {
+    const modalRef = await this.modalService.open(
+      TermsAndConditionsComponent,
+      { size: 'lg' }
+    );
+
+    try {
+
+      await modalRef.result;
+    } catch (error) {
+      if (error !== 'Cross click' && error !== 1) {
+        // console.error('Error inesperado:', error);
+      }
+    }
   }
 }
