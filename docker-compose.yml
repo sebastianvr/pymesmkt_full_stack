@@ -1,15 +1,15 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
     restart: always
     image: mysql:8
     env_file:
-      - ./config/db.env
+      - ./config/.db.env
     environment:
       - TZ=America/Santiago
     ports:
-      - '8889:3306'
+      - "8889:3306"
     volumes:
       - data:/var/lib/mysql
     networks:
@@ -18,25 +18,25 @@ services:
   api:
     restart: always
     depends_on:
-      - db 
+      - db
     build: ./backend
     env_file:
-      - ./config/api.env
+      - ./config/.api.env
     ports:
-      - '8081:8080'
-    command: npm run dev
+      - "8081:8080"
     volumes:
       - ./backend:/api
     networks:
       - red_privada
       - red_proxy
+    command:  npm run dev
 
   web:
     restart: always
     depends_on:
       - api
     ports:
-      - '5700:4200'
+      - "5700:4200"
     build: ./frontend
     volumes:
       - ./frontend:/web
@@ -46,10 +46,9 @@ services:
 
 volumes:
   data:
-  minio_data:
 
-networks:                  # Definir redes
-  red_proxy:               # Nombre de una red
-    external: true         # Indica que es una red externa al docker-compose
-    name: nginx-proxy      # Nombre de la Red de uso publico entre Docker
-  red_privada: 
+networks:
+  red_proxy:
+    driver: bridge
+  red_privada:
+    driver: bridge
