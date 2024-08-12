@@ -75,7 +75,7 @@
                                 </button>
                                 <button *ngIf="!loadingInfoPropietario && !this.editMode.infoPropietario"
                                     (click)="updateUser('infoPropietario')"
-                                    [disabled]="userForm.get('infoPropietario')?.invalid"
+                                    [disabled]="userForm.get('infoPropietario')?.invalid || !userForm.get('infoPropietario')?.touched"
                                     class="btn btn-sm btn-primary float-start my-3 mx-2">
                                     Guardar
                                 </button>
@@ -88,7 +88,7 @@
                                     <!-- Contenedor de la imagen -->
                                     <div class="image-container">
                                         <ng-container *ngIf="user.imagen; else defaultImage">
-                                            <img [src]="user.imagen" class="imgProfile" alt="camera.jpg"
+                                            <img [src]=" user.imagen" class="imgProfile" alt="camera.jpg"
                                                 loading="eager">
                                         </ng-container>
                                         <ng-template #defaultImage>
@@ -97,20 +97,35 @@
                                         </ng-template>
                                     </div>
                                 </div>
+
                                 <div class="mt-2">
-                                    <label class="custom-file-label custom-file-upload" for="formFile">Subir imagen
-                                        <input class="custom-file-input" type="file" id="formFile"
-                                            (change)="onFileSelected($event)">
+                                    <label class="custom-file-label custom-file-upload" for="formFile">
+                                        <ng-container *ngIf="!loadingFile">Subir imagen</ng-container>
+                                        <ng-container *ngIf="loadingFile">
+                                            Subiendo...
+                                            <div class="spinner-border spinner-border-sm text-light" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </ng-container>
+                                        <input [disabled]="loadingFile" class="custom-file-input" type="file"
+                                            id="formFile" (change)="onFileSelected($event)" accept="image/*" />
                                     </label>
-                                    <div
-                                        *ngIf="userForm.get('infoPropietario.imagen')?.dirty && userForm.get('infoPropietario.imagen')?.errors">
-                                        <span *ngIf="userForm.get('infoPropietario.imagen')?.errors?.['invalidType']"
-                                            class="text-danger">
-                                            La extensión del archivo debe ser tipo imagen
+
+                                    <div class="container">
+                                        <span
+                                            *ngIf="campoInvalido('imagen', 'infoPropietario') && userForm.get('infoPropietario.imagen')?.hasError('invalidExtension')"
+                                            class="form-text text-danger">
+                                            La extesión del archivo no es válida.
                                         </span>
-                                        <span *ngIf="userForm.get('infoPropietario.imagen')?.errors?.['invalidSize']"
-                                            class="text-danger">
-                                            El archivo es demasiado grande (máximo 5MB)
+                                        <span
+                                            *ngIf="campoInvalido('imagen', 'infoPropietario') && userForm.get('infoPropietario.imagen')?.hasError('maxSizeExceeded')"
+                                            class="form-text text-danger">
+                                            El tamaño del archivo excede el límite de 2 MB.
+                                        </span>
+                                        <span
+                                            *ngIf="campoInvalido('imagen', 'infoPropietario') && userForm.get('infoPropietario.imagen')?.hasError('invalidFileCount')"
+                                            class="form-text text-danger">
+                                            Si va a subir una imágen, debe seleccionar un solo archivo.
                                         </span>
                                     </div>
                                 </div>
@@ -407,14 +422,13 @@
                             </div>
                         </ng-template>
                     </div>
-
                 </form>
 
                 <!-- Debug Mode -->
-                <div class="container">
+                <!-- <div class="container">
                     <pre><b>formulario.value: </b> {{userForm.value | json }}</pre>
                     <pre><b>formulario.errors: </b> {{userForm.errors | json }}</pre>
-                </div>
+                </div> -->
 
             </ng-template>
         </div>

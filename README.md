@@ -1,4 +1,39 @@
-# **Ejecución de Docker en modo desarrollo**
+# **Funcionalidades del proyecto**
+
+Este proyecto cuenta con tres perfiles de usuarios diferentes:
+
+**Usuario Visitante**: Este perfil tiene acceso limitado a ciertas funcionalidades del sitio web. Las acciones permitidas incluyen la visualización de publicaciones, la búsqueda de las mismas y el registro de un nuevo usuario.
+
+  1. **Visualización y búsqueda de publicaciones**:  
+      [![Visualización y búsqueda](https://img.youtube.com/vi/-bSTxQ5WlcA/maxresdefault.jpg)](https://www.youtube.com/watch?v=-bSTxQ5WlcA)
+
+  2. **Registro de un nuevo usuario**: El usuario visitante puede registrarse en la plataforma para obtener acceso a funcionalidades adicionales como usuario Pyme.  
+      [![Registro de usuario](https://img.youtube.com/vi/4wyy5c12e34/maxresdefault.jpg)](https://www.youtube.com/watch?v=4wyy5c12e34)
+
+**Usuario Pyme**: Una vez registrado, el usuario tiene acceso a las siguientes funcionalidades adicionales:
+
+  1. **Creación de publicaciones**: El usuario puede crear publicaciones para buscar nuevos productos o servicios.
+    [![Creacin de publicaciones](https://img.youtube.com/vi/eK0q5APUQ_E/maxresdefault.jpg)](https://www.youtube.com/watch?v=eK0q5APUQ_E)
+
+  2. **Búsqueda de ofertas y seguimiento de las mismas**: El usuario puede buscar ofertas y realizar un seguimiento de ellas.
+  3. **Compra de ofertas**: El usuario puede comprar una oferta y proceder a la pasarela de pagos de Transbank.
+  4. **Revisión de pagos y calificación**: Después de completar un pago, el usuario puede revisar la transacción y calificar al proveedor del producto o servicio.
+  5. **Creación de reclamos**: Si hay problemas con productos o servicios, el usuario puede enviar un reclamo.
+
+**Usuario Administrador**: Este perfil tiene un acceso más amplio con las siguientes funcionalidades:
+
+  1. **Visualización de relaciones entre PYMEs**: El administrador puede ver un grafo que muestra las conexiones entre diferentes PYMEs.
+  2. **Gestión de usuarios Pyme**:
+        - Búsqueda y suspensión de usuarios.
+        - Búsqueda y eliminación de usuarios.
+  3. **Gestión de reclamos**:
+        - Búsqueda y visualización de detalles de reclamos.
+        - Archivado de reclamos.
+  4. **Simulación**: El administrador puede simular la creación de usuarios Pyme o administradores, así como la cantidad de publicaciones, ofertas, compras, ventas y reclamos.
+
+---
+
+## **Ejecución del proyecto usando Docker en modo desarrollo**
 
 Este proyecto adopta un enfoque para la ejecución Full-Stack, abarcando todos los servicios necesarios a través del uso de Docker. La implementación de Docker simplifica significativamente la configuración del entorno de desarrollo. A continuación, se describe paso a paso los procedimientos para ejecutar el proyecto en modo de desarrollo.
 
@@ -26,7 +61,7 @@ cd .../path/pymesmkt_full_stack
 docker-compose up
 ```
 
-# **All Tools and Frameworks used**
+## **All Tools and Frameworks used**
 
 - ***Angular CLI : `v13.3.9`***
 - ***Bootstrap : `v5.2.0`***
@@ -66,7 +101,7 @@ docker-compose up
   </a>
 </div>
 
-# **Independent Executions**
+## **Independent Executions**
 
 It's possible to run this project independently if you're working solely on the frontend or backend.
 
@@ -85,7 +120,7 @@ nvm install 16.14.2
   nvm use 16.14.2
 ```
 
-# **Front-end Development**
+## **Front-end Development**
 
 1. Navigate to the frontend directory
 
@@ -117,7 +152,7 @@ nvm install 16.14.2
     http://localhost:5700
   ```
 
-# **Back-end Development**
+## **Back-end Development**
 
 Before executing the project, ensure that the local server is running.
 

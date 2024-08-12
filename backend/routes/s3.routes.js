@@ -22,7 +22,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.post('/uploadUserImage', [
-    validarJWT,
+    // validarJWT,
     upload.single('image'),
     // validateImageFile,
 ], postUserImage

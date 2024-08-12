@@ -1,8 +1,11 @@
+import { CompilerConfig } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { columnsGap } from 'ngx-bootstrap-icons';
 import { catchError, of } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { S3FilesService } from 'src/app/core/services/files/s3-files.service';
+import { ImageEventService } from 'src/app/core/services/image-event/image-event-service.service';
 
 import { MessageService } from 'src/app/core/services/message/message.service';
 import { RegionesComunasService } from 'src/app/core/services/regiones-comunas/regiones-comunas.service';
@@ -48,7 +51,12 @@ export class MyProfileComponent implements OnInit {
 
   public imageUrl!: string;
   private emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
-  
+  private allowedFilesExtention: string[] = ['jpg', 'jpeg', 'png', 'svg'];
+  // 2 MB como tamaño máximo de archivo
+  private fileSize: number = (2 * 1024 * 1024);
+  public selectedFile: File | null = null;
+  loadingFile: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -59,6 +67,7 @@ export class MyProfileComponent implements OnInit {
     private regionesComunas: RegionesComunasService,
     private messageService: MessageService,
     private s3FilesService: S3FilesService,
+    private imageEventService: ImageEventService,
   ) {
     this.userForm = this.buildForm();
   }
@@ -67,7 +76,6 @@ export class MyProfileComponent implements OnInit {
     this.usuarioService.getUsuario(this.currentUserId)
       .subscribe((user) => {
         this.user = user;
-
         // Setea valores del formulario con los datos del usuario
         this.setForm(user);
       });
@@ -127,7 +135,7 @@ export class MyProfileComponent implements OnInit {
           [Validators.required, Validators.pattern(this.emailPattern)],
           [this.emailValidator],
         ],
-        imagen: [null, [this.fileValidator]],
+        imagen: [null, []],
       }),
       infoLocalidadPropietario: this.fb.group({
         opRegion: [
@@ -189,14 +197,13 @@ export class MyProfileComponent implements OnInit {
           const control = groupControls[controlName];
           if (this.editMode[groupName]) {
             // Si el control es el run ,rut o el correo electrónico, no habilitarlo nunca
-            if (controlName === 'run' || controlName === 'rut' || controlName === 'email') {
+            if (controlName === 'run' || controlName === 'rut' || controlName === 'email' || controlName === 'imagen' || controlName === 'url') {
               control.disable();
             } else {
               control.enable();
             }
           } else {
             control.disable();
-
           }
         }
       }
@@ -242,6 +249,7 @@ export class MyProfileComponent implements OnInit {
         // Si es un archivo, no incluir la imagen en los datos de actualización
         delete updateData.imagen;
       }
+
     }
 
     this.usuarioService.updateUser(this.currentUserId, updateData)
@@ -283,30 +291,6 @@ export class MyProfileComponent implements OnInit {
       });
   }
 
-  private fileValidator(control: FormControl): { [key: string]: any } | null {
-    const file = control.value;
-    if (!file) {
-      return null;
-    }
-
-    const fileType = file.type;
-    const fileSize = file.size;
-
-    // Validar tipo de archivo (por ejemplo, solo imágenes)
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!allowedTypes.includes(fileType)) {
-      return { invalidType: true };
-    }
-
-    // Validar tamaño máximo (5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB en bytes
-    if (fileSize > maxSize) {
-      return { invalidSize: true };
-    }
-
-    return null;
-  }
-
   public onFileSelected(event: Event) {
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files ? fileInput.files[0] : null;
@@ -317,7 +301,7 @@ export class MyProfileComponent implements OnInit {
         return;
       }
 
-      fileControl.setValue(file);
+      fileControl.setValue(file.name);
       fileControl.markAsDirty();
       fileControl.markAsTouched();
 
@@ -326,11 +310,28 @@ export class MyProfileComponent implements OnInit {
         return;
       }
 
+      const fileName = file.name || '';
+      const fileExt = fileName.split('.').pop()?.toLowerCase() as string;
+      if (!this.allowedFilesExtention.includes(fileExt)) {
+        fileControl.setErrors({ invalidExtension: true });
+        return;
+      }
+
+      // Validar el tamaño máximo (2 MB)
+      if (file.size <= this.fileSize) {
+        this.selectedFile = file;
+        fileControl.setErrors(null);
+      } else {
+        fileControl.setErrors({ maxSizeExceeded: true })
+        return;
+      }
+
+      this.loadingFile = true;
       this.s3FilesService.uploadImage(file).pipe(
         catchError((error: any) => {
           console.error({ error });
-
           this.messageService.showErrorMessage('Error al subir imagen');
+          this.loadingFile = false;
           return of(null);
         })
       ).subscribe((response: any) => {
@@ -341,10 +342,20 @@ export class MyProfileComponent implements OnInit {
             .subscribe((data) => {
               this.user.imagen = data.usuario.imagen;
               this.messageService.showSuccessMessage('Imagen actualizada')
+
+              // Emitir el evento con la imagen al navbar
+              this.imageEventService.emitImageUpdate(file);
+
             });
+          this.loadingFile = false;
         }
       });
     }
+  }
+
+  public campoInvalido(field: string, arrayForm: string) {
+    return this.userForm.get(arrayForm)?.get(field)?.errors
+      && this.userForm.get(arrayForm)?.get(field)?.touched;
   }
 
   public onRegionChange(event: Event, formControlName: string) {
@@ -360,10 +371,5 @@ export class MyProfileComponent implements OnInit {
     } else {
       this.selectedRegionCommunes = [];
     }
-  }
-
-  public campoInvalido(field: string, arrayForm: string) {
-    return this.userForm.get(arrayForm)?.get(field)?.errors
-      && this.userForm.get(arrayForm)?.get(field)?.touched;
   }
 }
