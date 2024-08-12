@@ -23,7 +23,7 @@ import { TermsAndConditionsComponent } from '../../components/terms-and-conditio
 export class RegisterComponent implements OnInit {
 
   private emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
-  public formulario: FormGroup;
+  public formulario!: FormGroup;
 
   public regionesEmpresa: any;
   public regionesPropietario: any;
@@ -41,6 +41,7 @@ export class RegisterComponent implements OnInit {
 
   closeResult = '';
   imagePreview: string | null = null;
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -56,13 +57,13 @@ export class RegisterComponent implements OnInit {
   ) {
     this.regionesEmpresa = this.regionesComunas.getRegions();
     this.regionesPropietario = this.regionesComunas.getRegions();
-    this.formulario = this.buildForm();
-
-    /* Debug - set mock of new user */
-    this.setUser();
   }
 
   ngOnInit(): void {
+    this.formulario = this.buildForm();
+
+    /* Debug - set mock of new user */
+    // this.setUser();
   }
 
   private buildForm(): FormGroup {
@@ -149,7 +150,6 @@ export class RegisterComponent implements OnInit {
   }
 
   public sendForm() {
-    console.log('sendForm()');
     if (this.step !== 4) {
       return;
     }
@@ -168,6 +168,7 @@ export class RegisterComponent implements OnInit {
 
     this.bar += 25;
 
+    this.isLoading = true;
     const nuevoUsuario = {
       nombreUsuario: infoPropietario?.get('nombre')?.value,
       apellidos: infoPropietario?.get('apellidos')?.value,
@@ -191,7 +192,6 @@ export class RegisterComponent implements OnInit {
       descripcionEmpresa: infoLocalidadEmpresa?.get('descripcionEmpresa')?.value,
     };
 
-    // console.log({ nuevoUsuario });
     const imageFile = this.selectedFile;
 
     if (imageFile) {
@@ -199,7 +199,6 @@ export class RegisterComponent implements OnInit {
         .uploadImage(imageFile)
         .pipe(
           concatMap((imagePath) => {
-            console.log({imagePath});
             nuevoUsuario.imagen = imagePath.filePath;
             return this.authService.registerUser(nuevoUsuario).pipe(
               catchError((error) => {
@@ -221,6 +220,7 @@ export class RegisterComponent implements OnInit {
           });
 
           this.router.navigate([ok ? '/visitor/login' : '/visitor/']);
+          this.isLoading = false;
         });
     } else {
       // Si no hay imagen para subir, registramos al usuario sin esperar la subida de la imagen
@@ -236,6 +236,7 @@ export class RegisterComponent implements OnInit {
         });
 
         this.router.navigate([ok ? '/visitor/login' : '/visitor/']);
+        this.isLoading = false;
       });
     }
   }
