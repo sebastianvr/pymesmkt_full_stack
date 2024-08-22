@@ -28,7 +28,6 @@ services:
       - ./backend:/api
     networks:
       - red_privada
-      - red_proxy
     command:  npm run dev
 
   web:
@@ -42,13 +41,10 @@ services:
       - ./frontend:/web
     networks:
       - red_privada
-      - red_proxy
 
 volumes:
   data:
 
 networks:
-  red_proxy:
-    driver: bridge
   red_privada:
     driver: bridge

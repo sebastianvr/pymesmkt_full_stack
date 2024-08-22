@@ -51,7 +51,7 @@ export class ModalArchivingComponent implements OnInit {
   }
 
   private setExampleMessage(): void {
-    const exampleMessage = 'Nos complace informar que el reclamo presentado ha sido resuelto de manera satisfactoria. Ambas partes han acordado los términos de la solución, asegurando que todas las preocupaciones fueron atendidas. Agradecemos a ambas pymes por su cooperación y disposición para llegar a un acuerdo amistoso';
+    const exampleMessage = 'El reclamo presentado ha sido resuelto de manera satisfactoria. Ambas partes han acordado los términos de la solución, asegurando que todas las preocupaciones fueron atendidas.';
     this.reportForm.get('mensaje')?.setValue(exampleMessage);
   }
 

@@ -7,29 +7,43 @@ Este proyecto cuenta con tres perfiles de usuarios diferentes:
   1. **Visualización y búsqueda de publicaciones**:  
       [![Visualización y búsqueda](https://img.youtube.com/vi/-bSTxQ5WlcA/maxresdefault.jpg)](https://www.youtube.com/watch?v=-bSTxQ5WlcA)
 
-  2. **Registro de un nuevo usuario**: El usuario visitante puede registrarse en la plataforma para obtener acceso a funcionalidades adicionales como usuario Pyme.  
+  2. **Registro y login un nuevo usuario**: El usuario visitante puede registrarse en la plataforma para obtener acceso a funcionalidades adicionales como usuario Pyme.  
       [![Registro de usuario](https://img.youtube.com/vi/4wyy5c12e34/maxresdefault.jpg)](https://www.youtube.com/watch?v=4wyy5c12e34)
 
-**Usuario Pyme**: Una vez registrado, el usuario tiene acceso a las siguientes funcionalidades adicionales:
+**Usuario Pyme**: Una vez registrado, el usuario tiene acceso a las siguientes funcionalidades:
 
-  1. **Creación de publicaciones**: El usuario puede crear publicaciones para buscar nuevos productos o servicios.
-    [![Creacin de publicaciones](https://img.youtube.com/vi/eK0q5APUQ_E/maxresdefault.jpg)](https://www.youtube.com/watch?v=eK0q5APUQ_E)
+  1. **Creación de Publicaciones**: La pyme puede crear publicaciones, cada una de las cuales representa una necesidad que desea resolver, ya sea la compra de un servicio o un producto(s). Para crear una publicación, el usuario debe completar el formulario de creación de publicaciones.
+    [![Creación de publicaciones](https://img.youtube.com/vi/eK0q5APUQ_E/maxresdefault.jpg)](https://www.youtube.com/watch?v=eK0q5APUQ_E)
 
-  2. **Búsqueda de ofertas y seguimiento de las mismas**: El usuario puede buscar ofertas y realizar un seguimiento de ellas.
-  3. **Compra de ofertas**: El usuario puede comprar una oferta y proceder a la pasarela de pagos de Transbank.
-  4. **Revisión de pagos y calificación**: Después de completar un pago, el usuario puede revisar la transacción y calificar al proveedor del producto o servicio.
-  5. **Creación de reclamos**: Si hay problemas con productos o servicios, el usuario puede enviar un reclamo.
+  2. **Creación de ofertas**: El usuario pyme tiene la posibilidad de crear nuevas ofertas siguiendo un proceso sencillo. Primero, debe identificar una publicación que contenga una necesidad que desea resolver. Una vez seleccionada la publicación, se procede a completar los campos requeridos en el formulario de creación de ofertas.
+  Después de crear la oferta, esta se almacenará en la sección "Ofertas creadas", accesible desde el menú de navegación. Aquí, el usuario podrá revisar y gestionar todas las ofertas que ha generado.
+    [![Creación de ofertas](https://img.youtube.com/vi/Ez199z9-69k/maxresdefault.jpg)](https://www.youtube.com/watch?v=Ez199z9-69k)
+
+  3. **Compra de ofertas**: El usuario tiene la opción de comprar una oferta y proceder a la pasarela de pagos proporcionada por Transbank. Esta funcionalidad se implementa utilizando la API de Transbank, configurada para pruebas en un **entorno de desarrollo**.
+    [![Realizar compra](https://img.youtube.com/vi/XmB8Ap0MdBE/maxresdefault.jpg)](https://www.youtube.com/watch?v=XmB8Ap0MdBE)
+
+  4. **Calificación de compra**: Una vez completado el pago, el usuario puede calificar su compra accediendo a su historial de ventas y seleccionando la transacción correspondiente.
+   [![Calificar usuario](https://img.youtube.com/vi/g_ZHBLBApTI/maxresdefault.jpg)](https://www.youtube.com/watch?v=g_ZHBLBApTI)
+
+  5. **Creación de reclamos**: Si el usuario experimenta problemas con productos o servicios adquiridos, puede enviar un reclamo para que sea revisado por el administrador del sitio web.
+   [![Crear reclamo](https://img.youtube.com/vi/mFlaNl8xvsg/maxresdefault.jpg)](https://www.youtube.com/watch?v=mFlaNl8xvsg)
 
 **Usuario Administrador**: Este perfil tiene un acceso más amplio con las siguientes funcionalidades:
 
-  1. **Visualización de relaciones entre PYMEs**: El administrador puede ver un grafo que muestra las conexiones entre diferentes PYMEs.
-  2. **Gestión de usuarios Pyme**:
-        - Búsqueda y suspensión de usuarios.
-        - Búsqueda y eliminación de usuarios.
-  3. **Gestión de reclamos**:
-        - Búsqueda y visualización de detalles de reclamos.
-        - Archivado de reclamos.
-  4. **Simulación**: El administrador puede simular la creación de usuarios Pyme o administradores, así como la cantidad de publicaciones, ofertas, compras, ventas y reclamos.
+  1. **Login de acceso**: El administrador debe iniciar sesión a través de un acceso específico.
+    [![Login admin](https://img.youtube.com/vi/-KREIgHo590/maxresdefault.jpg)](https://www.youtube.com/watch?v=-KREIgHo590)
+
+  2. **Grafo de relaciones entre PYMEs**: El administrador puede visualizar un grafo que representa las conexiones entre distintas PYMEs, basado en las transacciones de compra y venta realizadas.
+      [![Grafo](https://img.youtube.com/vi/dlNd_IM9va8/maxresdefault.jpg)](https://www.youtube.com/watch?v=dlNd_IM9va8)
+
+  3. **Gestión de usuarios Pyme**: El administrador cuenta con funciones para buscar, suspender, y eliminar usuarios PyME accediendo a través del menú desplegable.
+      [![Gestión usuarios](https://img.youtube.com/vi/rMyvuWHWOhw/maxresdefault.jpg)](https://www.youtube.com/watch?v=rMyvuWHWOhw)
+
+  4. **Gestión de reclamos**: El administrador puede buscar y visualizar los detalles de los reclamos. Una vez resueltos, tiene la función de archivar el reclamo, trasladándolo a la sección de reclamos revisados.
+      [![Gestión reclamos](https://img.youtube.com/vi/yLCcDUswtrw/maxresdefault.jpg)](https://www.youtube.com/watch?v=yLCcDUswtrw)
+
+  5. **Simulación**: El administrador puede simular la creación de usuarios Pyme o administradores, así como la cantidad de publicaciones, ofertas, compras, ventas y reclamos.
+    [![Simulación](https://img.youtube.com/vi/PxiDCCWVXvY/maxresdefault.jpg)](https://www.youtube.com/watch?v=PxiDCCWVXvY)
 
 ---
 

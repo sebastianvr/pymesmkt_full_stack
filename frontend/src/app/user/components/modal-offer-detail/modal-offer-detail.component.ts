@@ -25,7 +25,7 @@ export class ModalOfferDetailComponent implements OnInit {
   public selectedFile: File | null = null;
   uploadedFiles: File[] = [];
 
-  maxMessageCharacters = 300;
+  maxMessageCharacters = 600;
   remainingMessageCharacters!: number;
 
   currentRoute!: any;
@@ -69,8 +69,11 @@ export class ModalOfferDetailComponent implements OnInit {
 
   private createMockOffer() {
     const mockData = {
-      mensaje: 'En PcBuildFactory, entendemos la importancia de contar con equipos de alto rendimiento para las necesidades de una empresa de desarrollo de software. Por eso, hemos preparado una oferta especial para proporcionarte las laptops HP que necesitas con las características específicas que mencionaste.',
-      precioOferta: 3100500,
+      mensaje: 'En Pastelería el Molino, entendemos la importancia de contar con ingredientes de la más alta calidad para la elaboración de tartas artesanales excepcionales.\n' +
+        'Por eso, hemos preparado una oferta especial para suministrar los ingredientes que necesitas.\n' +
+        'Ofrecemos harina de trigo orgánica, azúcar moreno, mantequilla sin sal, cacao en polvo y chocolate belga semiamargo, todos seleccionados cuidadosamente para garantizar el mejor sabor y calidad en tus productos.\n' +
+        'Adjunto presupuesto y trabajos anteriores.',
+      precioOferta: 550000,
       archivo: null
     };
     this.offerForm.setValue(mockData);
