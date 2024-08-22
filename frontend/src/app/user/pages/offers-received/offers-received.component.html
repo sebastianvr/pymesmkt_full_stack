@@ -104,8 +104,8 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row mx-1">
-                                        <h3 class="fs-5 mt-3">
-                                            {{oferta.publicacion.titulo | uppercase}}
+                                        <h3 class="fs-5 mt-3 card-title">
+                                            <a class="card-link">{{oferta.publicacion.titulo | uppercase}}</a>
                                             <a pTooltip="Ir a mi publicación" class="float-end"
                                                 [routerLink]="['/user/publication-detail/', oferta.publicacion.id]">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"

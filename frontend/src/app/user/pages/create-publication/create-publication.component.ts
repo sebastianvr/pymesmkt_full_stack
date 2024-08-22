@@ -25,7 +25,7 @@ export class CreatePublicationComponent implements OnInit {
   isOpLoading!: boolean;
 
   maxTitleCharacters = 100;
-  maxDescriptionCharacters = 400;
+  maxDescriptionCharacters = 500;
   remainingTitleCharacters!: number;
   remainingDescriptionCharacters!: number;
 
@@ -66,8 +66,8 @@ export class CreatePublicationComponent implements OnInit {
       cantidad: [1, Validators.required],
       precioPorUnidad: [],
       totalPrecio: [, Validators.required],
-      color: ['', [Validators.maxLength(20)]],
-      modelo: ['', [Validators.maxLength(30)]],
+      color: ['', [Validators.maxLength(50)]],
+      modelo: ['', [Validators.maxLength(50)]],
       fechaInicio: [, Validators.required],
       fechaTermino: [, Validators.required],
       horasATrabajar: [,],
@@ -167,32 +167,29 @@ export class CreatePublicationComponent implements OnInit {
 
   private setProductoExampleValues() {
     this.publicationForm.patchValue({
-      titulo: 'Compra de Laptop Dell XPS 15',
-      descripcion: 'La empresa XYZ está en la búsqueda de laptops de alta gama para mejorar la eficiencia y el rendimiento de su equipo de desarrollo. Necesitan adquirir una Dell XPS 15, una computadora portátil de última generación conocida por su excelente combinación de potencia, portabilidad y diseño elegante. La Dell XPS 15 es ideal para desarrolladores que requieren una máquina robusta y confiable.',
+      titulo: 'Compra de Pasteles Personalizados para Eventos Corporativos',
+      descripcion: 'Eventos Corporativos XYZ busca adquirir una selección de pasteles personalizados para sus eventos de fin de año. Estos pasteles deben ser de alta calidad, elaborados con ingredientes frescos y diseñados según las temáticas específicas de cada evento. La empresa requiere un total de 10 pasteles grandes, con opciones de decoración especial y la posibilidad de adaptaciones dietéticas como sin gluten o sin lactosa.',
       productoOServicio: 'Producto',
-      cantidad: 5,
-      precioPorUnidad: 3033990,
-      totalPrecio: 3033990 * 5,
-      modelo: 'XPS 15 9500',
-      color: 'Plata',
-      garantia: true,
-      aniosGarantia: 2,
-      UsuarioId: 'cb8bcb308b7ccf1',
+      cantidad: 8,
+      precioPorUnidad: 77340,
+      totalPrecio: 77340 * 8,
+      modelo: 'Pastel dos pisos XXL',
+      color: 'Variedad de Colores según la Temática',
+      garantia: false,
     });
   }
 
   private setServicioExampleValues() {
     this.publicationForm.patchValue({
-      titulo: 'Implementación de Estrategias de Sostenibilidad Ambiental para Empresas Tecnológicas',
-      descripcion: 'La empresa XYZ, un líder innovador en el sector tecnológico, busca un servicio de consultoría especializada en sostenibilidad ambiental. Este proyecto incluye una evaluación exhaustiva del impacto ambiental actual, el desarrollo de estrategias personalizadas para reducir el consumo energético y gestionar residuos, la implementación de tecnologías verdes, y la capacitación del personal.',
+      titulo: 'Servicio de Repostería Personalizada para Eventos Corporativos de Fin de Año',
+      descripcion: 'Eventos Corporativos XYZ busca una pastelería experta para la creación y entrega de postres personalizados en sus eventos de fin de año. Este servicio incluye la elaboración de pasteles temáticos, postres gourmet, y opciones personalizadas según las preferencias dietéticas de los asistentes. Se espera una alta calidad en la presentación y un compromiso con la entrega puntual para cada uno de los eventos programados.',
       productoOServicio: 'Servicio',
-      totalPrecio: 75000,
-      fechaInicio: '2024-09-01',
-      fechaTermino: '2025-02-28',
-      horasATrabajar: 300,
-      garantia: false,
-      aniosGarantia: null,
-      UsuarioId: 'cb8bcb308b7ccf1',
+      totalPrecio: 15000,
+      fechaInicio: '2024-11-01',
+      fechaTermino: '2024-12-31',
+      horasATrabajar: 150,
+      garantia: true,
+      aniosGarantia: 1,
     });
   }
 

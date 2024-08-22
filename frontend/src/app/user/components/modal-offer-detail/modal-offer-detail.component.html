@@ -44,11 +44,11 @@
                 <!-- Subir archivos -->
                 <div class="col-lg-12 mb-3">
                     <div class="my-3 col-md-12">
-                        <label for="files[]" class="mb-2 ">Adjuntar archivos (máximo 2 archivos, máximo 15
+                        <label for="files[]" class="mb-2 ">Adjuntar archivos (máximo 3 archivos, máximo 15
                             MB total)</label>
                         <p-fileUpload mode="advanced" name="files[]" [showCancelButton]="false"
                             [showUploadButton]="false" (onSelect)="onUpload($event)" [multiple]="true"
-                            accept=".jpg,.jpeg,.png,.pdf,.zip" [maxFileSize]="15000000" [fileLimit]="2">
+                            accept=".jpg,.jpeg,.png,.pdf,.zip,.xlsx,.csv" [maxFileSize]="15000000" [fileLimit]="3">
                         </p-fileUpload>
                     </div>
                 </div>

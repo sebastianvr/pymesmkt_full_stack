@@ -17,17 +17,22 @@
 
             <ng-template #divPublicacion>
                 <div class="col-md-12 mt-3">
-                    <div class="row">
-                        <p class="text-center float-end alert py-1 mb-0" [ngClass]="{
-                          'alert-success': publication.procesoDePublicacion.toLowerCase() === 'iniciada',
-                          'alert-primary': publication.procesoDePublicacion.toLowerCase() === 'finalizada'
-                        }">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="alert alert-success d-inline-block mb-0 px-2 py-1" role="alert"
+                            ngbTooltip="ID de la publicación">
+                            {{publication.id}}
+                        </h6>
+                        <p class="alert py-1 mb-0" [ngClass]="{
+                              'alert-primary': publication.procesoDePublicacion.toLowerCase() === 'iniciada',
+                              'alert-warning': publication.procesoDePublicacion.toLowerCase() === 'finalizada'
+                            }">
                             <strong>Publicación {{ publication.procesoDePublicacion | lowercase }}</strong>
                         </p>
                     </div>
 
+
                     <div class="container mt-3">
-                        <h3>{{publication.titulo | uppercase }}</h3>
+                        <h3 class="card-title"><a class="card-link">{{publication.titulo | uppercase }}</a></h3>
                         <p class="descriptionCard">{{publication.descripcion}}</p>
 
                         <table class="table table-hover">
@@ -79,10 +84,10 @@
                             <div class="container">
                                 <div class="row justify-content-center">
                                     <div class="col-md-4 col-sm-12 text-center">
-                                        <h3 class="fs-6 mb-3"><strong>Archivos adjuntos</strong></h3>
-                                        <img class="d-block mx-auto mb-2" width="50"
+                                        <h3 class="fs-6"><strong>Archivos adjuntos</strong></h3>
+                                        <img class="d-block mx-auto mb-1" width="50"
                                             src="../../../../assets/icons/file-zip.svg" alt="file-zip.svg">
-                                        <button class="btn btn-success btn-sm my-2" type="button"
+                                        <button class="btn btn-success btn-sm" type="button"
                                             (click)="downloadFile(publication.archivoAdjunto)">Descargar</button>
                                         <a #downloadLink style="display: none;"></a>
                                     </div>
@@ -90,11 +95,10 @@
                             </div>
                         </ng-container>
                     </div>
-                    <hr>
 
                     <ng-container
                         *ngIf="this.idCurrentUser === publication.UsuarioId && publication.procesoDePublicacion.toLowerCase() !== 'finalizada'">
-                        <div class="row my-4">
+                        <div class="row">
                             <div class="col-6 my-1 d-flex justify-content-start">
                                 <button (click)="deletePublication()" class="btn btn-danger">
                                     Eliminar
@@ -115,8 +119,8 @@
 
                     <ng-container
                         *ngIf="this.idCurrentUser !== publication.UsuarioId && publication.procesoDePublicacion.toLowerCase() !== 'finalizada'">
-                        <div class="row my-4">
-                            <div class="col-12 my-1 d-flex justify-content-center">
+                        <div class="row">
+                            <div class="col-12 my-1 d-flex justify-content-end">
                                 <button type="button" class="btn btn-primary float-end"
                                     (click)="openOffer(publication)">
                                     Ofertar

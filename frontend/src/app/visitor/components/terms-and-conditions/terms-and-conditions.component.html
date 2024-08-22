@@ -1,30 +1,34 @@
 <div class="modal-header">
-    <h4 class="modal-title text-center">Términos y Condiciones</h4>
-    <img src="../../../../assets/icons/terms-icon.svg" alt="terms-icon.svg" class="img-fluid">
+    <img src="../../../../assets/icons/terms-icon.svg" alt="terms-icon.svg float-start" class="img-fluid">
+    <h4 class="modal-title mx-auto">Términos y condiciones</h4>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss('Cross click')"></button>
 </div>
 <div class="modal-body">
     <div class="container">
-        <div class="col-md-12 text-center">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Qui necessitatibus dolorum recusandae, non ex
+        <div class="col-md-12 text-start">
+            <p class="alert alert-secondary">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Qui
+                necessitatibus dolorum recusandae, non ex
                 laborum earum quod. Amet expedita quia facere quasi repudiandae quis nisi quos quae, saepe illum
                 corrupti
                 assumenda quidem nobis perspiciatis doloribus! Iure magnam sapiente culpa, distinctio at omnis quos
                 blanditiis, perferendis doloremque ad fuga nisi aut!
             </p>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Qui necessitatibus dolorum recusandae, non ex
+            <p class="alert alert-secondary">Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+            <p class="alert alert-info">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Qui necessitatibus
+                dolorum recusandae, non ex
                 laborum earum quod. Amet expedita quia facere quasi repudiandae quis nisi quos quae, saepe illum
                 corrupti
                 assumenda quidem nobis perspiciatis doloribus! Iure magnam sapiente culpa, distinctio at omnis quos
                 blanditiis, perferendis doloremque ad fuga nisi aut!
             </p>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Qui necessitatibus dolorum recusandae, non ex
+            <p class="alert alert-secondary">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Qui
+                necessitatibus dolorum recusandae, non ex
                 laborum earum quod. Amet expedita quia facere quasi repudiandae quis nisi quos quae, saepe illum
                 corrupti
                 assumenda quidem nobis perspiciatis doloribus! Iure magnam sapiente culpa, distinctio at omnis quos
                 blanditiis, perferendis doloremque ad fuga nisi aut!
             </p>
-            <p>
+            <p class="alert alert-warning">
                 <strong>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quam blanditiis deserunt magni nemo
                     eaque culpa
                     assumenda esse ipsum praesentium id?
@@ -34,5 +38,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-danger" (click)="closeModal()">Cerrar</button>
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
 </div>

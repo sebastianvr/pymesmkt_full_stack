@@ -7,11 +7,40 @@
     display: inline-block;
     padding: 6px 12px;
     cursor: pointer;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
+    background-color: #0d6efd;
+    border: 1px solid #0b5ed7;
+    color: white;
     border-radius: 4px;
 }
 
 .custom-file-upload input[type="file"] {
     display: none;
 }
+
+.image-container {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    overflow: hidden; /* Oculta cualquier parte de la imagen que sobresalga del contenedor */
+    border: 5px solid black;
+  }
+  
+  .imgProfile {
+    width: 100%; /* Asegura que la imagen ocupe el 100% del contenedor */
+    height: 100%; /* Asegura que la imagen ocupe el 100% del contenedor */
+    object-fit: cover; /* Mantiene las proporciones de la imagen y la ajusta al contenedor */
+  }
+  
+  @media (max-width: 992px) {
+    .image-container {
+      width: 150px;
+      height: 150px;
+    }
+    .imgProfile {
+      width: 100%;
+      height: 100%;
+    }
+  }

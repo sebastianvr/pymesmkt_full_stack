@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { switchMap } from 'rxjs';
@@ -15,21 +15,18 @@ import { AuthService } from '../../../core/services/auth/auth.service';
   templateUrl: './offer-detail.component.html',
   styleUrls: ['./offer-detail.component.css']
 })
-export class OfferDetailComponent implements OnInit, OnDestroy {
+export class OfferDetailComponent implements OnInit {
 
   garantiaMapa = {
     'true': 'Si',
     'false': 'No'
-  }
+  };
 
+  idUser!: string;
   oferta: any
-  transactionButton: any = {}
-  compra: any = {}
-
-  pago: any = {}
-
-  // id del usuario que va a comprar
-  id : string = ''
+  transactionButton: any = {};
+  compra: any = {};
+  pago: any = {};
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -42,7 +39,7 @@ export class OfferDetailComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.id = this.authService.usuario.id
+    this.idUser = this.authService.usuario.id;
 
     this.activatedRoute.params
       .pipe(
@@ -50,16 +47,13 @@ export class OfferDetailComponent implements OnInit, OnDestroy {
           this.ofertaService.getOfertaById(id)
             .pipe(
               tap(({ oferta }) => {
-                // console.log('tap res: ', oferta)
                 this.pago = {
                   amount: oferta.precioOferta,
                   returnUrl: location.href.toString()
-                }
+                };
 
                 this.pagoService.getTransaccion(this.pago).subscribe((res2) => {
-                  // console.log('res2 ', res2)
-                  this.transactionButton = res2
-                  // console.log(this.transactionButton)
+                  this.transactionButton = res2;
                 })
               })
             )
@@ -67,9 +61,8 @@ export class OfferDetailComponent implements OnInit, OnDestroy {
 
       )
       .subscribe((res) => {
-        this.oferta = res.oferta
-        console.log('this.oferta : ', this.oferta)
-      })
+        this.oferta = res.oferta;
+      });
 
     this.activatedRoute.queryParams.
       subscribe(({ token_ws, TBK_TOKEN, TBK_ORDEN_COMPRA, TBK_ID_SESION }) => {
@@ -80,9 +73,8 @@ export class OfferDetailComponent implements OnInit, OnDestroy {
          * tab de Chrome y luego lo recuperas) Llegará token_ws, TBK_TOKEN, TBK_ID_SESION, TBK_ORDEN_COMPRA.
          */
         if (token_ws && TBK_TOKEN && TBK_ID_SESION && TBK_ORDEN_COMPRA) {
-          return console.log('Algo extraño pasó')
+          return console.log('Algo extraño pasó');
         }
-
 
         /**
         * Pago abortado (con botón anular compra en el formulario de Webpay):
@@ -90,9 +82,8 @@ export class OfferDetailComponent implements OnInit, OnDestroy {
         * contiene el token de la transacción), TBK_ID_SESION, TBK_ORDEN_COMPRA
         */
         if (TBK_TOKEN && TBK_ID_SESION && TBK_ORDEN_COMPRA) {
-          return console.log('Pago abortado')
+          return console.log('Pago abortado');
         }
-
 
         /**
          * Timeout (más de 10 minutos en el formulario de Transbank): Llegará 
@@ -101,7 +92,7 @@ export class OfferDetailComponent implements OnInit, OnDestroy {
          * No llegará token.
          */
         if (TBK_ID_SESION && TBK_ORDEN_COMPRA) {
-          return console.log('TIME OUT')
+          return console.log('TIME OUT');
         }
 
         /**
@@ -109,41 +100,36 @@ export class OfferDetailComponent implements OnInit, OnDestroy {
         * un rechazo o una aprobación) llegará solamente token_ws.
         */
         if (token_ws) {
-          // console.log('token_ws :',token_ws)
           return this.pagoService.getCommitPago(token_ws).subscribe(({ viewData }) => {
-            console.log(viewData)
             if (viewData.commitResponse.details[0].status === 'AUTHORIZED') {
-              // cambiar publicacion a FINALIZADA
+              // Cambiar publicacion a FINALIZADA
               this.publicacionService.aceptarPublicacion(this.oferta.PublicacionId).subscribe((res) => {
                 console.log('aceptarPublicacion', res)
-              })
+              });
 
-              // cambiar proceso de oferta a FINALIZADA
+              // Cambiar proceso de oferta a FINALIZADA
               this.ofertaService.aceptaOferta(this.oferta.id).subscribe((res) => {
-                console.log('aceptaOferta', res)
+                console.log('aceptaOferta', res);
               })
 
-              // crear nueva compra en la tabla compras
+              // Crear nueva compra en la tabla compras
               this.compra = {
                 precio: viewData.commitResponse.details[0].amount,
                 codAutorizacion: viewData.commitResponse.details[0].authorization_code,
                 PublicacionId: this.oferta.PublicacionId,
-                UsuarioId: this.id,
+                UsuarioId: this.idUser,
                 OfertumId: this.oferta.id
 
               }
-              // console.log(this.compra)
 
-              // hacer peticion post con la compra creada
+              // Hacer peticion post con la compra creada
               this.compraService.postCompra(this.compra)
-               
                 .subscribe((data) => {
-                  console.log('postCompra', data)
+                  console.log('postCompra', data);
                   if (!data) {
-                    console.log('data existe')
+                    console.log('data existe');
                   }
-
-                })
+                });
 
               // Mostrar pago aceptado
               Swal.fire({
@@ -173,18 +159,12 @@ export class OfferDetailComponent implements OnInit, OnDestroy {
                   confirmButton: 'btn btn-primary px-4',
                 },
                 buttonsStyling: false
-              })
+              });
               this.router.navigate(['/user/offers-received'])
             }
-          })
+
+          });
         }
-      })
-
-
+      });
   }
-
-  ngOnDestroy(): void {
-
-  }
-
 }

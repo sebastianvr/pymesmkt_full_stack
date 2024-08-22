@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalDismissReasons, NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-terms-and-conditions',
@@ -8,14 +8,14 @@ import { ModalDismissReasons, NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-
 })
 export class TermsAndConditionsComponent implements OnInit {
 
+  constructor(
+    public activeModal: NgbActiveModal,
+  ) { }
+
   ngOnInit(): void {
   }
 
-  constructor(
-    public activeModal: NgbActiveModal
-  ) { }
-
   closeModal() {
-    this.activeModal.close('Close button clicked');
+    this.activeModal.close(1);
   }
 }
