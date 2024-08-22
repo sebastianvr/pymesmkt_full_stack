@@ -17,13 +17,16 @@
             </div>
 
             <ng-template #divOfertas>
-                <div class="card text-bg-light mb-3 containerPublicacion">
+                <div class="card text-bg-light mb-3">
                     <div class="card-header">
-                        <span class="float-end text-muted"> {{oferta.Publicacion.createdAt | date : 'dd MMMM yyyy' : '+0000'}}</span>
+                        <span class="float-end text-muted"> {{oferta.Publicacion.createdAt | date : 'dd MMMM yyyy' :
+                            '+0000'}}</span>
                     </div>
                     <div class="card-body">
-                        <div class="container mt-3">
-                            <h3 class="text-center">{{oferta.Publicacion.titulo | uppercase }}</h3>
+                        <div class="container">
+                            <h6 class="text-muted fst-italic"> Mi publicación: </h6>
+                            <h3 class="text-start card-title"><a class="card-link">{{oferta.Publicacion.titulo |
+                                    uppercase }}</a></h3>
                             <p class="descriptionCard">{{oferta.Publicacion.descripcion}}</p>
 
                             <table class="table">
@@ -46,11 +49,13 @@
                                     </tr>
                                     <tr *ngIf="oferta.Publicacion.fechaInicioServicio">
                                         <td>Fecha inicio del servicio</td>
-                                        <td>{{oferta.Publicacion.fechaInicioServicio | date : 'dd MMMM yyyy' : '+0000'}}</td>
+                                        <td>{{oferta.Publicacion.fechaInicioServicio | date : 'dd MMMM yyyy' : '+0000'}}
+                                        </td>
                                     </tr>
                                     <tr *ngIf="oferta.Publicacion.fechaFinServicio">
                                         <td>Fecha finalización del servicio </td>
-                                        <td>{{oferta.Publicacion.fechaFinServicio | date : 'dd MMMM yyyy' : '+0000'}}</td>
+                                        <td>{{oferta.Publicacion.fechaFinServicio | date : 'dd MMMM yyyy' : '+0000'}}
+                                        </td>
                                     </tr>
                                     <tr *ngIf="oferta.Publicacion.horasATrabajar">
                                         <td>Cantidad de horas a trabajar </td>
@@ -68,36 +73,39 @@
                             </table>
                         </div>
 
-                        <hr>
-
                         <div class="container">
-                            <div class="row my-2">
-                                <div class="col-12">
-                                    <span class="text mb-3"> Mensaje de {{oferta.Usuario.nombreUsuario | titlecase}}
-                                        {{oferta.Usuario.apellidos | titlecase}} : </span>
-                                    <br>
-                                    <p>{{oferta.mensaje}}</p>
-                                </div>
-                                <div class="col-12 text-center">
-                                    <span class="text fs-2 mb-3">Precio de oferta</span>
-                                    <h5 class="fs-1">{{oferta.precioOferta | currency : 'CLP'}}</h5>
+                            <div class="row my-2 ">
+                                <div class="col-12 mt-3">
+                                    <h6 class="text-muted fst-italic mb-3"> Mensaje de {{oferta.Usuario.nombreUsuario |
+                                        titlecase}}
+                                        {{oferta.Usuario.apellidos | titlecase}} : </h6>
+                                    <p class="mb-0">{{oferta.mensaje}}</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <hr>
+                    <div class="card-footer">
+                        <div class="row my-2 mx-3">
+                            <div class="d-flex flex-column flex-md-row justify-content-between 
+                            align-items-center text-center w-100">
+                                <div class="alert alert-primary mb-sm-3 mb-md-0">
+                                    <span class="fs-2 mb-3">Total a pagar</span>
+                                    <h5 class="fs-2 mb-0">{{ oferta.precioOferta | currency : 'CLP' }}</h5>
+                                </div>
 
-                        <div class="container">
-                            <div class="row my-2">
-                                <div class="col-12 text-center">
-                                    <img src="../../../../assets/icons/webpayNegro.png" class=" ml-3" height="50px"
-                                        alt="webpay logo">
+                                <div class="d-flex flex-column justify-content-center align-items-center">
+                                    <div class="text-center mb-md-1">
+                                        <img src="../../../../assets/icons/webpayNegro.png" height="50px"
+                                            alt="webpay logo">
+                                    </div>
+                                    <form [action]="transactionButton.url" method="POST"
+                                        class="text-center mt-1 mt-md-0">
+                                        <input type="hidden" name="token_ws" [value]="transactionButton.token" />
+                                        <input class="btn btn-success rounded" type="submit" value="Pagar" />
+                                    </form>
                                 </div>
                             </div>
-                            <form [action]="transactionButton.url" method="POST" class="text-center">
-                                <input type="hidden" name="token_ws" [value]="transactionButton.token"/>
-                                <input class="btn btn-pagar btn-success text-center" type="submit" value="Pagar"/>
-                            </form>
                         </div>
                     </div>
                 </div>
