@@ -1,7 +1,5 @@
-import { CompilerConfig } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { columnsGap } from 'ngx-bootstrap-icons';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { catchError, of } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { S3FilesService } from 'src/app/core/services/files/s3-files.service';

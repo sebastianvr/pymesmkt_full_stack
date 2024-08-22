@@ -77,8 +77,8 @@ export class ReportProblemFormComponent {
 
   private setFormReportExample() {
     return this.reportForm.reset({
-      titulo: 'Problemas con la compra de computadoras',
-      descripcion: 'He adquirido recientemente un conjunto de computadoras de su tienda, pero desafortunadamente he encontrado varios problemas con los productos recibidos. El primer problema es que una de las computadoras no enciende, a pesar de seguir todas las instrucciones del manual. Además, he notado que la pantalla de otra computadora tiene varios píxeles muertos, lo cual afecta considerablemente su usabilidad.\n\nAdicionalmente, algunas de las especificaciones mencionadas en la página del producto no coinciden con las características reales de las computadoras recibidas. Por ejemplo, se prometía un disco duro de 1TB, pero solo recibí 500GB. Este tipo de inconsistencias son muy preocupantes y espero que puedan ofrecer una solución adecuada a estos inconvenientes lo antes posible.',
+      titulo: 'Problemas con la compra de pasteles personalizados',
+      descripcion: 'Compré pasteles personalizados para un evento corporativo, pero varios no coincidieron con la temática acordada y dos presentaron daños en su estructura. Además, uno tenía un sabor extraño. Estos problemas generaron inconvenientes durante el evento, y espero una pronta solución. Adjunto imágenes y detalles.',
       archivos: null,
     });
   }
